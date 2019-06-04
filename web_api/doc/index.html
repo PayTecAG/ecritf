@@ -1,0 +1,1751 @@
+
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>PayTec Terminal Web API</title>
+
+    <style>
+      .highlight table td { padding: 5px; }
+.highlight table pre { margin: 0; }
+.highlight .gh {
+  color: #999999;
+}
+.highlight .sr {
+  color: #f6aa11;
+}
+.highlight .go {
+  color: #888888;
+}
+.highlight .gp {
+  color: #555555;
+}
+.highlight .gs {
+}
+.highlight .gu {
+  color: #aaaaaa;
+}
+.highlight .nb {
+  color: #f6aa11;
+}
+.highlight .cm {
+  color: #75715e;
+}
+.highlight .cp {
+  color: #75715e;
+}
+.highlight .c1 {
+  color: #75715e;
+}
+.highlight .cs {
+  color: #75715e;
+}
+.highlight .c, .highlight .cd {
+  color: #75715e;
+}
+.highlight .err {
+  color: #960050;
+}
+.highlight .gr {
+  color: #960050;
+}
+.highlight .gt {
+  color: #960050;
+}
+.highlight .gd {
+  color: #49483e;
+}
+.highlight .gi {
+  color: #49483e;
+}
+.highlight .ge {
+  color: #49483e;
+}
+.highlight .kc {
+  color: #66d9ef;
+}
+.highlight .kd {
+  color: #66d9ef;
+}
+.highlight .kr {
+  color: #66d9ef;
+}
+.highlight .no {
+  color: #66d9ef;
+}
+.highlight .kt {
+  color: #66d9ef;
+}
+.highlight .mf {
+  color: #ae81ff;
+}
+.highlight .mh {
+  color: #ae81ff;
+}
+.highlight .il {
+  color: #ae81ff;
+}
+.highlight .mi {
+  color: #ae81ff;
+}
+.highlight .mo {
+  color: #ae81ff;
+}
+.highlight .m, .highlight .mb, .highlight .mx {
+  color: #ae81ff;
+}
+.highlight .sc {
+  color: #ae81ff;
+}
+.highlight .se {
+  color: #ae81ff;
+}
+.highlight .ss {
+  color: #ae81ff;
+}
+.highlight .sd {
+  color: #e6db74;
+}
+.highlight .s2 {
+  color: #e6db74;
+}
+.highlight .sb {
+  color: #e6db74;
+}
+.highlight .sh {
+  color: #e6db74;
+}
+.highlight .si {
+  color: #e6db74;
+}
+.highlight .sx {
+  color: #e6db74;
+}
+.highlight .s1 {
+  color: #e6db74;
+}
+.highlight .s {
+  color: #e6db74;
+}
+.highlight .na {
+  color: #a6e22e;
+}
+.highlight .nc {
+  color: #a6e22e;
+}
+.highlight .nd {
+  color: #a6e22e;
+}
+.highlight .ne {
+  color: #a6e22e;
+}
+.highlight .nf {
+  color: #a6e22e;
+}
+.highlight .vc {
+  color: #ffffff;
+}
+.highlight .nn {
+  color: #ffffff;
+}
+.highlight .nl {
+  color: #ffffff;
+}
+.highlight .ni {
+  color: #ffffff;
+}
+.highlight .bp {
+  color: #ffffff;
+}
+.highlight .vg {
+  color: #ffffff;
+}
+.highlight .vi {
+  color: #ffffff;
+}
+.highlight .nv {
+  color: #ffffff;
+}
+.highlight .w {
+  color: #ffffff;
+}
+.highlight {
+  color: #ffffff;
+}
+.highlight .n, .highlight .py, .highlight .nx {
+  color: #ffffff;
+}
+.highlight .ow {
+  color: #f92672;
+}
+.highlight .nt {
+  color: #f92672;
+}
+.highlight .k, .highlight .kv {
+  color: #f92672;
+}
+.highlight .kn {
+  color: #f92672;
+}
+.highlight .kp {
+  color: #f92672;
+}
+.highlight .o {
+  color: #f92672;
+}
+    </style>
+    <link href="stylesheets/screen.css" rel="stylesheet" media="screen" />
+    <link href="stylesheets/print.css" rel="stylesheet" media="print" />
+      <script src="javascripts/all.js"></script>
+  </head>
+
+  <body class="index" data-languages="[&quot;javascript&quot;]">
+    <a href="#" id="nav-button">
+      <span>
+        NAV
+        <img src="images/navbar.png" alt="Navbar" />
+      </span>
+    </a>
+    <div class="toc-wrapper">
+      <img src="images/logo.png" class="logo" alt="Logo" />
+        <div class="lang-selector">
+              <a href="#" data-language-name="javascript">javascript</a>
+        </div>
+        <div class="search">
+          <input type="text" class="search" id="input-search" placeholder="Search">
+        </div>
+        <ul class="search-results"></ul>
+      <ul id="toc" class="toc-list-h1">
+          <li>
+            <a href="#getting-started" class="toc-h1 toc-link" data-title="Getting started">Getting started</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#about" class="toc-h2 toc-link" data-title="About">About</a>
+                  </li>
+                  <li>
+                    <a href="#prerequisites" class="toc-h2 toc-link" data-title="Prerequisites">Prerequisites</a>
+                  </li>
+                  <li>
+                    <a href="#embed-the-api" class="toc-h2 toc-link" data-title="Embed the API">Embed the API</a>
+                  </li>
+                  <li>
+                    <a href="#pairing" class="toc-h2 toc-link" data-title="Pairing">Pairing</a>
+                  </li>
+                  <li>
+                    <a href="#transactions" class="toc-h2 toc-link" data-title="Transactions">Transactions</a>
+                  </li>
+              </ul>
+          </li>
+          <li>
+            <a href="#posterminal" class="toc-h1 toc-link" data-title="POSTerminal">POSTerminal</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#constructor" class="toc-h2 toc-link" data-title="Constructor">Constructor</a>
+                  </li>
+                  <li>
+                    <a href="#pair" class="toc-h2 toc-link" data-title="pair">pair</a>
+                  </li>
+                  <li>
+                    <a href="#unpair" class="toc-h2 toc-link" data-title="unpair">unpair</a>
+                  </li>
+                  <li>
+                    <a href="#connect" class="toc-h2 toc-link" data-title="connect">connect</a>
+                  </li>
+                  <li>
+                    <a href="#disconnect" class="toc-h2 toc-link" data-title="disconnect">disconnect</a>
+                  </li>
+                  <li>
+                    <a href="#activate" class="toc-h2 toc-link" data-title="activate">activate</a>
+                  </li>
+                  <li>
+                    <a href="#deactivate" class="toc-h2 toc-link" data-title="deactivate">deactivate</a>
+                  </li>
+                  <li>
+                    <a href="#starttransaction" class="toc-h2 toc-link" data-title="startTransaction">startTransaction</a>
+                  </li>
+                  <li>
+                    <a href="#aborttransaction" class="toc-h2 toc-link" data-title="abortTransaction">abortTransaction</a>
+                  </li>
+                  <li>
+                    <a href="#confirmtransaction" class="toc-h2 toc-link" data-title="confirmTransaction">confirmTransaction</a>
+                  </li>
+                  <li>
+                    <a href="#rollbacktransaction" class="toc-h2 toc-link" data-title="rollbackTransaction">rollbackTransaction</a>
+                  </li>
+                  <li>
+                    <a href="#balance" class="toc-h2 toc-link" data-title="balance">balance</a>
+                  </li>
+                  <li>
+                    <a href="#configure" class="toc-h2 toc-link" data-title="configure">configure</a>
+                  </li>
+                  <li>
+                    <a href="#initialize" class="toc-h2 toc-link" data-title="initialize">initialize</a>
+                  </li>
+                  <li>
+                    <a href="#requestreceipt" class="toc-h2 toc-link" data-title="requestReceipt">requestReceipt</a>
+                  </li>
+                  <li>
+                    <a href="#print" class="toc-h2 toc-link" data-title="print">print</a>
+                  </li>
+                  <li>
+                    <a href="#devicecommand" class="toc-h2 toc-link" data-title="deviceCommand">deviceCommand</a>
+                  </li>
+                  <li>
+                    <a href="#sendmessage" class="toc-h2 toc-link" data-title="sendMessage">sendMessage</a>
+                  </li>
+                  <li>
+                    <a href="#needsamount" class="toc-h2 toc-link" data-title="needsAmount">needsAmount</a>
+                  </li>
+                  <li>
+                    <a href="#haspairing" class="toc-h2 toc-link" data-title="hasPairing">hasPairing</a>
+                  </li>
+                  <li>
+                    <a href="#getpairinginfo" class="toc-h2 toc-link" data-title="getPairingInfo">getPairingInfo</a>
+                  </li>
+                  <li>
+                    <a href="#getserialnumber" class="toc-h2 toc-link" data-title="getSerialNumber">getSerialNumber</a>
+                  </li>
+                  <li>
+                    <a href="#getterminalid" class="toc-h2 toc-link" data-title="getTerminalID">getTerminalID</a>
+                  </li>
+                  <li>
+                    <a href="#getdevicemodelname" class="toc-h2 toc-link" data-title="getDeviceModelName">getDeviceModelName</a>
+                  </li>
+                  <li>
+                    <a href="#getsoftwareversion" class="toc-h2 toc-link" data-title="getSoftwareVersion">getSoftwareVersion</a>
+                  </li>
+                  <li>
+                    <a href="#getstatus" class="toc-h2 toc-link" data-title="getStatus">getStatus</a>
+                  </li>
+                  <li>
+                    <a href="#canperformtransactions" class="toc-h2 toc-link" data-title="canPerformTransactions">canPerformTransactions</a>
+                  </li>
+                  <li>
+                    <a href="#getacquirers" class="toc-h2 toc-link" data-title="getAcquirers">getAcquirers</a>
+                  </li>
+                  <li>
+                    <a href="#getacquirerinfo" class="toc-h2 toc-link" data-title="getAcquirerInfo">getAcquirerInfo</a>
+                  </li>
+                  <li>
+                    <a href="#getbrands" class="toc-h2 toc-link" data-title="getBrands">getBrands</a>
+                  </li>
+                  <li>
+                    <a href="#getcurrencies" class="toc-h2 toc-link" data-title="getCurrencies">getCurrencies</a>
+                  </li>
+                  <li>
+                    <a href="#gettransactionfunctions" class="toc-h2 toc-link" data-title="getTransactionFunctions">getTransactionFunctions</a>
+                  </li>
+                  <li>
+                    <a href="#gettransactionfunctionname" class="toc-h2 toc-link" data-title="getTransactionFunctionName">getTransactionFunctionName</a>
+                  </li>
+                  <li>
+                    <a href="#trmlng" class="toc-h2 toc-link" data-title="TrmLng">TrmLng</a>
+                  </li>
+                  <li>
+                    <a href="#printerwidth" class="toc-h2 toc-link" data-title="PrinterWidth">PrinterWidth</a>
+                  </li>
+                  <li>
+                    <a href="#autoconnect" class="toc-h2 toc-link" data-title="AutoConnect">AutoConnect</a>
+                  </li>
+                  <li>
+                    <a href="#autoreconnect" class="toc-h2 toc-link" data-title="AutoReconnect">AutoReconnect</a>
+                  </li>
+                  <li>
+                    <a href="#autoconfirm" class="toc-h2 toc-link" data-title="AutoConfirm">AutoConfirm</a>
+                  </li>
+                  <li>
+                    <a href="#heartbeatinterval" class="toc-h2 toc-link" data-title="HeartbeatInterval">HeartbeatInterval</a>
+                  </li>
+                  <li>
+                    <a href="#heartbeattimeout" class="toc-h2 toc-link" data-title="HeartbeatTimeout">HeartbeatTimeout</a>
+                  </li>
+                  <li>
+                    <a href="#connectiontimeout" class="toc-h2 toc-link" data-title="ConnectionTimeout">ConnectionTimeout</a>
+                  </li>
+                  <li>
+                    <a href="#initializationtimeout" class="toc-h2 toc-link" data-title="InitializationTimeout">InitializationTimeout</a>
+                  </li>
+                  <li>
+                    <a href="#transactiontimeout" class="toc-h2 toc-link" data-title="TransactionTimeout">TransactionTimeout</a>
+                  </li>
+                  <li>
+                    <a href="#defaulttimeout" class="toc-h2 toc-link" data-title="DefaultTimeout">DefaultTimeout</a>
+                  </li>
+                  <li>
+                    <a href="#onconnected" class="toc-h2 toc-link" data-title="OnConnected">OnConnected</a>
+                  </li>
+                  <li>
+                    <a href="#ondisconnected" class="toc-h2 toc-link" data-title="OnDisconnected">OnDisconnected</a>
+                  </li>
+                  <li>
+                    <a href="#onpairingsucceeded" class="toc-h2 toc-link" data-title="OnPairingSucceeded">OnPairingSucceeded</a>
+                  </li>
+                  <li>
+                    <a href="#onpairingfailed" class="toc-h2 toc-link" data-title="OnPairingFailed">OnPairingFailed</a>
+                  </li>
+                  <li>
+                    <a href="#onactivationsucceeded" class="toc-h2 toc-link" data-title="OnActivationSucceeded">OnActivationSucceeded</a>
+                  </li>
+                  <li>
+                    <a href="#onactivationfailed" class="toc-h2 toc-link" data-title="OnActivationFailed">OnActivationFailed</a>
+                  </li>
+                  <li>
+                    <a href="#onactivationtimedout" class="toc-h2 toc-link" data-title="OnActivationTimedOut">OnActivationTimedOut</a>
+                  </li>
+                  <li>
+                    <a href="#ondeactivationsucceeded" class="toc-h2 toc-link" data-title="OnDeactivationSucceeded">OnDeactivationSucceeded</a>
+                  </li>
+                  <li>
+                    <a href="#ondeactivationfailed" class="toc-h2 toc-link" data-title="OnDeactivationFailed">OnDeactivationFailed</a>
+                  </li>
+                  <li>
+                    <a href="#ondeactivationtimedout" class="toc-h2 toc-link" data-title="OnDeactivationTimedOut">OnDeactivationTimedOut</a>
+                  </li>
+                  <li>
+                    <a href="#ontransactionapproved" class="toc-h2 toc-link" data-title="OnTransactionApproved">OnTransactionApproved</a>
+                  </li>
+                  <li>
+                    <a href="#ontransactiondeclined" class="toc-h2 toc-link" data-title="OnTransactionDeclined">OnTransactionDeclined</a>
+                  </li>
+                  <li>
+                    <a href="#ontransactionreferred" class="toc-h2 toc-link" data-title="OnTransactionReferred">OnTransactionReferred</a>
+                  </li>
+                  <li>
+                    <a href="#ontransactionaborted" class="toc-h2 toc-link" data-title="OnTransactionAborted">OnTransactionAborted</a>
+                  </li>
+                  <li>
+                    <a href="#ontransactiontimedout" class="toc-h2 toc-link" data-title="OnTransactionTimedOut">OnTransactionTimedOut</a>
+                  </li>
+                  <li>
+                    <a href="#ontransactionconfirmationsucceeded" class="toc-h2 toc-link" data-title="OnTransactionConfirmationSucceeded">OnTransactionConfirmationSucceeded</a>
+                  </li>
+                  <li>
+                    <a href="#ontransactionconfirmationfailed" class="toc-h2 toc-link" data-title="OnTransactionConfirmationFailed">OnTransactionConfirmationFailed</a>
+                  </li>
+                  <li>
+                    <a href="#ontransactionconfirmationtimedout" class="toc-h2 toc-link" data-title="OnTransactionConfirmationTimedOut">OnTransactionConfirmationTimedOut</a>
+                  </li>
+                  <li>
+                    <a href="#onbalancesucceeded" class="toc-h2 toc-link" data-title="OnBalanceSucceeded">OnBalanceSucceeded</a>
+                  </li>
+                  <li>
+                    <a href="#onbalancefailed" class="toc-h2 toc-link" data-title="OnBalanceFailed">OnBalanceFailed</a>
+                  </li>
+                  <li>
+                    <a href="#onbalancetimedout" class="toc-h2 toc-link" data-title="OnBalanceTimedOut">OnBalanceTimedOut</a>
+                  </li>
+                  <li>
+                    <a href="#onconfigurationsucceeded" class="toc-h2 toc-link" data-title="OnConfigurationSucceeded">OnConfigurationSucceeded</a>
+                  </li>
+                  <li>
+                    <a href="#onconfigurationfailed" class="toc-h2 toc-link" data-title="OnConfigurationFailed">OnConfigurationFailed</a>
+                  </li>
+                  <li>
+                    <a href="#onconfigurationtimedout" class="toc-h2 toc-link" data-title="OnConfigurationTimedOut">OnConfigurationTimedOut</a>
+                  </li>
+                  <li>
+                    <a href="#oninitializationsucceeded" class="toc-h2 toc-link" data-title="OnInitializationSucceeded">OnInitializationSucceeded</a>
+                  </li>
+                  <li>
+                    <a href="#oninitializationfailed" class="toc-h2 toc-link" data-title="OnInitializationFailed">OnInitializationFailed</a>
+                  </li>
+                  <li>
+                    <a href="#oninitializationtimedout" class="toc-h2 toc-link" data-title="OnInitializationTimedOut">OnInitializationTimedOut</a>
+                  </li>
+                  <li>
+                    <a href="#ondevicecommandsucceeded" class="toc-h2 toc-link" data-title="OnDeviceCommandSucceeded">OnDeviceCommandSucceeded</a>
+                  </li>
+                  <li>
+                    <a href="#ondevicecommandfailed" class="toc-h2 toc-link" data-title="OnDeviceCommandFailed">OnDeviceCommandFailed</a>
+                  </li>
+                  <li>
+                    <a href="#ondevicecommandtimedout" class="toc-h2 toc-link" data-title="OnDeviceCommandTimedOut">OnDeviceCommandTimedOut</a>
+                  </li>
+                  <li>
+                    <a href="#onstatuschanged" class="toc-h2 toc-link" data-title="OnStatusChanged">OnStatusChanged</a>
+                  </li>
+                  <li>
+                    <a href="#onreceipt" class="toc-h2 toc-link" data-title="OnReceipt">OnReceipt</a>
+                  </li>
+                  <li>
+                    <a href="#onmessagesent" class="toc-h2 toc-link" data-title="OnMessageSent">OnMessageSent</a>
+                  </li>
+                  <li>
+                    <a href="#onmessagereceived" class="toc-h2 toc-link" data-title="OnMessageReceived">OnMessageReceived</a>
+                  </li>
+                  <li>
+                    <a href="#onerror" class="toc-h2 toc-link" data-title="OnError">OnError</a>
+                  </li>
+              </ul>
+          </li>
+          <li>
+            <a href="#symbolic-constants" class="toc-h1 toc-link" data-title="Symbolic constants">Symbolic constants</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#transactionfunctions" class="toc-h2 toc-link" data-title="TransactionFunctions">TransactionFunctions</a>
+                  </li>
+                  <li>
+                    <a href="#transactionabortflags" class="toc-h2 toc-link" data-title="TransactionAbortFlags">TransactionAbortFlags</a>
+                  </li>
+                  <li>
+                    <a href="#receipttypes" class="toc-h2 toc-link" data-title="ReceiptTypes">ReceiptTypes</a>
+                  </li>
+                  <li>
+                    <a href="#receiptflags" class="toc-h2 toc-link" data-title="ReceiptFlags">ReceiptFlags</a>
+                  </li>
+                  <li>
+                    <a href="#statusflags" class="toc-h2 toc-link" data-title="StatusFlags">StatusFlags</a>
+                  </li>
+                  <li>
+                    <a href="#devicecommands" class="toc-h2 toc-link" data-title="DeviceCommands">DeviceCommands</a>
+                  </li>
+              </ul>
+          </li>
+      </ul>
+        <ul class="toc-footer">
+            <li><a href='https://www.paytec.ch'>PayTec AG</a></li>
+        </ul>
+    </div>
+    <div class="page-wrapper">
+      <div class="dark-box"></div>
+      <div class="content">
+        <h1 id='getting-started'>Getting started</h1><h2 id='about'>About</h2>
+<p>Use the PayTec Terminal Web API to access your PayTec POS Terminal from any web-based application.</p>
+
+<ul>
+<li>Works from any modern web browser</li>
+<li>Terminal and client may run in separate networks, e.g. cash register in LAN and terminal on 4G</li>
+<li>Keeps connection while roaming between networks</li>
+<li>Secure TLS 1.2 connection</li>
+</ul>
+
+<p>A comprehensive example application can be found <a href="//ecritf.paytec.ch">here</a>.</p>
+<h2 id='prerequisites'>Prerequisites</h2>
+<p>To access your POS terminal via web, the following is required:</p>
+
+<ul>
+<li>PayTec POS terminal with PayTec EP2 software equal or higher than 16.00.00</li>
+<li>Configured cash register integration type: &#39;KIT&#39;</li>
+</ul>
+
+<aside class="notice">
+The terminal uses HTTPS for communication, so make sure outbound TCP port 443
+is not blocked! Inbound communication is not used.
+</aside>
+<h2 id='embed-the-api'>Embed the API</h2>
+<p>At the end of your HTML code, embed the API as a script:</p>
+
+<p><code>&lt;script src=&quot;//ecritf.paytec.ch/api/v1.0/ecritf.js&quot;&gt;&lt;/script&gt;</code></p>
+
+<p>Instantiate a <a href="#posterminal">POSTerminal</a> object using its <a href="#constructor">constructor</a>:</p>
+
+<p><code>trm = new PayTec.POSTerminal(undefined, { OnConnected: onConnected, ... });</code></p>
+<h2 id='pairing'>Pairing</h2>
+<p>Before a web application can communicate with the POS terminal, it establishes
+a trusted connection providing a temporary pairing code. This code is generated
+on the POS terminal via the attendant menu...</p>
+
+<p><img src="images/start_pairing.png" alt="Screenshot start pairing" /> <strong>click &#39;Go&#39; =&gt;</strong> <img src="images/pairing_code.png" alt="Screenshot pairing code" /></p>
+
+<p>... and used by the web application via the <a href="#pair">pair</a> method:</p>
+
+<p><code>trm.pair(&quot;6017087&quot;, &quot;Awesome POS 1234&quot;);</code></p>
+
+<p>=&gt; the following message will be shown for a few seconds on the terminal:</p>
+
+<p><img src="images/pairing_successful.png" alt="Screenshot pairing successful" /></p>
+<pre class="highlight javascript tab-javascript"><code><span class="c1">// store the current pairing info in local browser storage</span>
+<span class="kd">function</span> <span class="nx">onConnected</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="nx">Storage</span><span class="p">)</span> <span class="o">!==</span> <span class="s2">"undefined"</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">localStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="s2">"pairingInfo"</span><span class="p">,</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">trm</span><span class="p">.</span><span class="nx">getPairingInfo</span><span class="p">()));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// reuse it in a later session</span>
+<span class="kd">var</span> <span class="nx">pairingInfo</span><span class="p">;</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="nx">Storage</span><span class="p">)</span> <span class="o">!==</span> <span class="s2">"undefined"</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">info</span> <span class="o">=</span> <span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s2">"pairingInfo"</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">info</span> <span class="o">!==</span> <span class="kc">undefined</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">pairingInfo</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">info</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">trm</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">PayTec</span><span class="p">.</span><span class="nx">POSTerminal</span><span class="p">(</span><span class="nx">pairingInfo</span><span class="p">,</span> <span class="p">...</span>
+</code></pre>
+<p>Once pairing was successful, pairing info can be <a href="#getpairinginfo">retrieved</a> and stored
+for further sessions.</p>
+<h2 id='transactions'>Transactions</h2><pre class="highlight javascript tab-javascript"><code><span class="kd">function</span> <span class="nx">onTransactionApproved</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"All ok\n"</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">trm</span><span class="p">.</span><span class="nx">setOnTransactionApproved</span><span class="p">(</span><span class="nx">onTransactionApproved</span><span class="p">);</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nx">trm</span><span class="p">.</span><span class="nx">canPerformTransactions</span><span class="p">())</span> <span class="p">{</span>
+    <span class="nx">trm</span><span class="p">.</span><span class="nx">startTransaction</span><span class="p">({</span>
+            <span class="na">TrxFunction</span><span class="p">:</span> <span class="nx">PURCHASE</span><span class="p">,</span>
+            <span class="na">TrxCurrC</span><span class="p">:</span> <span class="mi">756</span><span class="p">,</span>
+            <span class="na">AmtAuth</span><span class="p">:</span> <span class="mi">1000</span>
+        <span class="p">}</span>
+    <span class="p">);</span>
+<span class="p">}</span>
+</code></pre>
+<p>Once <a href="#activate">activated</a>, the terminal is ready to <a href="#starttransaction">start a transaction</a>.
+The result of this operation is reported through the <a href="#ontransactionapproved">OnTransactionApproved</a>,
+<a href="#ontransactiondeclined">OnTransactionDeclined</a>, <a href="#ontransactionaborted">OnTransactionaborted</a> and
+<a href="#ontransactionreferred">OnTransactionReferred</a> callback functions.</p>
+<h1 id='posterminal'>POSTerminal</h1>
+<p>This object represents the POS terminal to interact with. </p>
+<h2 id='constructor'>Constructor</h2>
+<p><code>trm = new PayTec.POSTerminal(pairingInfo, options);</code></p>
+<pre class="highlight javascript tab-javascript"><code>
+<span class="c1">// not yet paired:</span>
+<span class="nx">trm</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">PayTec</span><span class="p">.</span><span class="nx">POSTerminal</span><span class="p">(</span>
+    <span class="kc">undefined</span><span class="p">,</span>
+    <span class="p">{</span>
+        <span class="na">TrmLng</span><span class="p">:</span> <span class="s1">'en'</span><span class="p">,</span>
+        <span class="na">PrinterWidth</span><span class="p">:</span> <span class="mi">34</span><span class="p">,</span>
+        <span class="na">OnConnected</span><span class="p">:</span> <span class="nx">myOnConnected</span>
+    <span class="p">}</span>
+<span class="p">);</span>
+
+<span class="c1">// pairing info available e.g. from local storage:</span>
+<span class="nx">trm</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">PayTec</span><span class="p">.</span><span class="nx">POSTerminal</span><span class="p">(</span>
+    <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s2">"pairingInfo"</span><span class="p">)),</span>
+    <span class="nx">options</span>
+<span class="p">);</span>
+
+</code></pre>
+<table><thead>
+<tr>
+<th>Available options:</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#trmlng">TrmLng</a></td>
+</tr>
+<tr>
+<td><a href="#printerwidth">PrinterWidth</a></td>
+</tr>
+<tr>
+<td><a href="#autoconnect">AutoConnect</a></td>
+</tr>
+<tr>
+<td><a href="#autoreconnect">AutoReconnect</a></td>
+</tr>
+<tr>
+<td><a href="#autoconfirm">AutoConfirm</a></td>
+</tr>
+<tr>
+<td><a href="#heartbeatinterval">HeartbeatInterval</a></td>
+</tr>
+<tr>
+<td><a href="#heartbeattimeout">HeartbeatTimeout</a></td>
+</tr>
+<tr>
+<td><a href="#connectiontimeout">ConnectionTimeout</a></td>
+</tr>
+<tr>
+<td><a href="#initializationtimeout">InitializationTimeout</a></td>
+</tr>
+<tr>
+<td><a href="#transactiontimeout">TransactionTimeout</a></td>
+</tr>
+<tr>
+<td><a href="#defaulttimeout">DefaultTimeout</a></td>
+</tr>
+</tbody></table>
+
+<table><thead>
+<tr>
+<th>Configurable callbacks:</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#onpairingfailed">OnPairingFailed</a></td>
+</tr>
+<tr>
+<td><a href="#onpairingsucceeded">OnPairingSucceeded</a></td>
+</tr>
+<tr>
+<td><a href="#onconnected">OnConnected</a></td>
+</tr>
+<tr>
+<td><a href="#ondisconnected">OnDisconnected</a></td>
+</tr>
+<tr>
+<td><a href="#onactivationsucceeded">OnActivationSucceeded</a></td>
+</tr>
+<tr>
+<td><a href="#onactivationfailed">OnActivationFailed</a></td>
+</tr>
+<tr>
+<td><a href="#onactivationtimedout">OnActivationTimedOut</a></td>
+</tr>
+<tr>
+<td><a href="#ondeactivationsucceeded">OnDeactivationSucceeded</a></td>
+</tr>
+<tr>
+<td><a href="#ondeactivationfailed">OnDeactivationFailed</a></td>
+</tr>
+<tr>
+<td><a href="#ondeactivationtimedout">OnDeactivationTimedOut</a></td>
+</tr>
+<tr>
+<td><a href="#ontransactionapproved">OnTransactionApproved</a></td>
+</tr>
+<tr>
+<td><a href="#ontransactiondeclined">OnTransactionDeclined</a></td>
+</tr>
+<tr>
+<td><a href="#ontransactionreferred">OnTransactionReferred</a></td>
+</tr>
+<tr>
+<td><a href="#ontransactionaborted">OnTransactionAborted</a></td>
+</tr>
+<tr>
+<td><a href="#ontransactiontimedout">OnTransactionTimedOut</a></td>
+</tr>
+<tr>
+<td><a href="#ontransactionconfirmationsucceeded">OnTransactionConfirmationSucceeded</a></td>
+</tr>
+<tr>
+<td><a href="#ontransactionconfirmationfailed">OnTransactionConfirmationFailed</a></td>
+</tr>
+<tr>
+<td><a href="#ontransactionconfirmationtimedout">OnTransactionConfirmationTimedOut</a></td>
+</tr>
+<tr>
+<td><a href="#onbalancesucceeded">OnBalanceSucceeded</a></td>
+</tr>
+<tr>
+<td><a href="#onbalancefailed">OnBalanceFailed</a></td>
+</tr>
+<tr>
+<td><a href="#onbalancetimedout">OnBalanceTimedOut</a></td>
+</tr>
+<tr>
+<td><a href="#onconfigurationsucceeded">OnConfigurationSucceeded</a></td>
+</tr>
+<tr>
+<td><a href="#onconfigurationfailed">OnConfigurationFailed</a></td>
+</tr>
+<tr>
+<td><a href="#onconfigurationtimedout">OnConfigurationTimedOut</a></td>
+</tr>
+<tr>
+<td><a href="#oninitializationsucceeded">OnInitializationSucceeded</a></td>
+</tr>
+<tr>
+<td><a href="#oninitializationfailed">OnInitializationFailed</a></td>
+</tr>
+<tr>
+<td><a href="#oninitializationtimedout">OnInitializationTimedOut</a></td>
+</tr>
+<tr>
+<td><a href="#ondevicecommandsucceeded">OnDeviceCommandSucceeded</a></td>
+</tr>
+<tr>
+<td><a href="#ondevicecommandfailed">OnDeviceCommandFailed</a></td>
+</tr>
+<tr>
+<td><a href="#ondevicecommandtimedout">OnDeviceCommandTimedOut</a></td>
+</tr>
+<tr>
+<td><a href="#onstatuschanged">OnStatusChanged</a></td>
+</tr>
+<tr>
+<td><a href="#onreceipt">OnReceipt</a></td>
+</tr>
+<tr>
+<td><a href="#onmessagesent">OnMessageSent</a></td>
+</tr>
+<tr>
+<td><a href="#onmessagereceived">OnMessageReceived</a></td>
+</tr>
+<tr>
+<td><a href="#onerror">OnError</a></td>
+</tr>
+</tbody></table>
+<h2 id='pair'>pair</h2>
+<p><code>trm.pair(code, friendlyName);</code></p>
+<pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">pair</span><span class="p">(</span><span class="s2">"6017087"</span><span class="p">,</span> <span class="s2">"Awesome POS 1234"</span><span class="p">);</span>
+</code></pre>
+<p>Establishes a trusted connection between the web application and the POS terminal.</p>
+<h2 id='unpair'>unpair</h2>
+<p><code>trm.unpair();</code></p>
+
+<p>Disconnects from the terminal and removes any pairing info from the POSTerminal object.</p>
+<h2 id='connect'>connect</h2>
+<p><code>trm.connect();</code></p>
+
+<p>Connects the POSTerminal object with its physical counterpart.</p>
+<h2 id='disconnect'>disconnect</h2>
+<p><code>trm.disconnect();</code></p>
+
+<p>Disconnects from the terminal and removes any pairing info from the POSTerminal object.</p>
+<h2 id='activate'>activate</h2>
+<p><code>trm.activate()</code></p>
+
+<p>Activates the terminal to get ready for transaction processing.</p>
+<h2 id='deactivate'>deactivate</h2>
+<p><code>trm.deactivate()</code></p>
+
+<p>Deactivates the terminal. In deactivated state, no transactions can be done.</p>
+<h2 id='starttransaction'>startTransaction</h2>
+<p><code>trm.startTransaction(params)</code></p>
+<pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">startTransaction</span><span class="p">({</span>
+        <span class="na">TrxFunction</span><span class="p">:</span> <span class="nx">trm</span><span class="p">.</span><span class="nx">TransactionFunctions</span><span class="p">.</span><span class="nx">PURCHASE_WITH_CASHBACK</span><span class="p">,</span>
+        <span class="na">TrxCurrC</span><span class="p">:</span> <span class="mi">756</span><span class="p">,</span>
+        <span class="na">AmtAuth</span><span class="p">:</span> <span class="mi">1575</span><span class="p">,</span>
+        <span class="na">AmtOther</span><span class="p">:</span> <span class="mi">1000</span>
+    <span class="p">});</span>
+</code></pre>
+<p>Starts a new payment transaction.</p>
+<h3 id='parameters'>Parameters:</h3>
+<aside class="notice">
+For details concerning parameters which depend on certain transaction types,
+ please refer to the ep2 resp. corresponding payment system documentation.
+</aside>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Format</th>
+<th>Condition</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>AcqID</td>
+<td>Numeric</td>
+<td>For Cancel Reservation transactions</td>
+<td>The registered acquirer identifier</td>
+</tr>
+<tr>
+<td>AmtAuth</td>
+<td>Numeric</td>
+<td>For amount based transaction types</td>
+<td>The amount to be authorized, in the currency&#39;s minor unit</td>
+</tr>
+<tr>
+<td>AmtOther</td>
+<td>Numeric</td>
+<td>For Purchase with Cashback transactions</td>
+<td>Cashback amount, in the currency&#39;s minor unit</td>
+</tr>
+<tr>
+<td>AppExpDate</td>
+<td>Hex string, e.g. &#39;491231&#39;</td>
+<td>If PAN-key entry or token based transaction</td>
+<td>Application Expiration Date</td>
+</tr>
+<tr>
+<td>AppPAN</td>
+<td>Hex string, padded with trailing &#39;F&#39;</td>
+<td>If PAN-key entry or token based transaction</td>
+<td>Application Primary Account Number</td>
+</tr>
+<tr>
+<td>AuthC</td>
+<td>String</td>
+<td>For Purchase, Phone Authorised transactions</td>
+<td>The Authorisation Code received by phone</td>
+</tr>
+<tr>
+<td>CVC2</td>
+<td>String</td>
+<td>If PAN-key entry transaction and known by the attendant</td>
+<td>Card Verification Code 2</td>
+</tr>
+<tr>
+<td>TrxCurrC</td>
+<td>Numeric</td>
+<td>For amount based transaction types</td>
+<td>Transaction Currency Code (ISO-4217)</td>
+</tr>
+<tr>
+<td>TrxFunction</td>
+<td>Numeric</td>
+<td><strong>Mandatory</strong></td>
+<td><a href="#transactionfunctions">Transaction function</a> to be used</td>
+</tr>
+<tr>
+<td>TrxRefNum</td>
+<td>String</td>
+<td>For reference based transactions like e.g. Purchase Reservation</td>
+<td>Original Transaction Reference Number</td>
+</tr>
+</tbody></table>
+<h2 id='aborttransaction'>abortTransaction</h2>
+<p><code>trm.abortTransaction(params)</code></p>
+<pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">abortTransaction</span><span class="p">({</span>
+        <span class="na">TrxAbortFlags</span><span class="p">:</span> <span class="nx">trm</span><span class="p">.</span><span class="nx">TransactionAbortFlags</span><span class="p">.</span><span class="nx">ABORT_TRX_SILENT</span>
+    <span class="p">}</span>
+<span class="p">);</span>
+</code></pre>
+<p>Aborts a ongoing payment transaction.</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Format</th>
+<th>Condition</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>TrxAbortFlags</td>
+<td>Numeric</td>
+<td>optional</td>
+<td>Combination of <a href="#transactionabortflags">Transaction Abort Flags</a></td>
+</tr>
+</tbody></table>
+<h2 id='confirmtransaction'>confirmTransaction</h2>
+<p><code>trm.confirmTransaction(params)</code></p>
+<pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">confirmTransaction</span><span class="p">({</span>
+        <span class="na">TrxAmt</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span>
+        <span class="na">TrxSeqCnt</span><span class="p">:</span> <span class="mi">1234</span>
+    <span class="p">});</span>
+</code></pre>
+<p>Confirms a successfully authorized payment transaction. Without this, no money will be
+transferred from the cardholder&#39;s to the merchant&#39;s account, and the authorized amount
+is finally reverted.</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Format</th>
+<th>Condition</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>TrxAmt</td>
+<td>Numeric</td>
+<td>If the final transaction amount is lower than the authorized amount, e.g. in case of fuel purchase</td>
+<td>Final transaction amount, in the currency&#39;s minor unit</td>
+</tr>
+<tr>
+<td>TrxSeqCnt</td>
+<td>Numeric</td>
+<td>For Authorisation Purchase transactions where multiple simultaneous fueling operations are possible</td>
+<td>Transaction Sequence Counter of the transaction to be confirmed</td>
+</tr>
+</tbody></table>
+<h2 id='rollbacktransaction'>rollbackTransaction</h2>
+<p><code>trm.rollbackTransaction(params)</code></p>
+<pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">rollbackTransaction</span><span class="p">({</span> <span class="na">TrxSeqCnt</span><span class="p">:</span> <span class="mi">1234</span> <span class="p">});</span>
+</code></pre>
+<p>Cancels an approved but not yet confirmed transaction, e.g. if a vending machine cannot deliver the purchased goods.</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Format</th>
+<th>Condition</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>TrxSeqCnt</td>
+<td>Numeric</td>
+<td>For Authorisation Purchase transactions where multiple simultaneous fueling operations are possible</td>
+<td>Transaction Sequence Counter of the transaction to be rolled back</td>
+</tr>
+</tbody></table>
+<h2 id='balance'>balance</h2>
+<p><code>trm.balance()</code></p>
+
+<p>Triggers the final balance procedure.</p>
+<h2 id='configure'>configure</h2>
+<p><code>trm.configure()</code></p>
+
+<p>Lets the terminal download its configuration data from the Service Center/TMS.</p>
+<h2 id='initialize'>initialize</h2>
+<p><code>trm.initialize(acqID)</code></p>
+
+<p>Advises the terminal to update its initialization data from its acquirer(s). If acqID is -1, all acquirers will be reinitialized.</p>
+<h2 id='requestreceipt'>requestReceipt</h2>
+<p><code>trm.requestReceipt(params)</code></p>
+<pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">requestReceipt</span><span class="p">({</span>
+        <span class="na">ReceiptType</span><span class="p">:</span> <span class="nx">trm</span><span class="p">.</span><span class="nx">ReceiptTypes</span><span class="p">.</span><span class="nx">TRX_COPY</span><span class="p">,</span>
+        <span class="na">ReceiptID</span><span class="p">:</span> <span class="mi">1234</span>
+    <span class="p">});</span>
+</code></pre>
+<p>Request a certain receipt from the terminal. When the receipt is available, <a href="#setonreceipt">OnReceipt</a> will be called.</p>
+
+<table><thead>
+<tr>
+<th>Parameter -</th>
+<th>Format</th>
+<th>Condition</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>ReceipType</td>
+<td>Numeric</td>
+<td>mandatory</td>
+<td><a href="#receipttypes">Receipt Type</a></td>
+</tr>
+<tr>
+<td>ReceiptID</td>
+<td>Numeric</td>
+<td>optional</td>
+<td>Transaction Sequence Counter for transaction receipts, Acquirer Identifier for initialization receipts.</td>
+</tr>
+</tbody></table>
+<h2 id='print'>print</h2>
+<p><code>trm.print(params)</code></p>
+<pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">print</span><span class="p">({</span>
+        <span class="na">ReceiptText</span><span class="p">:</span> <span class="s2">"THE QUICK BROWN FOX"</span><span class="p">,</span>
+        <span class="na">ReceiptFlags</span><span class="p">:</span> <span class="nx">trm</span><span class="p">.</span><span class="nx">ReceiptFlags</span><span class="p">.</span><span class="nx">MORE_DATA_AVAILABLE</span>
+                    <span class="o">|</span> <span class="nx">trm</span><span class="p">.</span><span class="nx">ReceiptFlags</span><span class="p">.</span><span class="nx">DOUBLE_HEIGHT</span>
+    <span class="p">});</span>
+
+<span class="nx">trm</span><span class="p">.</span><span class="nx">print</span><span class="p">({</span>
+        <span class="na">ReceiptText</span><span class="p">:</span> <span class="s2">"jumps over\nthe lazy dog"</span>
+    <span class="p">});</span>
+</code></pre>
+<p>Prints a text on the terminal&#39;s thermal printer.</p>
+
+<table><thead>
+<tr>
+<th>Parameter -</th>
+<th>Format</th>
+<th>Condition</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>ReceiptText</td>
+<td>String</td>
+<td>mandatory</td>
+<td>Text to print. Use &#39;\n&#39; for line breaks.</td>
+</tr>
+<tr>
+<td>ReceiptFlags</td>
+<td>Numeric</td>
+<td>optional</td>
+<td><a href="#receiptflags">Flags</a> that influence printing.</td>
+</tr>
+</tbody></table>
+<h2 id='devicecommand'>deviceCommand</h2>
+<p><code>trm.deviceCommand(commandCode, params)</code></p>
+<pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">deviceCommand</span><span class="p">({</span>
+        <span class="na">DeviceCommandCode</span><span class="p">:</span> <span class="nx">trm</span><span class="p">.</span><span class="nx">DeviceCommands</span><span class="p">.</span><span class="nx">REBOOT</span>
+    <span class="p">}</span>
+<span class="p">);</span>
+</code></pre>
+<p>Let the terminal perform some <a href="#devicecommands">actions</a> in addition to payment.</p>
+<h2 id='sendmessage'>sendMessage</h2>
+<p><code>trm.sendMessage(message)</code></p>
+
+<p>Sends a JSON message to the terminal. This function is meant for use cases not yet reflected in the API.</p>
+<h2 id='needsamount'>needsAmount</h2>
+<p><code>trm.needsAmount(trxFunction)</code></p>
+
+<p>Tells whether a <a href="#transactionfunctions">transaction function</a> needs an amount.</p>
+<h2 id='haspairing'>hasPairing</h2>
+<p><code>trm.hasPairing()</code></p>
+
+<p>Tells whether the API has been provisioned with pairing data.</p>
+<h2 id='getpairinginfo'>getPairingInfo</h2>
+<p><code>trm.getPairingInfo()</code></p>
+
+<p>Returns the pairing data in JSON form.</p>
+<h2 id='getserialnumber'>getSerialNumber</h2>
+<p><code>trm.getSerialNumber()</code></p>
+
+<p>Returns the terminal&#39;s device serial number.</p>
+<h2 id='getterminalid'>getTerminalID</h2>
+<p><code>trm.getTerminalID()</code></p>
+
+<p>Returns the Terminal Identification within the payment system.</p>
+<h2 id='getdevicemodelname'>getDeviceModelName</h2>
+<p><code>trm.getDeviceModelName()</code></p>
+
+<p>Returns the device model name of the terminal.</p>
+<h2 id='getsoftwareversion'>getSoftwareVersion</h2>
+<p><code>trm.getSoftwareVersion()</code></p>
+<pre class="highlight javascript tab-javascript"><code><span class="nx">v</span> <span class="o">=</span> <span class="nx">trm</span><span class="p">.</span><span class="nx">getSoftwareVersion</span><span class="p">();</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"Software version: "</span>
+    <span class="o">+</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">trunc</span><span class="p">(</span><span class="nx">v</span> <span class="o">/</span> <span class="mi">10000</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"."</span>
+    <span class="o">+</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">trunc</span><span class="p">((</span><span class="nx">v</span> <span class="o">%</span> <span class="mi">10000</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"."</span>
+    <span class="o">+</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">trunc</span><span class="p">(</span><span class="nx">v</span> <span class="o">%</span> <span class="mi">100</span><span class="p">));</span>
+</code></pre>
+<p>returns the terminal software version as a number.</p>
+<h2 id='getstatus'>getStatus</h2>
+<p><code>status = trm.getStatus()</code></p>
+
+<p>Gets the terminal status as a combination of <a href="#statusflags">flags</a>.</p>
+<h2 id='canperformtransactions'>canPerformTransactions</h2>
+<p><code>var ready = trm.canPerformTransactions()</code></p>
+
+<p>Tells whether the terminal is <a href="#activate">activated</a>, not <a href="#statusflags">locked</a> and not <a href="#statusflags">busy</a> with another use case.</p>
+<h2 id='getacquirers'>getAcquirers</h2>
+<p><code>trm.getAcquirers()</code></p>
+<pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">getAcquirers</span><span class="p">();</span>
+<span class="o">-&gt;</span> <span class="p">[</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span> <span class="p">]</span>
+</code></pre>
+<p>Return an array containing the configured acquirer IDs.</p>
+<h2 id='getacquirerinfo'>getAcquirerInfo</h2>
+<p><code>trm.getAcquirerInfo(acqID)</code></p>
+<pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">getAcquirerInfo</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="o">-&gt;</span>
+<span class="p">{</span>
+    <span class="na">AcqID</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="na">LastAcqInitDate</span><span class="p">:</span> <span class="s2">"2019-05-26 06:32:26"</span>
+<span class="p">}</span>
+</code></pre>
+<p>Returns information to a given acquirer ID as an object.</p>
+<h2 id='getbrands'>getBrands</h2>
+<p><code>trm.getBrands()</code></p>
+<pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">getBrands</span><span class="p">();</span>
+<span class="o">-&gt;</span> <span class="p">[</span> <span class="s2">"MAESTRO"</span><span class="p">,</span> <span class="s2">"MASTERCARD"</span><span class="p">,</span> <span class="s2">"V PAY"</span><span class="p">,</span> <span class="s2">"VISA"</span> <span class="p">]</span>
+</code></pre>
+<p>Returns an array containing the initialized payment brands</p>
+<h2 id='getcurrencies'>getCurrencies</h2>
+<p><code>trm.getCurrencies()</code></p>
+<pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">getCurrencies</span><span class="p">();</span>
+<span class="o">-&gt;</span> <span class="p">[</span> <span class="mi">756</span><span class="p">,</span> <span class="mi">840</span><span class="p">,</span> <span class="mi">978</span> <span class="p">]</span>
+</code></pre>
+<p>Returns an array of supported ISO-4217 currency codes.</p>
+<h2 id='gettransactionfunctions'>getTransactionFunctions</h2>
+<p><code>trm.getTransactionFunctions()</code></p>
+<pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">getTransactionFunctions</span><span class="p">();</span>
+<span class="o">-&gt;</span> <span class="p">[</span> <span class="mi">32768</span><span class="p">,</span> <span class="mi">2048</span><span class="p">,</span> <span class="mi">32</span> <span class="p">]</span>
+</code></pre>
+<p>Returns an array of supported <a href="#transactionfunctions">transaction functions</a>.</p>
+<h2 id='gettransactionfunctionname'>getTransactionFunctionName</h2>
+<p><code>trm.getTransactionFunctionName(trxFunction, language)</code></p>
+<pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">getTransactionFunctionName</span><span class="p">(</span>
+    <span class="nx">trm</span><span class="p">.</span><span class="nx">TransactionFunctions</span><span class="p">.</span><span class="nx">PURCHASE_RESERVATION</span><span class="p">,</span> <span class="s2">"fr"</span><span class="p">);</span>
+
+<span class="o">-&gt;</span> <span class="s2">"Vente Réservation"</span>
+</code></pre>
+<p>Returns the name of a transaction function in English, German, French or Italian.
+If <code>language</code> is <code>undefined</code>, the current <a href="#trmlng">terminal language</a> is used.</p>
+<h2 id='trmlng'>TrmLng</h2>
+<p><code>trm.getTrmLng()</code><br>
+<code>trm.setTrmLng(value)</code></p>
+<pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">setTrmLng</span><span class="p">(</span><span class="s2">"en"</span><span class="p">);</span>
+<span class="nx">trm</span><span class="p">.</span><span class="nx">setTrmLng</span><span class="p">(</span><span class="s2">"de"</span><span class="p">);</span>
+<span class="nx">trm</span><span class="p">.</span><span class="nx">setTrmLng</span><span class="p">(</span><span class="s2">"fr"</span><span class="p">);</span>
+<span class="nx">trm</span><span class="p">.</span><span class="nx">setTrmLng</span><span class="p">(</span><span class="s2">"it"</span><span class="p">);</span>
+</code></pre>
+<p>Terminal language as ISO 639-1 2 letter code.</p>
+
+<p>Default value: Language as configured on the TMS</p>
+<h2 id='printerwidth'>PrinterWidth</h2>
+<p><code>trm.getPrinterWidth()</code><br>
+<code>trm.setPrinterWidth(value)</code></p>
+
+<p>Width of the printer for receipt formatting in characters per line.</p>
+
+<p>Default value: 34</p>
+<h2 id='autoconnect'>AutoConnect</h2>
+<p><code>trm.getAutoConnect()</code><br>
+<code>trm.setAutoConnect(value)</code></p>
+
+<p>Configures whether the API tries to connect automatically to the terminal if pairing info has been provided.</p>
+
+<p>Default value: true</p>
+<h2 id='autoreconnect'>AutoReconnect</h2>
+<p><code>trm.getAutoReconnect()</code><br>
+<code>trm.setAutoReconnect(value)</code></p>
+
+<p>Configures whether the API tries to reconnect automatically to the terminal after connection loss.</p>
+
+<p>Default value: true</p>
+<h2 id='autoconfirm'>AutoConfirm</h2>
+<p><code>trm.getAutoConfirm()</code><br>
+<code>trm.setAutoConfirm(value)</code></p>
+
+<p>Configures whether the API shall automatically confirm successfully authorized payment transactions.</p>
+
+<p>Default value: true.</p>
+
+<aside class="notice">
+You should configure this to <code>false</code>  if the final amount is not yet known at transaction start.
+</aside>
+<h2 id='heartbeatinterval'>HeartbeatInterval</h2>
+<p><code>trm.getHeartbeatInterval()</code><br>
+<code>trm.setHeartbeatInterval(value)</code></p>
+
+<p>Configures how many milliseconds the API waits with sending heartbeat requests after receiving a message from the terminal.</p>
+
+<p>Default value: 10000.</p>
+<h2 id='heartbeattimeout'>HeartbeatTimeout</h2>
+<p><code>trm.getHeartbeatTimeout()</code><br>
+<code>trm.setHeartbeatTimeout(value)</code></p>
+
+<p>Configures after how many milliseconds without a message from the terminal the API assumes a connection loss.</p>
+
+<p>Default value: 10000</p>
+<h2 id='connectiontimeout'>ConnectionTimeout</h2>
+<p><code>trm.getConnectionTimeout()</code><br>
+<code>trm.setConnectionTimeout(value)</code></p>
+
+<p>Configures how many milliseconds to wait for a <a href="#connect">connection</a> to the terminal.</p>
+
+<p>Default value: 20000</p>
+<h2 id='initializationtimeout'>InitializationTimeout</h2>
+<p><code>trm.getInitializationTimeout()</code><br>
+<code>trm.setInitializationTimeout(value)</code></p>
+
+<p>Configures how many milliseconds to wait for an <a href="#initialize">initialization</a>.</p>
+
+<p>Default value: 120000</p>
+<h2 id='transactiontimeout'>TransactionTimeout</h2>
+<p><code>trm.getTransactionTimeout()</code><br>
+<code>trm.setTransactionTimeout(value)</code></p>
+
+<p>Configures how many milliseconds to wait for a <a href="#starttransaction">transaction</a> to complete.</p>
+
+<p>Default value: 70000</p>
+<h2 id='defaulttimeout'>DefaultTimeout</h2>
+<p><code>trm.getDefaultTimeout()</code><br>
+<code>trm.setDefaultTimeout(value)</code></p>
+
+<p>Configures how many milliseconds to wait for any other use case.</p>
+
+<p>Default value: 30000</p>
+<h2 id='onconnected'>OnConnected</h2>
+<p><code>function onConnected() {}</code><br>
+<code>trm.setOnConnected(onConnected)</code></p>
+
+<p>Called when the API has successfully connected to the terminal.</p>
+<h2 id='ondisconnected'>OnDisconnected</h2>
+<p><code>function onDisConnected() {}</code><br>
+<code>trm.setOnDisconnected(onDisConnected)</code></p>
+
+<p>Called when the API has lost connection to the terminal.</p>
+<h2 id='onpairingsucceeded'>OnPairingSucceeded</h2>
+<p><code>function onPairingSucceeded() {}</code><br>
+<code>trm.setOnPairingSucceeded(onPairingSucceeded)</code></p>
+
+<p>Called when <a href="#pair">pairing</a> has succeeded.</p>
+<h2 id='onpairingfailed'>OnPairingFailed</h2>
+<p><code>function onPairingFailed() {}</code><br>
+<code>trm.setOnPairingFailed(onPairingFailed)</code></p>
+
+<p>Called when <a href="#pair">pairing</a> has failed due to any reason.</p>
+<h2 id='onactivationsucceeded'>OnActivationSucceeded</h2>
+<p><code>function onActivationSucceeded() {}</code><br>
+<code>trm.setOnActivationSucceeded(onActivationSucceeded)</code></p>
+
+<p>Called when <a href="#activate">activate</a> has succeeded.</p>
+<h2 id='onactivationfailed'>OnActivationFailed</h2>
+<p><code>function onActivationFailed() {}</code><br>
+<code>trm.setOnActivationFailed(onActivationFailed)</code></p>
+
+<p>Called when <a href="#activate">activate</a> has failed.</p>
+<h2 id='onactivationtimedout'>OnActivationTimedOut</h2>
+<p><code>function onActivationTimedOut() {}</code><br>
+<code>trm.setOnActivationTimedOut(onActivationTimedOut)</code></p>
+
+<p>Called when <a href="#activate">activate</a> has timed out.</p>
+<h2 id='ondeactivationsucceeded'>OnDeactivationSucceeded</h2>
+<p><code>function onDeactivationSucceeded() {}</code><br>
+<code>trm.setOnDeactivationSucceeded(onDeactivationSucceeded)</code></p>
+
+<p>Called when <a href="#deactivate">deactivate</a> has succeeded.</p>
+<h2 id='ondeactivationfailed'>OnDeactivationFailed</h2>
+<p><code>function onDeactivationFailed() {}</code><br>
+<code>trm.setOnDeactivationFailed(onDeactivationFailed)</code></p>
+
+<p>Called when <a href="#deactivate">deactivate</a> has failed.</p>
+<h2 id='ondeactivationtimedout'>OnDeactivationTimedOut</h2>
+<p><code>function onDeactivationTimedOut() {}</code><br>
+<code>trm.setOnDeactivationTimedOut(onDeactivationTimedOut)</code></p>
+
+<p>Called when <a href="#deactivate">deactivate</a> has timed out.</p>
+<h2 id='ontransactionapproved'>OnTransactionApproved</h2>
+<p><code>function onTransactionApproved(transactionResponse) {}</code><br>
+<code>trm.setOnTransactionApproved(onTransactionApproved)</code></p>
+
+<p>Called when a payment transaction gets successfully authorized.</p>
+
+<p>Please refer to the PayTec ECR Interface Specification for further information about the content of <code>transactionResponse</code>.</p>
+<h2 id='ontransactiondeclined'>OnTransactionDeclined</h2>
+<p><code>function onTransactionDeclined(transactionResponse) {}</code><br>
+<code>trm.setOnTransactionDeclined(onTransactionDeclined)</code></p>
+
+<p>Called when a payment transaction is declined by either the acquirer, the card or the terminal.</p>
+
+<p>Please refer to the PayTec ECR Interface Specification for further information about the content of <code>transactionResponse</code>.</p>
+<h2 id='ontransactionreferred'>OnTransactionReferred</h2>
+<p><code>function onTransactionReferred(transactionResponse) {}</code><br>
+<code>trm.setOnTransactionReferred(onTransactionReferred)</code></p>
+
+<p>Called when the card issuer request a voice referral to authorize a payment transaction.</p>
+
+<p>Please refer to the PayTec ECR Interface Specification for further information about the content of <code>transactionResponse</code>.</p>
+<h2 id='ontransactionaborted'>OnTransactionAborted</h2>
+<p><code>function onTransactionAborted(transactionResponse) {}</code><br>
+<code>trm.setOnTransactionAborted(onTransactionAborted)</code></p>
+
+<p>Called when a payment transaction is aborted before completion.</p>
+
+<p>Please refer to the PayTec ECR Interface Specification for further information about the content of <code>transactionResponse</code>.</p>
+<h2 id='ontransactiontimedout'>OnTransactionTimedOut</h2>
+<p><code>function onTransactionTimedOut() {}</code><br>
+<code>trm.setOnTransactionTimedOut(onTransactionTimedOut)</code></p>
+
+<p>Called when no transaction response has been received within <a href="#transactiontimeout">TransactionTimeout</a> milliseconds
+after <a href="#starttransaction">startTransaction</a>.</p>
+<h2 id='ontransactionconfirmationsucceeded'>OnTransactionConfirmationSucceeded</h2>
+<p><code>function onTransactionConfirmationSucceeded() {}</code><br>
+<code>trm.setOnTransactionConfirmationSucceeded(onTransactionConfirmationSucceeded)</code></p>
+
+<p>Called when the <a href="#confirmtransaction">confirmation</a> of a payment transaction has been acknowledged by the terminal.</p>
+<h2 id='ontransactionconfirmationfailed'>OnTransactionConfirmationFailed</h2>
+<p><code>function onTransactionConfirmationFailed() {}</code><br>
+<code>trm.setOnTransactionConfirmationFailed(onTransactionConfirmationFailed)</code></p>
+
+<p>Called when the <a href="#confirmtransaction">confirmation</a> of a payment transaction fails.</p>
+<h2 id='ontransactionconfirmationtimedout'>OnTransactionConfirmationTimedOut</h2>
+<p><code>function onTransactionConfirmationTimedOut() {}</code><br>
+<code>trm.setOnTransactionConfirmationTimedOut(onTransactionConfirmationTimedOut)</code></p>
+
+<p>Called when the <a href="#confirmtransaction">confirmation</a> of a payment transaction timed out.</p>
+<h2 id='onbalancesucceeded'>OnBalanceSucceeded</h2>
+<p><code>function onBalanceSucceeded() {}</code><br>
+<code>trm.setOnBalanceSucceeded(onBalanceSucceeded)</code></p>
+
+<p>Called when <a href="#balance">balance</a> has succeeded.</p>
+<h2 id='onbalancefailed'>OnBalanceFailed</h2>
+<p><code>function onBalanceFailed() {}</code><br>
+<code>trm.setOnBalanceFailed(onBalanceFailed)</code></p>
+
+<p>Called when <a href="#balance">balance</a> has failed.</p>
+<h2 id='onbalancetimedout'>OnBalanceTimedOut</h2>
+<p><code>function onBalanceTimedOut() {}</code><br>
+<code>trm.setOnBalanceTimedOut(onBalanceTimedOut)</code></p>
+
+<p>Called when <a href="#balance">balance</a> has timed out.</p>
+<h2 id='onconfigurationsucceeded'>OnConfigurationSucceeded</h2>
+<p><code>function onConfigurationSucceeded() {}</code><br>
+<code>trm.setOnConfigurationSucceeded(onConfigurationSucceeded)</code></p>
+
+<p>Called when <a href="#configure">configure</a> has succeeded.</p>
+<h2 id='onconfigurationfailed'>OnConfigurationFailed</h2>
+<p><code>function onConfigurationFailed() {}</code><br>
+<code>trm.setOnConfigurationFailed(onConfigurationFailed)</code></p>
+
+<p>Called when <a href="#configure">configure</a> has failed.</p>
+<h2 id='onconfigurationtimedout'>OnConfigurationTimedOut</h2>
+<p><code>function onConfigurationTimedOut() {}</code><br>
+<code>trm.setOnConfigurationTimedOut(onConfigurationTimedOut)</code></p>
+
+<p>Called when <a href="#configure">configure</a> has timed out.</p>
+<h2 id='oninitializationsucceeded'>OnInitializationSucceeded</h2>
+<p><code>function onInitializationSucceeded() {}</code><br>
+<code>trm.setOnInitializationSucceeded(onInitializationSucceeded)</code></p>
+
+<p>Called when <a href="#initialize">initialize</a> has succeeded.</p>
+<h2 id='oninitializationfailed'>OnInitializationFailed</h2>
+<p><code>function onInitializationFailed() {}</code><br>
+<code>trm.setOnInitializationFailed(onInitializationFailed)</code></p>
+
+<p>Called when <a href="#initialize">initialize</a> has failed.</p>
+<h2 id='oninitializationtimedout'>OnInitializationTimedOut</h2>
+<p><code>function onInitializationTimedOut() {}</code><br>
+<code>trm.setOnInitializationTimedOut(onInitializationTimedOut)</code></p>
+
+<p>Called when <a href="#initialize">initialize</a> has timed out.</p>
+<h2 id='ondevicecommandsucceeded'>OnDeviceCommandSucceeded</h2>
+<p><code>function onDeviceCommandSucceeded() {}</code><br>
+<code>trm.setOnDeviceCommandSucceeded(onDeviceCommandSucceeded)</code></p>
+
+<p>Called when <a href="#devicecommand">deviceCommand</a> has succeeded.</p>
+<h2 id='ondevicecommandfailed'>OnDeviceCommandFailed</h2>
+<p><code>function onDeviceCommandFailed() {}</code><br>
+<code>trm.setOnDeviceCommandFailed(onDeviceCommandFailed)</code></p>
+
+<p>Called when <a href="#devicecommand">deviceCommand</a> has failed.</p>
+<h2 id='ondevicecommandtimedout'>OnDeviceCommandTimedOut</h2>
+<p><code>function onDeviceCommandTimedOut() {}</code><br>
+<code>trm.setOnDeviceCommandTimedOut(onDeviceCommandTimedOut)</code></p>
+
+<p>Called when <a href="#devicecommand">deviceCommand</a> has timed out.</p>
+<h2 id='onstatuschanged'>OnStatusChanged</h2>
+<p><code>function onStatusChanged() {}</code><br>
+<code>trm.setOnStatusChanged(onStatusChanged)</code></p>
+
+<p>Called whenever the terminal <a href="#statusflags">status flags</a> have changed.</p>
+<h2 id='onreceipt'>OnReceipt</h2>
+<p><code>function onReceipt(receiptType, receiptText) {}</code><br>
+<code>trm.setOnReceipt(onReceipt)</code></p>
+
+<p>Called when a <a href="#receipttypes">receipt</a> has been received from the terminal. This can happen automatically by performing
+use cases or after <a href="#requestreceipt">requesting</a> a receipt explicitely.</p>
+<h2 id='onmessagesent'>OnMessageSent</h2>
+<p><code>function onMessageSent(message) {}</code><br>
+<code>trm.setOnMessageSent(onMessageSent)</code></p>
+
+<p>Called after the API sends a JSON message to the terminal. This is mainly meant for logging.</p>
+<h2 id='onmessagereceived'>OnMessageReceived</h2>
+<p><code>function onMessageReceived(message) {}</code><br>
+<code>trm.setOnMessageReceived(onMessageReceived)</code></p>
+
+<p>Called when the API has received a JSON message from the terminal.</p>
+
+<aside class="warning">
+If this callback is used e.g. for logging, it is essential that it returns <code>false</code>. Otherwise
+the API does not do any further processing of the message.
+</aside>
+<h2 id='onerror'>OnError</h2>
+<p><code>function onError(message) {}</code><br>
+<code>trm.setOnError(callback)</code></p>
+
+<p>Called when an error occurs; message is a textual description of the error.</p>
+<h1 id='symbolic-constants'>Symbolic constants</h1><h2 id='transactionfunctions'>TransactionFunctions</h2>
+<p><code>trm.TransactionFunctions.PURCHASE</code></p>
+
+<p>The transaction function is a mandatory paramater to <a href="#starttransaction">start a payment transaction</a>.</p>
+
+<table><thead>
+<tr>
+<th>Function</th>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>PURCHASE</td>
+<td>0x00008000</td>
+<td>EFT/POS transaction where the products or services are paid (prepaid, debit or credit) by card (chip or magnetic stripe) or by manual PAN key entry. Additionally a tip can be entered.</td>
+</tr>
+<tr>
+<td>PURCHASE_RESERVATION</td>
+<td>0x00004000</td>
+<td>Purchase referencing a prior reservation</td>
+</tr>
+<tr>
+<td>TIP</td>
+<td>0x00002000</td>
+<td>Not available as a separate transaction type, but terminal allows tip amount entry if this function is supported.</td>
+</tr>
+<tr>
+<td>CASH_ADVANCE</td>
+<td>0x00001000</td>
+<td>Advance of cash at the POS. The transaction is executed as an exchange of different tender: card money for cash.</td>
+</tr>
+<tr>
+<td>CREDIT</td>
+<td>0x00000800</td>
+<td>Exchange of products or services for card money, for example a return</td>
+</tr>
+<tr>
+<td>PURCHASE_PHONE_AUTH</td>
+<td>0x00000400</td>
+<td>Purchase that was authorised by phone after a referral. Additionally a tip can be entered.</td>
+</tr>
+<tr>
+<td>PURCHASE_FORCED_ACCEPTANCE</td>
+<td>0x00000200</td>
+<td>Merchant has forced the transaction to be accepted. Additionally a tip can be entered</td>
+</tr>
+<tr>
+<td>PURCHASE_PHONE_ORDERED</td>
+<td>0x00000100</td>
+<td>Manual entry of card data needed for a transaction, with the cardholder being absent</td>
+</tr>
+<tr>
+<td>AUTHORIZATION_PURCHASE</td>
+<td>0x00000080</td>
+<td>Is used by vending machines where the final amount is unknown when the transaction is authorised</td>
+</tr>
+<tr>
+<td>PURCHASE_MAIL_ORDERED</td>
+<td>0x00000040</td>
+<td>Manual entry of card data needed for a transaction, with the cardholder being absent</td>
+</tr>
+<tr>
+<td>REVERSAL</td>
+<td>0x00000020</td>
+<td>Cancellation of a previous transaction.</td>
+</tr>
+<tr>
+<td>RESERVATION</td>
+<td>0x00000010</td>
+<td>With a reservation, the amount of money that is expected is guaranteed in advance.</td>
+</tr>
+<tr>
+<td>RESERVATION_ADJUSTMENT</td>
+<td>0x00000008</td>
+<td>The amount of money of a prior reservation is increased with the reservation amount adjustment and/or the reservation period is extended</td>
+</tr>
+<tr>
+<td>CONFIRM_PHONE_AUTH_RESERVATION</td>
+<td>0x00000004</td>
+<td>Reservation that was authorised by phone after a referral.</td>
+</tr>
+<tr>
+<td>PURCHASE_WITH_CASHBACK</td>
+<td>0x00000001</td>
+<td>Purchase with Cashback is a service offered to retail customers whereby an amount is added to the total purchase price of a transaction paid by debit/credit card and the customer receives that amount in cash along with the purchase.</td>
+</tr>
+<tr>
+<td>BALANCE_INQUIRY</td>
+<td>0x00020000</td>
+<td>Balance Inquiry is to check the available balance on prepaid card (may be used for debit or credit cards too if supported by the issuer).</td>
+</tr>
+<tr>
+<td>ACTIVATE_CARD</td>
+<td>0x00800000</td>
+<td>An Activate Card transaction is used to activate a new, often pre-funded prepaid card</td>
+</tr>
+<tr>
+<td>LOAD</td>
+<td>0x01000000</td>
+<td>Load transaction is used to load a prepaid card with a chosen load amount</td>
+</tr>
+<tr>
+<td>CANCEL_RESERVATION</td>
+<td>0x02000000</td>
+<td>Cancellation of any reservation transaction (even if it is submitted) to fulfil MasterCard’s requirement: &quot;Processing of Authorisations and Pre-authorisations in the Europe Region.&quot;</td>
+</tr>
+</tbody></table>
+<h2 id='transactionabortflags'>TransactionAbortFlags</h2>
+<p><code>trm.TransactionAbortFlags.ABORT_TRX_SILENT</code></p>
+
+<p>Flags that impact the behaviour when <a href="#aborttransaction">aborting a transaction</a>.</p>
+
+<table><thead>
+<tr>
+<th>Flag</th>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>ABORT_TRX_SILENT</td>
+<td>0x00000001</td>
+<td>Abort the transaction without showing an error message to the customer</td>
+</tr>
+</tbody></table>
+<h2 id='receipttypes'>ReceiptTypes</h2>
+<p><code>trm.ReceiptTypes.TRX</code></p>
+
+<p>Types of receipts the terminal can create.</p>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>TRX</td>
+<td>1</td>
+<td>Transaction receipt</td>
+</tr>
+<tr>
+<td>TRX_COPY</td>
+<td>2</td>
+<td>Transaction receipt copy - usually the cardholder receipt</td>
+</tr>
+<tr>
+<td>ACTIVATION</td>
+<td>11</td>
+<td>Terminal activation receipt</td>
+</tr>
+<tr>
+<td>ACTIVATION_FAILED</td>
+<td>12</td>
+<td>Receipt when terminal activation has failed</td>
+</tr>
+<tr>
+<td>DEACTIVATION</td>
+<td>13</td>
+<td>Terminal deactivation receipt</td>
+</tr>
+<tr>
+<td>DEACTIVATION_FAILED</td>
+<td>14</td>
+<td>Receipt when terminal deactivation has failed</td>
+</tr>
+<tr>
+<td>FINAL_BALANCE</td>
+<td>21</td>
+<td>Final balance receipt</td>
+</tr>
+<tr>
+<td>FINAL_BALANCE_FAILED</td>
+<td>22</td>
+<td>Receipt when final balance has failed</td>
+</tr>
+<tr>
+<td>CONFIG</td>
+<td>41</td>
+<td>Configuration receipt</td>
+</tr>
+<tr>
+<td>INIT</td>
+<td>43</td>
+<td>Initialization receipt</td>
+</tr>
+</tbody></table>
+<h2 id='receiptflags'>ReceiptFlags</h2>
+<p><code>trm.ReceiptTypes.TRX</code></p>
+
+<p>Flags that modify receipt printing.</p>
+
+<table><thead>
+<tr>
+<th>Flag</th>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>MORE_DATA_AVAILABLE</td>
+<td>0x00000001</td>
+<td>The receipt is not yet finished; more data will be sent.</td>
+</tr>
+<tr>
+<td>DOUBLE_HEIGHT</td>
+<td>0x00000004</td>
+<td>Use a font with doubled height.</td>
+</tr>
+</tbody></table>
+<h2 id='statusflags'>StatusFlags</h2>
+<p><code>trm.StatusFlags.SHIFT_OPEN</code></p>
+
+<p>Flags that describe the terminal&#39;s <a href="#getStatus">current state</a>.</p>
+
+<table><thead>
+<tr>
+<th>Flag</th>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>SHIFT_OPEN</td>
+<td>0x00000001</td>
+<td>The terminal is in activated state</td>
+</tr>
+<tr>
+<td>CARD_DATA_AVAILABLE</td>
+<td>0x00000002</td>
+<td>A card with readable chip or magstripe data has been presented</td>
+</tr>
+<tr>
+<td>BUSY</td>
+<td>0x00000004</td>
+<td>The terminal is busy with a use case. In the state, the POS may not be able to start a new use case.</td>
+</tr>
+<tr>
+<td>READER_SLOT_OCCUPIED</td>
+<td>0x00000008</td>
+<td>A card is inserted into the chip or combined chip/magnetic stripe reader</td>
+</tr>
+<tr>
+<td>LOCKED</td>
+<td>0x00000010</td>
+<td>The terminal is locked and cannot perform payment use cases; usually due to an ongoing cardholder dialog initiated by the POS.</td>
+</tr>
+<tr>
+<td>APPLICATION_SELECTED</td>
+<td>0x00000020</td>
+<td>A payment application hs been selected to process the current transaction</td>
+</tr>
+<tr>
+<td>WAITING_FOR_TRANSACTION_REQUEST</td>
+<td>0x00000040</td>
+<td>The terminal needs a <a href="#starttransaction">transaction request</a> to proceed.</td>
+</tr>
+<tr>
+<td>WAITING_FOR_APPLICATION_SELECTION</td>
+<td>0x00000080</td>
+<td>The terminal is waiting for the cardholder to select a payment application</td>
+</tr>
+<tr>
+<td>ONLINE_PROCESSING</td>
+<td>0x00000100</td>
+<td>The terminal is currently connected to an acquirer or to the TMS/Service Center</td>
+</tr>
+<tr>
+<td>PRINTER_UNAVAILABLE</td>
+<td>0x00000200</td>
+<td>The terminal&#39;s printer is unavailable</td>
+</tr>
+<tr>
+<td>OUT_OF_PAPER</td>
+<td>0x00000400</td>
+<td>The terminal&#39;s printer is out of paper</td>
+</tr>
+</tbody></table>
+<h2 id='devicecommands'>DeviceCommands</h2>
+<p><code>trm.DeviceCommands.EJECT_CARD</code></p>
+
+<p>Commands to <a href="#devicecommand">perform</a> some terminal actions beside payment.</p>
+
+<table><thead>
+<tr>
+<th>Command</th>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>EJECT_CARD</td>
+<td>1</td>
+<td>Eject a card left within a motorized reader</td>
+</tr>
+<tr>
+<td>EJECT_CARD_FORCED</td>
+<td>2</td>
+<td>Force-eject a card left within a motorized reader</td>
+</tr>
+<tr>
+<td>REBOOT</td>
+<td>501</td>
+<td>Reboot the terminal</td>
+</tr>
+<tr>
+<td>SW_UPDATE</td>
+<td>502</td>
+<td>Trigger software update on the terminal</td>
+</tr>
+<tr>
+<td>ENABLE_LANGUAGE_SELECTION</td>
+<td>1001</td>
+<td>Show a language selection dialog if chip card without language preference is inserted</td>
+</tr>
+<tr>
+<td>DISABLE_LANGUAGE_SELECTION</td>
+<td>1002</td>
+<td>Don&#39;t show a language selection dialog if chip card without language preference is inserted</td>
+</tr>
+<tr>
+<td>SHOW_IDLE</td>
+<td>2001</td>
+<td>Show the terminal&#39;s idle message (usually &#39;Welcome, present card&#39; in activated state.</td>
+</tr>
+<tr>
+<td>SHOW_CARD_INSERTION</td>
+<td>2002</td>
+<td>Show the card insertion message to the cardholder</td>
+</tr>
+</tbody></table>
+
+      </div>
+      <div class="dark-box">
+          <div class="lang-selector">
+                <a href="#" data-language-name="javascript">javascript</a>
+          </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,598 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.7.0/css/all.css" />
+        <link rel="stylesheet" href="//stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
+
+        <style>
+            pre {
+                white-space: pre-wrap;       /* css-3 */
+                word-wrap: break-word;       /* Internet Explorer 5.5+ */
+            }
+            .initiallyHidden {
+                display: none;
+            }
+
+            /* Prevent spin buttons on Firefox. */
+            input[type='number'] {
+                -moz-appearance:textfield;
+            }
+
+            body, .tab-content {
+                height: 100%;
+            }
+
+            .nav i, .dropdown i {
+                margin-right: 5px;
+                margin-left: 5px;
+                font-size: 1.2em;
+            }
+
+            .info-title-1 {
+                margin-top: 3%;
+                font-size: 1.8em;
+            }
+
+            .info-title-2 {
+                margin-top: 1%;
+                font-weight: bold;
+            }
+
+            .page-spacer {
+                margin-top: 1%;
+            }
+
+            .section-spacer {
+                margin-top: 10%;
+            }
+
+            .subsection-spacer {
+                margin-top: 5%;
+            }
+
+            .button-spacer {
+                margin-top: 5%;
+            }
+        </style>
+
+        <title>PayTec AEM</title>
+    </head>
+    <body>
+        <div class="container-fluid page-spacer">
+            <div class="row">
+                <div class="col-6">
+                    <img src="https://www.paytec.ch/fileadmin/bilder/website/logo-paytec.png"></img>
+                </div>
+                <div class="col-6 text-right">
+                    <i id="onlineProcessing" class="fas fa-phone status initiallyHidden" title="Terminal is online"></i>
+                    <i id="cardDataAvailable" class="fa fa-credit-card status initiallyHidden" title="Card has been read"></i>
+                    <i id="busy" class="fa fa-hourglass status initiallyHidden" title="Terminal is busy"></i>
+                    <i id="shiftOpen" class="fa fa-lock-open status activated initiallyHidden" title="Shift is open"></i>
+                    <i id="shiftClosed" class="fa fa-lock status deactivated" title="Shift is closed"></i>
+                    <i id="connected" class="fa fa-link connected initiallyHidden" title="Connected to terminal"></i>
+                    <i id="disconnected" class="fa fa-unlink disconnected" title="No terminal connected"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="navbar">
+                <ul class="nav nav-tabs mr-auto">
+                    <li class="nav-item">
+                        <span class="nav-link active" id="paymentTab" data-toggle="tab" href="#paymentPane" role="tab" aria-controls="paymentPane" aria-selected="true">
+                            <i class="fa fa-credit-card"></i>
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <span class="nav-link" id="receiptTab" data-toggle="tab" href="#receiptPane" role="tab" aria-controls="receiptPane" aria-selected="false">
+                            <i class="fas fa-receipt"></i>
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <span class="nav-link" id="infoTab" data-toggle="tab" href="#infoPane" role="tab" aria-controls="infoPane" aria-selected="false">
+                            <i class="fas fa-info"></i>
+                        </span>
+                    </li>
+                </ul>
+                <ul class="nav">
+                    <li class="dropdown">
+                        <span class="dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-wrench"></i>
+                        </span>
+                        <div class="dropdown-menu dropdown-menu-right dropdown-primary" aria-labelledby="navbarDropdownMenuLink">
+                            <span class="dropdown-item disconnected" onclick="javascript:enterPairingCode();">
+                                <i class="fas fa-link"></i>&nbsp;Mit Terminal verbinden
+                            </span>
+                            <span class="dropdown-item connected" onclick="javascript:unpair();">
+                                <i class="fas fa-unlink"></i>&nbsp;Verbindung aufheben
+                            </span>
+                            <div class="dropdown-divider"></div> 
+                            <span class="dropdown-item" id="reboot" onclick="javascript:trm.deviceCommand({ DeviceCommandCode: trm.DeviceCommands.REBOOT });">
+                                <i class="fas fa-power-off"></i>&nbsp;Neustart
+                            </span>
+                            <span class="dropdown-item" id="swUpdate" onclick="javascript:trm.deviceCommand({ DeviceCommandCode: trm.DeviceCommands.SW_UPDATE });">
+                                <i class="fas fa-cloud-download-alt"></i>&nbsp;SW Update
+                            </span>
+                            <div class="dropdown-divider"></div> 
+                            <span class="dropdown-item" id="swUpdate" onclick="javascript:location.reload();">
+                                <i class="fas fa-redo"></i>&nbsp;Seite neu laden
+                            </span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="tab-content">
+                <div id="paymentPane" class="tab-pane container show active section-spacer" role="tabpanel">
+                    <div class="row">
+                        <div class="col-12">
+                            <form id="paymentForm" class="md-form needs-validation connected activated" action="javascript:transaction()" novalidate>
+                                <div class="form-group">
+                                    <label for="trxFunctionSelect" class="">Funktion:</label>
+                                    <select class="form-control" id="trxFunctionSelect"></select>
+                                </div>
+                                <div class="form-group amount-needed">
+                                    <label for="amount" class="">Betrag:</label>
+                                    <input type="text" inputmode="numeric" class="form-control" id="amount" pattern="^\$?(([1-9](\d*|\d{0,2}(,\d{3})*))|0)(\.\d{1,2})?$" required></input>
+                                    <div class="invalid-feedback">
+                                        <div class="col-12">ungültiger Betrag - gültige Werte: 0.01 - 999999.99</div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary btn-block btn-lg" id="pay">
+                                        <i class="fas fa-check"></i> OK
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger btn-lg initiallyHidden" id="abortTransactionButton" onclick="javascript:trm.abortTransaction();">
+                                        <i class="fas fa-times"></i> Abbruch
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="disconnected text-center">
+                        <button type="button" class="btn btn-primary btn-block btn-lg" onclick="javascript:enterPairingCode();">
+                            <i class="fas fa-link"></i>&nbsp;Mit Terminal verbinden
+                        </button>
+                    </div>
+                    <div class="connected deactivated text-center">
+                        <button type="button" class="btn btn-primary btn-block btn-lg" id="activate" onclick="javascript:trm.activate()">Terminal aktivieren</button>
+                    </div>
+                    <div class="section-spacer"></div>
+                    <div class="connected activated text-center">
+                        <button type="button" class="btn btn-primary btn-block"
+                            id="deactivate" onclick="javascript:trm.deactivate()">Terminal deaktivieren</button>
+                    </div>
+                    <div class="connected deactivated text-center button-spacer">
+                        <button type="button" class="btn btn-primary btn-block"
+                            id="balance" onclick="javascript:trm.balance()">Tagesabschluss</button>
+                    </div>
+                    <div class="connected text-center button-spacer">
+                        <button type="button" class="btn btn-primary btn-block"
+                            id="config" onclick="javascript:trm.configure()">Konfiguration</button>
+                    </div>
+                    <div class="connected text-center button-spacer">
+                        <button type="button" class="btn btn-primary btn-block"
+                            id="init" onclick="javascript:trm.initialize(-1)">Initialisierung</button>
+                    </div>
+                </div>
+                <div id="receiptPane" class="tab-pane container" role="tabpanel">
+                    <div class="text-right">
+                        <button type="button" id="clearReceipts" class="btn btn-primary d-none" title="Clear" onclick="javascript:clearReceipts()">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div id="receipts">
+                    </div>
+                </div>
+                <div id="infoPane" class="tab-pane container" role="tabpanel">
+                    <div class="row info-title-1">Info:</div>
+                    <div class="row info-title-2">Terminalmodell:</div>
+                    <div class="row" id="terminalModel">unbekannt</div>
+                    <div class="row info-title-2">Terminal ID:</div>
+                    <div class="row" id="terminalID">unbekannt</div>
+                    <div class="row info-title-2">Seriennummer:</div>
+                    <div class="row" id="serialNumber">unbekannt</div>
+                    <div class="row info-title-2">Software:</div>
+                    <div class="row" id="software">unbekannt</div>
+                    <div class="row info-title-1">Verarbeiter</div>
+                    <div id="acquirerInfo">[keine]</div>
+                    <div class="row info-title-1">Brands</div>
+                    <div id="brandInfo">[keine]</div>
+                    <div class="row info-title-1">Funktionen</div>
+                    <div id="trxFunctionInfo">[keine]</div>
+                </div>
+            </div>
+            <div id="dialog" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 id="dialogTitle" class="modal-title"></h4>
+                            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+                        </div>
+                        <div class="modal-body">
+                            <p id="dialogText"></p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="pairingDialog" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                    <form class="form-horizontal" role="form" method="post" action="">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 id="pairingDialogTitle" class="modal-title">Pairing mit Terminal</h4>
+                                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+                            </div>
+                            <div class="modal-body">
+                                <p id="pairingDialogText">Bitte Pairing Code eingeben:</p>
+                                <input type="number" id="pairingCode"></input>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary" data-dismiss="modal" onclick="javascript:doPairing($('#pairingCode')[0].value);">
+                                    <i class="fas fa-check"></i>&nbsp;OK
+                                </button>
+                                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+                                    <i class="fas fa-times"></i>&nbsp;Abbruch
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script src="//code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+        <script src="//stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+        <script src="//ecritf.paytec.ch/api/v1.0/ecritf.js"></script>
+
+        <script language = "javascript" type = "text/javascript">
+            var language = navigator.language.split("-")[0];
+            var trm;
+            var dialogTimer = undefined;
+            var trmStatus = 0;
+            var pairingInfo;
+
+            $(".connected").hide();
+            $(".activated").hide();
+
+            if (typeof(Storage) !== "undefined") {
+                let info = localStorage.getItem("pairingInfo");
+
+                if (info !== undefined) {
+                    try {
+                        pairingInfo = JSON.parse(info);
+                    }
+                    catch (err) {
+                        console.log("Cannot parse pairing info");
+                        pairingInfo = undefined;
+                    }
+                }
+            }
+
+            trm = new PayTec.POSTerminal(pairingInfo, {
+                    TrmLng: language,
+                    OnPairingFailed: onPairingFailed,
+                    OnConnected: onConnected,
+                    OnDisconnected: onDisconnected,
+                    OnStatusChanged: onStatusChanged,
+                    OnTransactionApproved: onTransactionApproved,
+                    OnTransactionDeclined: onTransactionFailed,
+                    OnTransactionAborted: onTransactionFailed,
+                    OnTransactionTimedOut: onTransactionTimedOut,
+                    OnReceipt: onReceipt,
+                    OnError: onError
+                });
+
+            function onConnected() {
+                if (dialogTimer == undefined) {
+                    setDialogTimer(500);
+                }
+
+                $("#terminalModel").html(trm.getDeviceModelName());
+                $("#serialNumber").html(trm.getSerialNumber());
+                $("#terminalID").html(trm.getTerminalID());
+
+                v = trm.getSoftwareVersion();
+
+                $("#software").html(pad(Math.trunc(v / 10000), 2, '0')
+                    + "." + pad(Math.trunc((v % 10000) / 100), 2, '0')
+                    + "." + pad(Math.trunc(v % 100), 2, '0'));
+
+                $(".connected").show();
+                $(".disconnected").hide();
+                $(".activated").hide();
+                $(".deactivated").hide();
+            }
+
+            function onPairingFailed() {
+                showDialog("Fehler", "Es konnte keine Verbindung zum Terminal hergestellt werden", 10000);
+            }
+
+            function onStatusChanged() {
+                var newStatus = trm.getStatus();
+
+                if ((trm.StatusFlags.OUT_OF_PAPER & newStatus) != (trm.StatusFlags.OUT_OF_PAPER & trmStatus)) {
+                    if (trm.StatusFlags.OUT_OF_PAPER & newStatus) {
+                        showDialog("Druckerproblem", "Bitte Papierrolle wechseln", Infinity);
+                    }
+                    else {
+                        if (dialogTimer == undefined) {
+                            setDialogTimer(500);
+                        }
+                    }
+                }
+                else if ((trm.StatusFlags.WAITING_FOR_TRANSACTION_REQUEST & newStatus) && !(trm.StatusFlags.WAITING_FOR_TRANSACTION_REQUEST & trmStatus)) {
+                    $("#amount").focus();
+                    hideDialog();
+                }
+                else if (((trm.StatusFlags.BUSY & newStatus) != (trm.StatusFlags.BUSY & trmStatus)) && $("#abortTransactionButton").is(":hidden")) {
+                    if (trm.StatusFlags.BUSY & newStatus) {
+                        showDialog("Bitte warten", "Bitte warten", Infinity);
+                    }
+                    else {
+                        if (dialogTimer == undefined) {
+                            setDialogTimer(500);
+                        }
+                    }
+                }
+
+                trmStatus = newStatus;
+                applyPrinterStatus();
+
+                if (trm.StatusFlags.SHIFT_OPEN & trmStatus) {
+                    $(".deactivated").hide();
+                    $(".activated").show();
+                }
+                else {
+                    $(".deactivated").show();
+                    $(".activated").hide();
+                }
+
+                $("#busy").toggle((trm.StatusFlags.BUSY & trmStatus) != 0);
+                $("#onlineProcessing").toggle((trm.StatusFlags.ONLINE_PROCESSING & trmStatus) != 0);
+                $("#cardDataAvailable").toggle(((trm.StatusFlags.CARD_DATA_AVAILABLE | trm.StatusFlags.APPLICATION_SELECTED) & trmStatus) != 0);
+
+                if (!(trm.StatusFlags.BUSY & trmStatus)) {
+                    // update acquirers
+                    var acquirerInfoHTML = "";
+                    var acquirers = trm.getAcquirers();
+
+                    for (var i in acquirers) {
+                        var acqInfo = trm.getAcquirerInfo(acquirers[i]);
+                        var lastInitDate = acqInfo.LastAcqInitDate === undefined ? "nie" : acqInfo.LastAcqInitDate;
+
+                        acquirerInfoHTML +=
+                            "<div class='row'>"
+                                + "<div class='col text-left'>Acquirer ID: " + acqInfo.AcqID
+                                + "</div>"
+                                + "<div class='col text-left'>erfolgreich initialisiert: " + lastInitDate
+                                + "</div>"
+                                + "<div class='col text-right'>"
+                                    + "<button type='button' class='btn btn-primary connected' onclick='javascript:trm.initialize(" + acqInfo.AcqID + ");'>"
+                                        + "<i class=\"fas fa-redo\"></i>"
+                                    + "</button>"
+                                + "</div>"
+                            + "</div>";
+                    }
+
+                    $("#acquirerInfo").html(acquirerInfoHTML);
+
+                    // update supported brands & transaction functions
+                    var brandInfoHTML = "";
+                    var brands = trm.getBrands();
+
+                    for (var i in brands) {
+                        var brand = brands[i];
+
+                        brandInfoHTML +=
+                            "<div class='row'>"
+                                + "<div class='col-3'>" + brand + "</div>"
+                            + "</div>";
+                    }
+
+                    $("#brandInfo").html(brandInfoHTML);
+
+                    var trxFunctionInfoHTML = "";
+                    var trxFunctionSelectHTML = "";
+                    var trxFunctions = trm.getTransactionFunctions();
+
+                    for (var i in trxFunctions) {
+                        var name = trm.getTransactionFunctionName(trxFunctions[i], language);
+                        trxFunctionInfoHTML += "<div class='row'><div class='col'>" + name + "</div></div>";
+                        trxFunctionSelectHTML += "<option value='" + trxFunctions[i] + "'>" + name + "</option>";
+                    }
+
+                    $("#trxFunctionInfo").html(trxFunctionInfoHTML);
+                    $("#trxFunctionSelect").html(trxFunctionSelectHTML);
+                }
+            }
+
+            function resetTransactionUI() {
+                $("#abortTransactionButton").hide();
+                $("#pay").show();
+                $("#amount")[0].value = "";
+                $("#trxFunctionSelect").val($("#trxFunctionSelect option:first").val());
+                $("#trxFunctionSelect").trigger("change");
+            }
+
+            function onTransactionApproved(rsp) {
+                resetTransactionUI();
+                showDialog("Verarbeitung OK", rsp.AttendantText, 5000);
+            }
+
+            function onTransactionFailed(rsp) {
+                resetTransactionUI();
+                showDialog("Verarbeitung fehlgeschlagen", rsp.AttendantText, 30000);
+            }
+
+            function onTransactionTimedOut() {
+                resetTransactionUI();
+                showDialog("Verarbeitung fehlgeschlagen", "Timeout", 30000);
+            }
+
+            function onReceipt(receiptType, receiptText) {
+                $("#receipts").html("<div>"
+                            + "<span class='print-tooltip' data-toggle='tooltip' title=''>"
+                                + "<button type='button' class='print-button btn btn-primary connected' onclick='javascript:print(\"" + receiptText.replace(/\n/g, "\\n") + "\");'><i class=\"fas fa-print\"></i>"
+                                + "</button>"
+                            + "</span>"
+                            + "<pre>"
+                                + receiptText.replace("\\n", "\n") + "  ----------------------------  \n\n"
+                            + "</pre>"
+                        + "</div>"
+                    + $("#receipts").html());
+
+                applyPrinterStatus();
+                $("#clearReceipts").removeClass("d-none");
+                
+                while ($("#receipts").children().length > 20) {
+                    $("#receipts > div:last-child").remove();
+                }
+            }
+
+            function onDisconnected() {
+                $(".connected").hide();
+                $(".status").hide();
+                $(".disconnected").show();
+            }
+
+            function onError(message) {
+                showDialog("Fehler", message, 60000);
+            }
+
+            function enterPairingCode() {
+                $("#pairingCode")[0].value = "";
+                $("#pairingDialog").modal("show");
+            }
+
+            function doPairing(code) {
+                showDialog("Bitte warten", "Verbindung wird hergestellt", Infinity);
+                trm.pair(code, document.title);
+
+                if (typeof(Storage) !== "undefined") {
+                    localStorage.setItem("pairingInfo", JSON.stringify(trm.getPairingInfo()));
+                }
+            }
+
+            function unpair() {
+                trm.unpair();
+
+                if (typeof(Storage) !== "undefined") {
+                    localStorage.setItem("pairingInfo", undefined);
+                }
+            }
+
+            function transaction() {
+                trm.startTransaction({
+                        TrxFunction: Number($("#trxFunctionSelect").find(":selected")[0].value),
+                        TrxCurrC: trm.getCurrencies()[0],
+                        AmtAuth: Number($("#amount")[0].value) * 100
+                    });
+
+                $("#paymentForm").removeClass("was-validated");
+                $("#pay").hide();
+                $("#abortTransactionButton").show();
+            }
+
+            function print(text) {
+                var lines = text.replace(/\\n/g, "\n").split('\n');
+
+                trm.print({ ReceiptText: lines.slice(0, 1).join('\n'), ReceiptFlags: trm.ReceiptFlags.DOUBLE_HEIGHT | trm.ReceiptFlags.MORE_DATA_AVAILABLE });
+                trm.print({ ReceiptText: lines.slice(1).join('\n') });
+            }
+
+            function applyPrinterStatus() {
+                if (trm.StatusFlags.PRINTER_UNAVAILABLE & trmStatus) {
+                    $(".print-tooltip").attr('data-original-title', "Drucker nicht verfügbar").tooltip("enable");
+                    $(".print-button").prop("disabled", true);
+                }
+                else if (trm.StatusFlags.OUT_OF_PAPER & trmStatus) {
+                    $(".print-tooltip").attr('data-original-title', "Drucker hat kein Papier mehr").tooltip("enable");
+                    $(".print-button").prop("disabled", true);
+                }
+                else {
+                    $(".print-tooltip").tooltip("disable");
+                    $(".print-button").prop("disabled", false);
+                }
+            }
+
+            function clearDialogTimer() {
+                if (undefined !== dialogTimer) {
+                    clearTimeout(dialogTimer);
+                    dialogTimer = undefined;
+                }
+            }
+
+            function setDialogTimer(timeout) {
+                clearDialogTimer();
+
+                if (Infinity != timeout) {
+                    dialogTimer = setTimeout(function () {
+                            hideDialog();
+                        }, timeout);
+                }
+            }
+
+            function showDialog(title, text, timeout) {
+                $("#dialogTitle")[0].innerText = title;
+                $("#dialogText")[0].innerText = text;
+
+                $("#dialog").modal("show");
+                setDialogTimer(timeout);
+            }
+            
+            function hideDialog() {
+                clearDialogTimer();
+                $("#dialog").modal("hide");
+            }
+
+            function clearReceipts() {
+                $("#receipts").html("");
+                $("#clearReceipts").addClass("d-none");
+            }
+
+            function pad(num, padlen, padchar) {
+                var pad_char = typeof padchar !== 'undefined' ? padchar : '0';
+                var padArray = new Array(1 + padlen).join(pad_char);
+                return (padArray + num).slice(-padArray.length);
+            }
+
+            window.addEventListener('load', function() {
+                $("#pairingDialog").on('shown.bs.modal', function(){
+                    $(this).find('#pairingCode').focus();
+                });
+
+                $('#trxFunctionSelect').change(function() {
+                    if (trm.needsAmount($("#trxFunctionSelect").val())) {
+                        $(".amount-needed").show();
+                    }
+                    else {
+                        $(".amount-needed").hide();
+                    }
+
+                    $("#paymentForm").removeClass("was-validated");
+                });
+
+                var forms = document.getElementsByClassName('needs-validation');
+
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (trm.needsAmount($("#trxFunctionSelect").val())) {
+                            if (form.checkValidity() === false) {
+                                event.preventDefault();
+                                event.stopPropagation();
+                            }
+                            form.classList.add('was-validated');
+                        }
+                    }, false);
+                });
+            }, false);
+        </script>
+    </body>
+</html>
