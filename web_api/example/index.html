@@ -258,6 +258,17 @@
             var trmStatus = 0;
             var pairingInfo;
 
+            // IE compatibility
+            Math.trunc = Math.trunc || function(x) {
+              if (isNaN(x)) {
+                return NaN;
+              }
+              if (x > 0) {
+                return Math.floor(x);
+              }
+              return Math.ceil(x);
+            };
+
             $(".connected").hide();
             $(".activated").hide();
 
