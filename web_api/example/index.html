@@ -82,45 +82,47 @@
             <div class="navbar">
                 <ul class="nav nav-tabs mr-auto">
                     <li class="nav-item">
-                        <span class="nav-link active" id="paymentTab" data-toggle="tab" href="#paymentPane" role="tab" aria-controls="paymentPane" aria-selected="true">
+                        <a class="nav-link active" id="paymentTab" data-toggle="tab" href="#paymentPane" role="tab" aria-controls="paymentPane" aria-selected="true">
                             <i class="fa fa-credit-card"></i>
-                        </span>
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <span class="nav-link" id="receiptTab" data-toggle="tab" href="#receiptPane" role="tab" aria-controls="receiptPane" aria-selected="false">
+                        <a class="nav-link" id="receiptTab" data-toggle="tab" href="#receiptPane" role="tab" aria-controls="receiptPane" aria-selected="false">
                             <i class="fas fa-receipt"></i>
-                        </span>
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <span class="nav-link" id="infoTab" data-toggle="tab" href="#infoPane" role="tab" aria-controls="infoPane" aria-selected="false">
+                        <a class="nav-link" id="infoTab" data-toggle="tab" href="#infoPane" role="tab" aria-controls="infoPane" aria-selected="false">
                             <i class="fas fa-info"></i>
-                        </span>
+                        </a>
                     </li>
                 </ul>
                 <ul class="nav">
-                    <li class="dropdown">
-                        <span class="dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <li>
+                    <a href="#" class="dropdown">
+                        <a href="#" class="dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fa fa-wrench"></i>
-                        </span>
+                        </a>
                         <div class="dropdown-menu dropdown-menu-right dropdown-primary" aria-labelledby="navbarDropdownMenuLink">
-                            <span class="dropdown-item disconnected" onclick="javascript:enterPairingCode();">
+                            <a class="dropdown-item disconnected" onclick="javascript:enterPairingCode();">
                                 <i class="fas fa-link"></i>&nbsp;Mit Terminal verbinden
-                            </span>
-                            <span class="dropdown-item connected" onclick="javascript:unpair();">
+                            </a>
+                            <a class="dropdown-item connected" onclick="javascript:unpair();">
                                 <i class="fas fa-unlink"></i>&nbsp;Verbindung aufheben
-                            </span>
+                            </a>
                             <div class="dropdown-divider"></div> 
-                            <span class="dropdown-item" id="reboot" onclick="javascript:trm.deviceCommand({ DeviceCommandCode: trm.DeviceCommands.REBOOT });">
+                            <a class="dropdown-item" id="reboot" onclick="javascript:trm.deviceCommand({ DeviceCommandCode: trm.DeviceCommands.REBOOT });">
                                 <i class="fas fa-power-off"></i>&nbsp;Neustart
-                            </span>
-                            <span class="dropdown-item" id="swUpdate" onclick="javascript:trm.deviceCommand({ DeviceCommandCode: trm.DeviceCommands.SW_UPDATE });">
+                            </a>
+                            <a class="dropdown-item" id="swUpdate" onclick="javascript:trm.deviceCommand({ DeviceCommandCode: trm.DeviceCommands.SW_UPDATE });">
                                 <i class="fas fa-cloud-download-alt"></i>&nbsp;SW Update
-                            </span>
+                            </a>
                             <div class="dropdown-divider"></div> 
-                            <span class="dropdown-item" id="swUpdate" onclick="javascript:location.reload();">
+                            <a class="dropdown-item" id="swUpdate" onclick="javascript:location.reload();">
                                 <i class="fas fa-redo"></i>&nbsp;Seite neu laden
-                            </span>
+                            </a>
                         </div>
+                    </a>
                     </li>
                 </ul>
             </div>
