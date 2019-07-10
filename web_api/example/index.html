@@ -516,22 +516,32 @@
             function print(text) {
                 var lines = text.replace(/\\n/g, "\n").split('\n');
 
-                trm.print({ ReceiptText: lines.slice(0, 1).join('\n'), ReceiptFlags: trm.ReceiptFlags.DOUBLE_HEIGHT | trm.ReceiptFlags.MORE_DATA_AVAILABLE });
-                trm.print({ ReceiptText: lines.slice(1).join('\n') });
+                if (trm.StatusFlags.OUT_OF_PAPER & trmStatus) {
+                    showDialog("Kein Papier", "Bitte Papier am Terminaldrucker wechseln", 10000);
+                }
+                else if (trm.StatusFlags.PRINTER_UNAVAILABLE & trmStatus) {
+                    var printerWindow = window.open('', '', 'left=0,top=0,width=800,height=900,toolbar=0,scrollbars=0,status=0');
+                    printerWindow.document.write("<pre>" + lines.join('\n') + "</pre>");
+                    printerWindow.document.close();
+                    printerWindow.focus();
+                    printerWindow.print();
+                    printerWindow.close();
+                }
+                else {
+                    trm.print({ ReceiptText: lines.slice(0, 1).join('\n'), ReceiptFlags: trm.ReceiptFlags.DOUBLE_HEIGHT | trm.ReceiptFlags.MORE_DATA_AVAILABLE });
+                    trm.print({ ReceiptText: lines.slice(1).join('\n') });
+                }
             }
 
             function applyPrinterStatus() {
                 if (trm.StatusFlags.PRINTER_UNAVAILABLE & trmStatus) {
-                    $(".print-tooltip").attr('data-original-title', "Drucker nicht verfügbar").tooltip("enable");
-                    $(".print-button").prop("disabled", true);
+                    $(".print-tooltip").attr('data-original-title', "Druck via Browser").tooltip("enable");
                 }
                 else if (trm.StatusFlags.OUT_OF_PAPER & trmStatus) {
-                    $(".print-tooltip").attr('data-original-title', "Drucker hat kein Papier mehr").tooltip("enable");
-                    $(".print-button").prop("disabled", true);
+                    $(".print-tooltip").attr('data-original-title', "Druck via Terminal - bitte Papier wechseln").tooltip("enable");
                 }
                 else {
-                    $(".print-tooltip").tooltip("disable");
-                    $(".print-button").prop("disabled", false);
+                    $(".print-tooltip").attr('data-original-title', "Druck via Terminal").tooltip("enable");
                 }
             }
 
