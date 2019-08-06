@@ -505,7 +505,7 @@
                 trm.startTransaction({
                         TrxFunction: Number($("#trxFunctionSelect").find(":selected")[0].value),
                         TrxCurrC: trm.getCurrencies()[0],
-                        AmtAuth: Number($("#amount")[0].value) * 100
+                        AmtAuth: Math.round(Number($("#amount")[0].value) * 100)
                     });
 
                 $("#paymentForm").removeClass("was-validated");
