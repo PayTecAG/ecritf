@@ -1081,6 +1081,9 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     }
 
     function connect() {
+        if ((smq === undefined) || (smq.getsock() === undefined) || (smq.getsock() == null))
+            createSMQ();
+
         smq.subscribe(pairing.Channel, undefined, { datatype: "json", onmsg: onMessage } );
         changeState(State.CONNECTING);
     }
