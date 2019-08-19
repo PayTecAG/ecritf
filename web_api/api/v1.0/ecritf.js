@@ -984,7 +984,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     var autoConfirm = (undefined !== options && undefined !== options.AutoConfirm) ? (options.AutoConfirm ? true : false) : true;
     var heartbeatInterval = (undefined !== options && undefined !== options.HeartbeatInterval) ? options.HeartbeatInterval : 10000;
     var heartbeatTimeout = (undefined !== options && undefined !== options.HeartbeatTimeout) ? options.HeartbeatTimeout : 10000;
-    var connectionTimeour = (undefined !== options && undefined !== options.ConnectionTimeour) ? options.ConnectionTimeour : 20000;
+    var connectionTimeout = (undefined !== options && undefined !== options.ConnectionTimeout) ? options.ConnectionTimeout : 20000;
     var initializationTimeout = (undefined !== options && undefined !== options.InitializationTimeout) ? options.InitializationTimeout : 120000;
     var transactionTimeout = (undefined !== options && undefined !== options.TransactionTimeout) ? options.TransactionTimeout : 70000;
     var defaultTimeout = (undefined !== options && undefined !== options.DefaultTimeout) ? options.DefaultTimeout : 30000;
@@ -1813,7 +1813,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         switch (state) {
         case State.PAIRING:
         case State.CONNECTING:
-            setTimer(connectionTimeour);
+            setTimer(connectionTimeout);
             break;
         case State.TRANSACTION:
             confirmingTrxSeqCnt = undefined;
