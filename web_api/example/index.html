@@ -96,6 +96,11 @@
                             <i class="fas fa-info"></i>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="settingsTab" data-toggle="tab" href="#settingsPane" role="tab" aria-controls="settingsPane" aria-selected="false">
+                            <i class="fas fa-sliders-h"></i>
+                        </a>
+                    </li>
                 </ul>
                 <ul class="nav">
                     <li>
@@ -205,6 +210,21 @@
                     <div class="row info-title-1">Funktionen</div>
                     <div id="trxFunctionInfo">[keine]</div>
                 </div>
+                <div id="settingsPane" class="tab-pane container" role="tabpanel">
+                   <div class="row form-group info-title-1">Belege automatisch auf Terminal drucken</div>
+                   <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="printMerchantReceipts" onclick="javascript:storeSettings();">
+                        <label class="form-check-label" for="printMerchantReceipts">Händlerbelege</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="printCardholderReceipts" onclick="javascript:storeSettings();">
+                        <label class="form-check-label" for="printCardholderReceipts">Kundenbelege</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="printInfoReceipts" onclick="javascript:storeSettings();">
+                        <label class="form-check-label" for="printInfoReceipts">Infobelege</label>
+                    </div>
+                </div>
             </div>
             <div id="dialog" class="modal fade" role="dialog">
                 <div class="modal-dialog">
@@ -286,6 +306,10 @@
                         pairingInfo = undefined;
                     }
                 }
+
+                $("#printMerchantReceipts").prop('checked', localStorage.getItem("printMerchantReceipts") == "true");
+                $("#printCardholderReceipts").prop('checked', localStorage.getItem(printCardholderReceipts) == "true");
+                $("#printInfoReceipts").prop('checked', localStorage.getItem("printInfoReceipts") == "true");
             }
 
             trm = new PayTec.POSTerminal(pairingInfo, {
@@ -463,9 +487,37 @@
 
                 applyPrinterStatus();
                 $("#clearReceipts").removeClass("d-none");
-                
+
                 while ($("#receipts").children().length > 20) {
                     $("#receipts > div:last-child").remove();
+                }
+
+                if (0 == ((trm.StatusFlags.PRINTER_UNAVAILABLE | trm.StatusFlags.OUT_OF_PAPER) & trmStatus)) {
+                    var doPrint = false;
+
+                    switch (receiptType) {
+                        case trm.ReceiptTypes.TRX:
+                        case trm.ReceiptTypes.FINAL_BALANCE:
+                        case trm.ReceiptTypes.FINAL_BALANCE_FAILED:
+                            if ($("#printMerchantReceipts").is(":checked"))
+                                doPrint = true;
+
+                            break;
+                        case trm.ReceiptTypes.TRX_COPY:
+                            if ($("#printCardholderReceipts").is(":checked"))
+                                doPrint = true;
+
+                            break;
+                        default:
+                            if ($("#printInfoReceipts").is(":checked"))
+                                doPrint = true;
+
+                            break;
+                    }
+
+                    if (doPrint) {
+                        print(receiptText);
+                    }
                 }
             }
 
@@ -542,6 +594,14 @@
                 }
                 else {
                     $(".print-tooltip").attr('data-original-title', "Druck via Terminal").tooltip("enable");
+                }
+            }
+
+            function storeSettings() {
+                if (typeof(Storage) !== "undefined") {
+                    localStorage.setItem("printMerchantReceipts", $("#printMerchantReceipts").is(":checked") ? "true" : "false");
+                    localStorage.setItem("printCardholderReceipts", $("#printCardholderReceipts").is(":checked") ? "true" : "false");
+                    localStorage.setItem("printInfoReceipts", $("#printInfoReceipts").is(":checked") ? "true" : "false");
                 }
             }
 
