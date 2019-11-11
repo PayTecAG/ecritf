@@ -951,7 +951,8 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         ENABLE_LANGUAGE_SELECTION: 1001,
         DISABLE_LANGUAGE_SELECTION: 1002,
         SHOW_IDLE: 2001,
-        SHOW_CARD_INSERTION: 2002
+        SHOW_CARD_INSERTION: 2002,
+        CONFIGURE_DISCONNECTED_TEXT: 2501
     };
 
 
