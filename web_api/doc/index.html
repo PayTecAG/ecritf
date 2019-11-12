@@ -1040,8 +1040,36 @@ is finally reverted.</p>
         <span class="na">DeviceCommandCode</span><span class="p">:</span> <span class="nx">trm</span><span class="p">.</span><span class="nx">DeviceCommands</span><span class="p">.</span><span class="nx">REBOOT</span>
     <span class="p">}</span>
 <span class="p">);</span>
+
+<span class="nx">trm</span><span class="p">.</span><span class="nx">deviceCommand</span><span class="p">({</span>
+        <span class="na">DeviceCommandCode</span><span class="p">:</span> <span class="nx">trm</span><span class="p">.</span><span class="nx">DeviceCommands</span><span class="p">.</span><span class="nx">CONFIGURE_DISCONNECTED_TEXT</span><span class="p">,</span>
+        <span class="na">CardholderText</span><span class="p">:</span> <span class="s2">"Welcome"</span>
+    <span class="p">}</span>
+<span class="p">);</span>
 </code></pre>
 <p>Let the terminal perform some <a href="#devicecommands">actions</a> in addition to payment.</p>
+
+<table><thead>
+<tr>
+<th>Parameter -</th>
+<th>Format</th>
+<th>Condition</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>DeviceCommandCode</td>
+<td>Numeric</td>
+<td>mandatory</td>
+<td><a href="#devicecommands">action</a> to perform.</td>
+</tr>
+<tr>
+<td>CardholderText</td>
+<td>String</td>
+<td>for CONFIGURE_DISCONNECTED_TEXT</td>
+<td>Text to be shown to the cardholder if no ECR or vending machine has connected.</td>
+</tr>
+</tbody></table>
 <h2 id='sendmessage'>sendMessage</h2>
 <p><code>trm.sendMessage(message)</code></p>
 
@@ -1737,6 +1765,11 @@ the API does not do any further processing of the message.
 <td>SHOW_CARD_INSERTION</td>
 <td>2002</td>
 <td>Show the card insertion message to the cardholder</td>
+</tr>
+<tr>
+<td>CONFIGURE_DISCONNECTED_TEXT</td>
+<td>2501</td>
+<td>Configure display text that is shown on terminal when no ECR or vending ma-chine has connected. If this display text is configured, the terminal does not switch anymore to monoblock mode when ECR disconnects. To reset the display text to the default behavior, set the empty string as cardholder text.</td>
 </tr>
 </tbody></table>
 
