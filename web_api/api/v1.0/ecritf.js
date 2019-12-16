@@ -2344,6 +2344,10 @@ PayTec.POSTerminal = function(pairingInfo, options) {
                     return "PayTec Castles V3M2";
                 case "CVD":
                     return "PayTec Castles V3M2 (Development)";
+                case "UPT":
+                    return "PayTec Castles UPT1000F";
+                case "UPD":
+                    return "PayTec Castles UPT1000F (Development)";
             }
         }
 
