@@ -782,6 +782,12 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     this.deviceCommand = deviceCommand;
     this.sendMessage = sendMessage; // for not yet API-ed use cases
     this.needsAmount = needsAmount;
+    this.needsAcqID = needsAcqID;
+    this.needsAmtAuth = needsAmount;
+    this.needsAmtOther = needsAmtOther;
+    this.needsAuthC = needsAuthC;
+    this.needsTrxRefNum = needsTrxRefNum;
+    this.supportsUnsolicitedReceipts = supportsUnsolicitedReceipts;
     this.hasPairing = hasPairing;
     this.getPairingInfo = getPairingInfo;
     this.getSerialNumber = getSerialNumber;
@@ -965,11 +971,12 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         ACTIVATE: 4,
         DEACTIVATE: 5,
         TRANSACTION: 6,
-        TRX_CONFIRMATION: 7,
-        BALANCE: 8,
-        CONFIG: 9,
-        INIT: 10,
-        DEVICE_COMMAND: 11
+        AUTHORIZATION_PURCHASE: 7,
+        TRX_CONFIRMATION: 8,
+        BALANCE: 9,
+        CONFIG: 10,
+        INIT: 11,
+        DEVICE_COMMAND: 12
     };
 
     var self = this;
@@ -1123,7 +1130,13 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         }
 
         sendMessage({ TransactionRequest: req });
-        changeState(State.TRANSACTION);
+
+        if ((undefined !== req.TrxFunction) && (self.TransactionFunctions.AUTHORIZATION_PURCHASE == req.TrxFunction)) {
+            changeState(State.AUTHORIZATION_PURCHASE);
+        }
+        else {
+            changeState(State.TRANSACTION);
+        }
     }
 
     function abortTransaction(params) {
@@ -1308,6 +1321,41 @@ PayTec.POSTerminal = function(pairingInfo, options) {
             return false;
         default:
             return true;
+        }
+    }
+
+    function needsAcqID(trxFunction) {
+        return needsTrxRefNum(trxFunction);
+    }
+
+    function needsAmtOther(trxFunction) {
+        switch (parseInt(trxFunction)) {
+        case self.TransactionFunctions.PURCHASE_WITH_CASHBACK:
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    function needsAuthC(trxFunction) {
+        switch (parseInt(trxFunction)) {
+        case self.TransactionFunctions.PURCHASE_PHONE_AUTH:
+        case self.TransactionFunctions.CONFIRM_PHONE_AUTH_RESERVATION:
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    function needsTrxRefNum(trxFunction) {
+        switch (parseInt(trxFunction)) {
+        case self.TransactionFunctions.PURCHASE_RESERVATION:
+        case self.TransactionFunctions.RESERVATION_ADJUSTMENT:
+        case self.TransactionFunctions.CONFIRM_PHONE_AUTH_RESERVATION:
+        case self.TransactionFunctions.CANCEL_RESERVATION:
+            return true;
+        default:
+            return false;
         }
     }
 
@@ -1820,11 +1868,10 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         case State.PAIRING:
         case State.CONNECTING:
         case State.TRANSACTION:
+        case State.AUTHORIZATION_PURCHASE:
         case State.ACTIVATE:
         case State.DEACTIVATE:
-            break;
         case State.TRX_CONFIRMATION:
-            confirmingTrxSeqCnt = undefined;
             break;
         case State.BALANCE:
         case State.CONFIG:
@@ -1844,6 +1891,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
             setTimer(connectionTimeout);
             break;
         case State.TRANSACTION:
+        case State.AUTHORIZATION_PURCHASE:
             confirmingTrxSeqCnt = undefined;
             setTimer(transactionTimeout);
             break;
@@ -2003,6 +2051,34 @@ PayTec.POSTerminal = function(pairingInfo, options) {
                 }
             }
             break;
+        case State.AUTHORIZATION_PURCHASE:
+            if (message.ErrorNotification) {
+                abortTransaction();
+            }
+            else if (message.TransactionResponse) {
+                let rsp = message.TransactionResponse;
+
+                switch (rsp.TrxResult) {
+                case 0:
+                    try {
+                        onTransactionApproved(rsp);
+                    }
+                    catch (e) {
+                    }
+                    break;
+                case 1:
+                    onTransactionDeclined(rsp);
+                    break;
+                case 2:
+                    onTransactionReferred(rsp);
+                    break;
+                default:
+                    onTransactionAborted(rsp);
+                }
+
+                changeState(State.CONNECTED);
+            }
+            break;
         case State.TRX_CONFIRMATION:
             if (message.ErrorNotification) {
                 rollbackTransaction();
@@ -2070,6 +2146,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
             disconnect();
             break;
         case State.TRANSACTION:
+        case State.AUTHORIZATION_PURCHASE:
             abortTransaction();
             onTransactionTimedOut();
             changeState(State.CONNECTED);
@@ -2145,9 +2222,9 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         currencies = rsp.Currencies;
         trxFunctions = [];
 
-        for (var i = 0; i < 32; i++) {
-            if (rsp.TrxFunctions & (1 << (31 - i))) {
-                trxFunctions.push(1 << (31 - i));
+        for (var i in self.TransactionFunctions) {
+            if (rsp.TrxFunctions & self.TransactionFunctions[i]) {
+                trxFunctions.push(self.TransactionFunctions[i]);
             }
         }
 

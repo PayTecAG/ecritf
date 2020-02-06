@@ -296,7 +296,22 @@
                     <a href="#sendmessage" class="toc-h2 toc-link" data-title="sendMessage">sendMessage</a>
                   </li>
                   <li>
+                    <a href="#needsacqid" class="toc-h2 toc-link" data-title="needsAcqID">needsAcqID</a>
+                  </li>
+                  <li>
+                    <a href="#needsamtauth" class="toc-h2 toc-link" data-title="needsAmtAuth">needsAmtAuth</a>
+                  </li>
+                  <li>
                     <a href="#needsamount" class="toc-h2 toc-link" data-title="needsAmount">needsAmount</a>
+                  </li>
+                  <li>
+                    <a href="#needsamtother" class="toc-h2 toc-link" data-title="needsAmtOther">needsAmtOther</a>
+                  </li>
+                  <li>
+                    <a href="#needsauthc" class="toc-h2 toc-link" data-title="needsAuthC">needsAuthC</a>
+                  </li>
+                  <li>
+                    <a href="#needstrxrefnum" class="toc-h2 toc-link" data-title="needsTrxRefNum">needsTrxRefNum</a>
                   </li>
                   <li>
                     <a href="#haspairing" class="toc-h2 toc-link" data-title="hasPairing">hasPairing</a>
@@ -1074,10 +1089,30 @@ is finally reverted.</p>
 <p><code>trm.sendMessage(message)</code></p>
 
 <p>Sends a JSON message to the terminal. This function is meant for use cases not yet reflected in the API.</p>
+<h2 id='needsacqid'>needsAcqID</h2>
+<p><code>trm.needsAcqID(trxFunction)</code></p>
+
+<p>Tells whether a <a href="#transactionfunctions">transaction function</a> needs an Acquirer Identifier.</p>
+<h2 id='needsamtauth'>needsAmtAuth</h2>
+<p><code>trm.needsAmtAuth(trxFunction)</code></p>
+
+<p>Tells whether a <a href="#transactionfunctions">transaction function</a> needs an Amount, Authorised.</p>
 <h2 id='needsamount'>needsAmount</h2>
 <p><code>trm.needsAmount(trxFunction)</code></p>
 
-<p>Tells whether a <a href="#transactionfunctions">transaction function</a> needs an amount.</p>
+<p>Alias for <a href="#needsAmtAuth">needsAmtAuth</a>.</p>
+<h2 id='needsamtother'>needsAmtOther</h2>
+<p><code>trm.needsAmtOther(trxFunction)</code></p>
+
+<p>Tells whether a <a href="#transactionfunctions">transaction function</a> needs an Amount, Other (cashback amount).</p>
+<h2 id='needsauthc'>needsAuthC</h2>
+<p><code>trm.needsAuthC(trxFunction)</code></p>
+
+<p>Tells whether a <a href="#transactionfunctions">transaction function</a> needs an Authorisation Code.</p>
+<h2 id='needstrxrefnum'>needsTrxRefNum</h2>
+<p><code>trm.needsTrxRefNum(trxFunction)</code></p>
+
+<p>Tells whether a <a href="#transactionfunctions">transaction function</a> needs a Transaction Reference Number.</p>
 <h2 id='haspairing'>hasPairing</h2>
 <p><code>trm.hasPairing()</code></p>
 

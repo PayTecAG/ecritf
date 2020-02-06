@@ -123,7 +123,7 @@
                                 <i class="fas fa-cloud-download-alt"></i>&nbsp;<span class="i18n">Update software</span>
                             </a>
                             <div class="dropdown-divider"></div> 
-                            <a class="dropdown-item" id="swUpdate" onclick="javascript:location.reload(true);">
+                            <a class="dropdown-item" id="reload" onclick="javascript:location.reload(true);">
                                 <i class="fas fa-redo"></i>&nbsp;<span class="i18n">Reload page</span>
                             </a>
                         </div>
@@ -140,12 +140,35 @@
                                     <label for="trxFunctionSelect" class="i18n">Function:</label>
                                     <select class="form-control" id="trxFunctionSelect"></select>
                                 </div>
-                                <div class="form-group amount-needed">
-                                    <label for="amount" class="i18n">Amount:</label>
-                                    <input type="text" inputmode="numeric" class="form-control" id="amount" pattern="^\$?(([1-9](\d*|\d{0,2}(,\d{3})*))|0)(\.\d{1,2})?$" required></input>
+                                <div class="form-group amt-auth-needed">
+                                    <label for="amtAuth" class="i18n">Amount:</label>
+                                    <input type="text" inputmode="numeric" class="form-control" id="amtAuth" pattern="^\$?(([1-9](\d*|\d{0,2}(,\d{3})*))|0)(\.\d{1,2})?$" required></input>
                                     <div class="invalid-feedback">
                                         <div class="col-12 i18n">Invalid amount - valid values: 0.01 - 999999.99</div>
                                     </div>
+                                </div>
+                                <div class="form-group amt-other-needed">
+                                    <label for="amtOther" class="i18n">Cashback:</label>
+                                    <input type="text" inputmode="numeric" class="form-control" id="amtOther" pattern="^\$?(([1-9](\d*|\d{0,2}(,\d{3})*))|0)(\.\d{1,2})?$"></input>
+                                    <div class="invalid-feedback">
+                                        <div class="col-12 i18n">Invalid amount - valid values: 0.01 - 999999.99</div>
+                                    </div>
+                                </div>
+                                <div class="form-group acq-id-needed">
+                                    <label for="acqIDSelect" class="i18n">Acquirer:</label>
+                                    <select class="form-control" id="acqIDSelect"></select>
+                                </div>
+                                <div class="form-group auth-c-needed">
+                                    <label for="authC" class="i18n">Authorization code:</label>
+                                    <input type="text" class="form-control" id="authC"></input>
+                                </div>
+                                <div class="form-group trx-ref-num-needed">
+                                    <label for="trxRefNum" class="i18n">Reference number:</label>
+                                    <input type="text" class="form-control" id="trxRefNum"></input>
+                                </div>
+                                <div class="form-group trx-seq-cnt-needed">
+                                    <label for="trxSeqCnt" class="i18n">Sequence counter:</label>
+                                    <input type="text" class="form-control" id="trxSeqCnt"></input>
                                 </div>
                                 <div class="form-group">
                                     <button type="submit" class="btn btn-primary btn-block btn-lg" id="pay">
@@ -177,11 +200,17 @@
                     </div>
                     <div class="connected text-center button-spacer">
                         <button type="button" class="btn btn-primary btn-block i18n"
-                            id="config" onclick="javascript:trm.configure()">Configuration</button>
+                            id="capture" onclick="javascript:trm.sendMessage({ BatchCaptureRequest: {}})">Submit transaction data</button>
                     </div>
                     <div class="connected text-center button-spacer">
                         <button type="button" class="btn btn-primary btn-block i18n"
-                            id="init" onclick="javascript:trm.initialize(-1)">Initialisation</button>
+                            id="config" onclick="javascript:trm.configure()">Configuration</button>
+                    </div>
+                    <div class="connected text-center button-spacer">
+                        <div class="dropdown">
+                            <button class="btn btn-primary btn-block dropdown-toggle i18n" type="button" data-toggle="dropdown">Initialisation<span class="caret"></span></button>
+                            <ul class="dropdown-menu dropdown-primary" id="initAcquirerList"/>
+                        </div>
                     </div>
                 </div>
                 <div id="receiptPane" class="tab-pane container" role="tabpanel">
@@ -211,16 +240,21 @@
                     <div class="i18n" id="trxFunctionInfo">[none]</div>
                 </div>
                 <div id="settingsPane" class="tab-pane container" role="tabpanel">
-                   <div class="row form-group info-title-1 i18n">Automatically print receipts on terminal</div>
-                   <div class="form-check">
+                    <div class="row form-group info-title-1 i18n">Sprache</div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="browserLanguageOnTrm" onclick="javascript:storeSettings();">
+                        <label class="form-check-label i18n" for="browserLanguageOnTrm">Browser language on terminal</label>
+                    </div>
+                    <div class="row form-group info-title-1 printer-available i18n">Automatically print receipts on terminal</div>
+                    <div class="form-check printer-available">
                         <input class="form-check-input" type="checkbox" value="" id="printMerchantReceipts" onclick="javascript:storeSettings();">
                         <label class="form-check-label i18n" for="printMerchantReceipts">Merchant receipts</label>
                     </div>
-                    <div class="form-check">
+                    <div class="form-check printer-available">
                         <input class="form-check-input" type="checkbox" value="" id="printCardholderReceipts" onclick="javascript:storeSettings();">
                         <label class="form-check-label i18n" for="printCardholderReceipts">Cardholder receipts</label>
                     </div>
-                    <div class="form-check">
+                    <div class="form-check printer-available">
                         <input class="form-check-input" type="checkbox" value="" id="printInfoReceipts" onclick="javascript:storeSettings();">
                         <label class="form-check-label i18n" for="printInfoReceipts">Information receipts</label>
                     </div>
@@ -279,6 +313,8 @@
             var dialogTimer = undefined;
             var trmStatus = 0;
             var pairingInfo;
+            var ONLINE_ADVICE = 0x11111111; // private function to confirm AUTHORIZATION_PURCHASE transactions (petrol use case)
+            var lastTrxSeqCnt = -1;
 
             // IE compatibility
             Math.trunc = Math.trunc || function(x) {
@@ -307,13 +343,13 @@
                     }
                 }
 
+                $("#browserLanguageOnTrm").prop('checked', localStorage.getItem("browserLanguageOnTrm") == "true");
                 $("#printMerchantReceipts").prop('checked', localStorage.getItem("printMerchantReceipts") == "true");
                 $("#printCardholderReceipts").prop('checked', localStorage.getItem("printCardholderReceipts") == "true");
                 $("#printInfoReceipts").prop('checked', localStorage.getItem("printInfoReceipts") == "true");
             }
 
             trm = new PayTec.POSTerminal(pairingInfo, {
-                    TrmLng: language,
                     OnPairingFailed: onPairingFailed,
                     OnConnected: onConnected,
                     OnDisconnected: onDisconnected,
@@ -322,9 +358,19 @@
                     OnTransactionDeclined: onTransactionFailed,
                     OnTransactionAborted: onTransactionFailed,
                     OnTransactionTimedOut: onTransactionTimedOut,
+                    OnActivationSucceeded: resetTransactionUI,
+                    OnInitializationSucceeded: resetTransactionUI,
+                    OnConfigurationSucceeded: resetTransactionUI,
+                    OnTransactionConfirmationSucceeded: resetTransactionUI,
+                    OnTransactionConfirmationFailed: resetTransactionUI,
+                    OnTransactionConfirmationTimedOut: resetTransactionUI,
                     OnReceipt: onReceipt,
                     OnError: onError
                 });
+
+            if ($("#browserLanguageOnTrm").is(":checked")) {
+                trm.setTrmLng(language);
+            }
 
             function onConnected() {
                 if (dialogTimer == undefined) {
@@ -353,6 +399,7 @@
 
             function onStatusChanged() {
                 var newStatus = trm.getStatus();
+                var oldStatus = trmStatus;
 
                 if ((trm.StatusFlags.OUT_OF_PAPER & newStatus) != (trm.StatusFlags.OUT_OF_PAPER & trmStatus)) {
                     if (trm.StatusFlags.OUT_OF_PAPER & newStatus) {
@@ -365,7 +412,7 @@
                     }
                 }
                 else if ((trm.StatusFlags.WAITING_FOR_TRANSACTION_REQUEST & newStatus) && !(trm.StatusFlags.WAITING_FOR_TRANSACTION_REQUEST & trmStatus)) {
-                    $("#amount").focus();
+                    $("#amtAuth").focus();
                     hideDialog();
                 }
                 else if (((trm.StatusFlags.BUSY & newStatus) != (trm.StatusFlags.BUSY & trmStatus)) && $("#abortTransactionButton").is(":hidden")) {
@@ -398,11 +445,13 @@
                 if (!(trm.StatusFlags.BUSY & trmStatus)) {
                     // update acquirers
                     var acquirerInfoHTML = "";
+                    var acqIDSelectHTML = "";
+                    var initAcquirerListHTML = "<li><a class='dropdown-item' onclick='javascript:trm.initialize(-1);'>" + i18n("all") + "</a></li>";
                     var acquirers = trm.getAcquirers();
 
                     for (var i in acquirers) {
                         var acqInfo = trm.getAcquirerInfo(acquirers[i]);
-                        var lastInitDate = acqInfo.LastAcqInitDate === undefined ? "nie" : acqInfo.LastAcqInitDate;
+                        var lastInitDate = acqInfo.LastAcqInitDate === undefined ? i18n("never") : acqInfo.LastAcqInitDate;
 
                         acquirerInfoHTML +=
                             "<div class='row'>"
@@ -416,9 +465,14 @@
                                     + "</button>"
                                 + "</div>"
                             + "</div>";
+
+                        acqIDSelectHTML += "<option value='" + acqInfo.AcqID + "'>" + acqInfo.AcqID + "</option>";
+                        initAcquirerListHTML += "<li><a class='dropdown-item' onclick='javascript:trm.initialize(" + acqInfo.AcqID + ");'>Acq&nbsp;" + acqInfo.AcqID + "</a></li>";
                     }
 
                     $("#acquirerInfo").html(acquirerInfoHTML);
+                    $("#acqIDSelect").html(acqIDSelectHTML);
+                    $("#initAcquirerList").html(initAcquirerListHTML);
 
                     // update supported brands & transaction functions
                     var brandInfoHTML = "";
@@ -443,6 +497,10 @@
                         var name = trm.getTransactionFunctionName(trxFunctions[i], language);
                         trxFunctionInfoHTML += "<div class='row'><div class='col'>" + name + "</div></div>";
                         trxFunctionSelectHTML += "<option value='" + trxFunctions[i] + "'>" + name + "</option>";
+
+                        if (trm.TransactionFunctions.AUTHORIZATION_PURCHASE == trxFunctions[i]) {
+                            trxFunctionSelectHTML += "<option value='" + ONLINE_ADVICE + "'>" + "Online Advice" + "</option>";
+                        }
                     }
 
                     $("#trxFunctionInfo").html(trxFunctionInfoHTML);
@@ -453,12 +511,18 @@
             function resetTransactionUI() {
                 $("#abortTransactionButton").hide();
                 $("#pay").show();
-                $("#amount")[0].value = "";
+                $("#acqIDSelect").val($("#acqIDSelect option:first").val());
+                $("#amtAuth")[0].value = "";
+                $("#amtOther")[0].value = "";
+                $("#authC")[0].value = "";
+                $("#trxRefNum")[0].value = "";
+                $("#trxSeqCnt")[0].value = lastTrxSeqCnt;
                 $("#trxFunctionSelect").val($("#trxFunctionSelect option:first").val());
                 $("#trxFunctionSelect").trigger("change");
             }
 
             function onTransactionApproved(rsp) {
+                lastTrxSeqCnt = rsp.TrxSeqCnt;
                 resetTransactionUI();
                 showDialog(i18n("Processing OK"), rsp.AttendantText, 5000);
             }
@@ -554,15 +618,31 @@
             }
 
             function transaction() {
-                trm.startTransaction({
-                        TrxFunction: Number($("#trxFunctionSelect").find(":selected")[0].value),
-                        TrxCurrC: trm.getCurrencies()[0],
-                        AmtAuth: Math.round(Number($("#amount")[0].value) * 100)
-                    });
+                var trxFunction = Number($("#trxFunctionSelect").find(":selected")[0].value);
+
+                if (ONLINE_ADVICE == trxFunction) {
+                    trm.confirmTransaction({
+                            Confirm: 1,
+                            TrxAmt: Math.round(Number($("#amtAuth")[0].value) * 100),
+                            TrxSeqCnt: Number($("#trxSeqCnt")[0].value)
+                        });
+                }
+                else {
+                    trm.startTransaction({
+                            TrxFunction: trxFunction,
+                            TrxCurrC: trm.getCurrencies()[0],
+                            AmtAuth: Math.round(Number($("#amtAuth")[0].value) * 100),
+                            AmtOther: Math.round(Number($("#amtOther")[0].value) * 100),
+                            AcqID: Number($("#acqIDSelect").find(":selected")[0].value),
+                            AuthC: Number($("#authC")[0].value),
+                            TrxRefNum: Number($("#trxRefNum")[0].value)
+                        });
+
+                    $("#abortTransactionButton").show();
+                }
 
                 $("#paymentForm").removeClass("was-validated");
                 $("#pay").hide();
-                $("#abortTransactionButton").show();
             }
 
             function print(text) {
@@ -595,10 +675,18 @@
                 else {
                     $(".print-tooltip").attr('data-original-title', i18n("Printing via terminal")).tooltip("enable");
                 }
+
+                if (trm.StatusFlags.PRINTER_UNAVAILABLE & trmStatus) {
+                    $(".printer-available").hide();
+                }
+                else {
+                    $(".printer-available").show();
+                }
             }
 
             function storeSettings() {
                 if (typeof(Storage) !== "undefined") {
+                    localStorage.setItem("browserLanguageOnTrm", $("#browserLanguageOnTrm").is(":checked") ? "true" : "false");
                     localStorage.setItem("printMerchantReceipts", $("#printMerchantReceipts").is(":checked") ? "true" : "false");
                     localStorage.setItem("printCardholderReceipts", $("#printCardholderReceipts").is(":checked") ? "true" : "false");
                     localStorage.setItem("printInfoReceipts", $("#printInfoReceipts").is(":checked") ? "true" : "false");
@@ -652,11 +740,53 @@
                 });
 
                 $('#trxFunctionSelect').change(function() {
-                    if (trm.needsAmount($("#trxFunctionSelect").val())) {
-                        $(".amount-needed").show();
+                    var selectedFunction = $("#trxFunctionSelect").val();
+
+                    if (ONLINE_ADVICE == selectedFunction) {
+                        $(".trx-seq-cnt-needed").show();
+                        $(".amt-auth-needed").show();
+                        $(".acq-id-needed").hide();
+                        $(".amt-other-needed").hide();
+                        $(".auth-c-needed").hide();
+                        $(".trx-ref-num-needed").hide();
                     }
                     else {
-                        $(".amount-needed").hide();
+                        if (trm.needsAcqID(selectedFunction)) {
+                            $(".acq-id-needed").show();
+                        }
+                        else {
+                            $(".acq-id-needed").hide();
+                        }
+
+                        if (trm.needsAmtAuth(selectedFunction)) {
+                            $(".amt-auth-needed").show();
+                        }
+                        else {
+                            $(".amt-auth-needed").hide();
+                        }
+
+                        if (trm.needsAmtOther(selectedFunction)) {
+                            $(".amt-other-needed").show();
+                        }
+                        else {
+                            $(".amt-other-needed").hide();
+                        }
+
+                        if (trm.needsAuthC(selectedFunction)) {
+                            $(".auth-c-needed").show();
+                        }
+                        else {
+                            $(".auth-c-needed").hide();
+                        }
+
+                        if (trm.needsTrxRefNum(selectedFunction)) {
+                            $(".trx-ref-num-needed").show();
+                        }
+                        else {
+                            $(".trx-ref-num-needed").hide();
+                        }
+
+                        $(".trx-seq-cnt-needed").hide();
                     }
 
                     $("#paymentForm").removeClass("was-validated");
@@ -666,7 +796,7 @@
 
                 var validation = Array.prototype.filter.call(forms, function(form) {
                     form.addEventListener('submit', function(event) {
-                        if (trm.needsAmount($("#trxFunctionSelect").val())) {
+                        if (trm.needsAmtAuth($("#trxFunctionSelect").val())) {
                             if (form.checkValidity() === false) {
                                 event.preventDefault();
                                 event.stopPropagation();
@@ -700,6 +830,16 @@
             }
 
             var translations = {
+                "all": {
+                    "de": "alle",
+                    "fr": "tous",
+                    "it": "tutti"
+                },
+                "Browser language on terminal": {
+                    "de": "Browser-Sprache auf Terminal",
+                    "fr": "Langue du navigateur sur le terminal",
+                    "it": "Lingua del browser sul terminale"
+                },
                 "Terminal is online": {
                     "de": "Terminal ist online",
                     "fr": "Terminal online",
@@ -810,6 +950,11 @@
                     "fr": "Modèle d'appareil:",
                     "it": "Modello di dispositivo:"
                 },
+                "never": {
+                    "de": "nie",
+                    "fr": "jamais",
+                    "it": "mai"
+                },
                 "unknown": {
                     "de": "unbekannt",
                     "fr": "inconnu",
@@ -829,6 +974,11 @@
                     "de": "Softwareversion:",
                     "fr": "Version du logiciel:",
                     "it": "Versione software:"
+                },
+                "Submit transaction data": {
+                    "de": "Transaktionsdaten einliefern",
+                    "fr": "Soumettre des données de transaction",
+                    "it": "Inviare i dati delle transazioni"
                 },
                 "Processors": {
                     "de": "Verarbeiter",
@@ -949,6 +1099,21 @@
                     "de": "Belege automatisch auf Terminal drucken",
                     "fr": "Impression automatique des reçus sur le terminal",
                     "it": "Stampa automaticamente le ricevute sul terminale"
+                },
+                "Authorization code:": {
+                    "de": "Autorisierungsscode:",
+                    "fr": "Code autorisation:",
+                    "it": "Codice Autorizzazione:"
+                },
+                "Sequence counter:": {
+                    "de": "Sequenznummer:",
+                    "fr": "Compteur de séquences:",
+                    "it": "Contatore di sequenza:"
+                },
+                "Reference number:": {
+                    "de": "Referenznummer:",
+                    "fr": "Numéro de référence:",
+                    "it": "Numero di riferimento:"
                 },
             };
         </script>
