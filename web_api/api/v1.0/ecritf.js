@@ -1237,6 +1237,26 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         sendMessage({ ReceiptRequest: req});
     }
 
+    function requestReceiptIfNecessary(params) {
+        if (!supportsUnsolicitedReceipts()) {
+            var req = {
+            };
+
+            if (undefined !== params) {
+                for (var i in params) {
+                    if (i == "ReceiptID") {
+                        req.ReceiptIDNumeric = parseInt(params[i]);
+                    }
+                    else {
+                        req[i] = params[i];
+                    }
+                }
+            }
+
+            sendMessage({ ReceiptRequest: req});
+        }
+    }
+
     function print(params) {
         var req = {
         };
@@ -1293,6 +1313,10 @@ PayTec.POSTerminal = function(pairingInfo, options) {
 
     function hasPairing() {
         return (pairing !== undefined) && pairing && (pairing.Channel);
+    }
+
+    function supportsUnsolicitedReceipts() {
+        return (getSoftwareVersion() >= 170005);
     }
 
     function getPairingInfo() {
@@ -1940,7 +1964,8 @@ PayTec.POSTerminal = function(pairingInfo, options) {
                 onDeactivationFailed();
             }
             else if (message.DeactivationResponse) {
-                requestReceipt({ ReceiptType: self.ReceiptTypes.DEACTIVATION });
+                requestReceiptIfNecessary({ ReceiptType: self.ReceiptTypes.DEACTIVATION });
+
                 changeState(State.CONNECTED);
                 onDeactivationSucceeded();
             }
@@ -1984,7 +2009,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
                 onTransactionConfirmationFailed();
             }
             else if (message.TransactionConfirmationResponse) {
-                requestReceipt({ ReceiptType: self.ReceiptTypes.TRX, ReceiptID: confirmingTrxSeqCnt });
+                requestReceiptIfNecessary({ ReceiptType: self.ReceiptTypes.TRX, ReceiptID: confirmingTrxSeqCnt });
                 changeState(State.CONNECTED);
                 onTransactionConfirmationSucceeded();
             }
@@ -1995,7 +2020,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
                 onBalanceFailed();
             }
             else if (message.BalanceResponse) {
-                requestReceipt({ ReceiptType: self.ReceiptTypes.FINAL_BALANCE });
+                requestReceiptIfNecessary({ ReceiptType: self.ReceiptTypes.FINAL_BALANCE });
                 changeState(State.CONNECTED);
                 onBalanceSucceeded();
             }
@@ -2006,7 +2031,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
                 onConfigurationFailed();
             }
             else if (message.ConfigurationResponse) {
-                requestReceipt({ ReceiptType: self.ReceiptTypes.CONFIG });
+                requestReceiptIfNecessary({ ReceiptType: self.ReceiptTypes.CONFIG });
                 changeState(State.CONNECTED);
                 onConfigurationSucceeded();
             }
@@ -2017,7 +2042,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
                 onInitializationFailed();
             }
             else if (message.InitializationResponse) {
-                requestReceipt({ ReceiptType: self.ReceiptTypes.INIT, ReceiptID: currentAcqID });
+                requestReceiptIfNecessary({ ReceiptType: self.ReceiptTypes.INIT, ReceiptID: currentAcqID });
                 changeState(State.CONNECTED);
                 onInitializationSucceeded();
             }
@@ -2114,7 +2139,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     }
 
     function onActivationResponse(rsp) {
-        requestReceipt({ ReceiptType: self.ReceiptTypes.ACTIVATION });
+        requestReceiptIfNecessary({ ReceiptType: self.ReceiptTypes.ACTIVATION });
 
         brands = rsp.Brands;
         currencies = rsp.Currencies;
@@ -2144,13 +2169,13 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         receiptText += rsp.ReceiptText;
 
         if (rsp.ReceiptFlags & self.ReceiptFlags.MORE_DATA_AVAILABLE) {
-            requestReceipt({ ReceiptType: rsp.ReceiptType });
+            requestReceiptIfNecessary({ ReceiptType: rsp.ReceiptType });
         }
         else {
             onReceipt(rsp.ReceiptType, receiptText);
 
             if (rsp.ReceiptType == self.ReceiptTypes.TRX) {
-                requestReceipt({ ReceiptType: self.ReceiptTypes.TRX_COPY, ReceiptID: confirmingTrxSeqCnt });
+                requestReceiptIfNecessary({ ReceiptType: self.ReceiptTypes.TRX_COPY, ReceiptID: confirmingTrxSeqCnt });
             }
         }
     }
@@ -2187,10 +2212,10 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         terminalID = rsp.TrmID;
 
         if (undefined !== trmLng) {
-            sendMessage({ ConnectRequest: { TrmLng: trmLng, PrinterWidth: printerWidth }});
+            sendMessage({ ConnectRequest: { TrmLng: trmLng, PrinterWidth: printerWidth, UnsolicitedReceipts: 1 }});
         }
         else {
-            sendMessage({ ConnectRequest: { PrinterWidth: printerWidth }});
+            sendMessage({ ConnectRequest: { PrinterWidth: printerWidth, UnsolicitedReceipts: 1 }});
         }
 
         sendMessage({ StatusRequest: {}});
