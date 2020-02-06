@@ -628,16 +628,35 @@
                         });
                 }
                 else {
-                    trm.startTransaction({
-                            TrxFunction: trxFunction,
-                            TrxCurrC: trm.getCurrencies()[0],
-                            AmtAuth: Math.round(Number($("#amtAuth")[0].value) * 100),
-                            AmtOther: Math.round(Number($("#amtOther")[0].value) * 100),
-                            AcqID: Number($("#acqIDSelect").find(":selected")[0].value),
-                            AuthC: Number($("#authC")[0].value),
-                            TrxRefNum: Number($("#trxRefNum")[0].value)
-                        });
+                    var req = {
+                        TrxFunction: trxFunction
+                    };
+                    
+                    if (trm.needsAmtAuth(trxFunction) || trm.needsAmtOther(trxFunction)) {
+                        req.TrxCurrC = trm.getCurrencies()[0];
+                    }
 
+                    if (trm.needsAmtAuth(trxFunction)) {
+                        req.AmtAuth = Math.round(Number($("#amtAuth")[0].value) * 100);
+                    }
+
+                    if (trm.needsAmtOther(trxFunction)) {
+                        req.AmtOther = Math.round(Number($("#amtOther")[0].value) * 100);
+                    }
+
+                    if (trm.needsAcqID(trxFunction)) {
+                        req.AcqID = Number($("#acqIDSelect").find(":selected")[0].value);
+                    }
+
+                    if (trm.needsAuthC(trxFunction)) {
+                        req.AuthC = String($("#authC")[0].value);
+                    }
+
+                    if (trm.needsTrxRefNum(trxFunction)) {
+                        req.TrxRefNum = String($("#trxRefNum")[0].value);
+                    }
+
+                    trm.startTransaction(req);
                     $("#abortTransactionButton").show();
                 }
 
