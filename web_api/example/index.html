@@ -142,6 +142,7 @@
                                 </div>
                                 <div class="form-group amt-auth-needed">
                                     <label for="amtAuth" class="i18n">Amount:</label>
+                                    <select class="form-control" id="currencySelect"></select>
                                     <input type="text" inputmode="numeric" class="form-control" id="amtAuth" pattern="^\$?(([1-9](\d*|\d{0,2}(,\d{3})*))|0)(\.\d{1,2})?$" required></input>
                                     <div class="invalid-feedback">
                                         <div class="col-12 i18n">Invalid amount - valid values: 0.01 - 999999.99</div>
@@ -474,7 +475,7 @@
                     $("#acqIDSelect").html(acqIDSelectHTML);
                     $("#initAcquirerList").html(initAcquirerListHTML);
 
-                    // update supported brands & transaction functions
+                    // update supported brands, currencies & transaction functions
                     var brandInfoHTML = "";
                     var brands = trm.getBrands();
 
@@ -488,6 +489,29 @@
                     }
 
                     $("#brandInfo").html(brandInfoHTML);
+
+                    var currencySelectHTML = "";
+                    var currencies = trm.getCurrencies();
+
+                    for (var i in currencies) {
+                        var currency = currencies[i];
+                        var name = "";
+
+                        // TODO: translate all ISO 4217 codes
+                        switch (currency) {
+                        case 756:
+                            currencySelectHTML += "<option value='" + currency + "'>CHF</option>";
+                            break;
+                        case 978:
+                            currencySelectHTML += "<option value='" + currency + "'>EUR</option>";
+                            break;
+                        case 840:
+                            currencySelectHTML += "<option value='" + currency + "'>USD</option>";
+                            break;
+                        }
+                    }
+
+                    $("#currencySelect").html(currencySelectHTML);
 
                     var trxFunctionInfoHTML = "";
                     var trxFunctionSelectHTML = "";
@@ -633,7 +657,7 @@
                     };
                     
                     if (trm.needsAmtAuth(trxFunction) || trm.needsAmtOther(trxFunction)) {
-                        req.TrxCurrC = trm.getCurrencies()[0];
+                        req.TrxCurrC = Number($("#currencySelect").find(":selected")[0].value);
                     }
 
                     if (trm.needsAmtAuth(trxFunction)) {
