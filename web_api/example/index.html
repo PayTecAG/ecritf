@@ -529,6 +529,7 @@
 
                     $("#trxFunctionInfo").html(trxFunctionInfoHTML);
                     $("#trxFunctionSelect").html(trxFunctionSelectHTML);
+                    onTrxFunctionChanged();
                 }
             }
 
@@ -622,6 +623,59 @@
                     // payment not started due to error
                     resetTransactionUI();
                 }
+            }
+
+            function onTrxFunctionChanged() {
+                var selectedFunction = $("#trxFunctionSelect").val();
+
+                if (ONLINE_ADVICE == selectedFunction) {
+                    $(".trx-seq-cnt-needed").show();
+                    $(".amt-auth-needed").show();
+                    $(".acq-id-needed").hide();
+                    $(".amt-other-needed").hide();
+                    $(".auth-c-needed").hide();
+                    $(".trx-ref-num-needed").hide();
+                }
+                else {
+                    if (trm.needsAcqID(selectedFunction)) {
+                        $(".acq-id-needed").show();
+                    }
+                    else {
+                        $(".acq-id-needed").hide();
+                    }
+
+                    if (trm.needsAmtAuth(selectedFunction)) {
+                        $(".amt-auth-needed").show();
+                    }
+                    else {
+                        $(".amt-auth-needed").hide();
+                    }
+
+                    if (trm.needsAmtOther(selectedFunction)) {
+                        $(".amt-other-needed").show();
+                    }
+                    else {
+                        $(".amt-other-needed").hide();
+                    }
+
+                    if (trm.needsAuthC(selectedFunction)) {
+                        $(".auth-c-needed").show();
+                    }
+                    else {
+                        $(".auth-c-needed").hide();
+                    }
+
+                    if (trm.needsTrxRefNum(selectedFunction)) {
+                        $(".trx-ref-num-needed").show();
+                    }
+                    else {
+                        $(".trx-ref-num-needed").hide();
+                    }
+
+                    $(".trx-seq-cnt-needed").hide();
+                }
+
+                $("#paymentForm").removeClass("was-validated");
             }
 
             function enterPairingCode() {
@@ -787,58 +841,7 @@
                     $(this).find('#pairingCode').focus();
                 });
 
-                $('#trxFunctionSelect').change(function() {
-                    var selectedFunction = $("#trxFunctionSelect").val();
-
-                    if (ONLINE_ADVICE == selectedFunction) {
-                        $(".trx-seq-cnt-needed").show();
-                        $(".amt-auth-needed").show();
-                        $(".acq-id-needed").hide();
-                        $(".amt-other-needed").hide();
-                        $(".auth-c-needed").hide();
-                        $(".trx-ref-num-needed").hide();
-                    }
-                    else {
-                        if (trm.needsAcqID(selectedFunction)) {
-                            $(".acq-id-needed").show();
-                        }
-                        else {
-                            $(".acq-id-needed").hide();
-                        }
-
-                        if (trm.needsAmtAuth(selectedFunction)) {
-                            $(".amt-auth-needed").show();
-                        }
-                        else {
-                            $(".amt-auth-needed").hide();
-                        }
-
-                        if (trm.needsAmtOther(selectedFunction)) {
-                            $(".amt-other-needed").show();
-                        }
-                        else {
-                            $(".amt-other-needed").hide();
-                        }
-
-                        if (trm.needsAuthC(selectedFunction)) {
-                            $(".auth-c-needed").show();
-                        }
-                        else {
-                            $(".auth-c-needed").hide();
-                        }
-
-                        if (trm.needsTrxRefNum(selectedFunction)) {
-                            $(".trx-ref-num-needed").show();
-                        }
-                        else {
-                            $(".trx-ref-num-needed").hide();
-                        }
-
-                        $(".trx-seq-cnt-needed").hide();
-                    }
-
-                    $("#paymentForm").removeClass("was-validated");
-                });
+                $('#trxFunctionSelect').change(onTrxFunctionChanged);
 
                 var forms = document.getElementsByClassName('needs-validation');
 
