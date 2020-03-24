@@ -617,6 +617,11 @@
 
             function onError(message) {
                 showDialog("Fehler", message, 60000);
+
+                if (!$("#abortTransactionButton").is(":hidden")) {
+                    // payment not started due to error
+                    resetTransactionUI();
+                }
             }
 
             function enterPairingCode() {
