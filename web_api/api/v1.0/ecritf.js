@@ -2443,6 +2443,8 @@ PayTec.POSTerminal = function(pairingInfo, options) {
                 case "ZVD":
                     return "PayTec PayTec Castles V3 (development)";
                 case "CVM":
+                case "CVN":
+                case "CVO":
                     return "PayTec Castles V3M2";
                 case "CVD":
                     return "PayTec Castles V3M2 (Development)";
