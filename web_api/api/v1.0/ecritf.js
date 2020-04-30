@@ -2439,18 +2439,23 @@ PayTec.POSTerminal = function(pairingInfo, options) {
                 case "AVR":
                     return "PayTec Reader Vending Contactless PCI PTS 5.1";
                 case "PCV":
+                case "PCW":
                     return "PayTec Castles V3";
                 case "ZVD":
+                case "ZVE":
                     return "PayTec PayTec Castles V3 (development)";
                 case "CVM":
                 case "CVN":
                 case "CVO":
                     return "PayTec Castles V3M2";
                 case "CVD":
+                case "CVE":
                     return "PayTec Castles V3M2 (Development)";
                 case "UPT":
+                case "UPU":
                     return "PayTec Castles UPT1000F";
                 case "UPD":
+                case "UPE":
                     return "PayTec Castles UPT1000F (Development)";
             }
         }
