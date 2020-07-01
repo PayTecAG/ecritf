@@ -823,6 +823,7 @@
             function hideDialog() {
                 clearDialogTimer();
                 $("#dialog").modal("hide");
+                $('.modal-backdrop').remove();
             }
 
             function clearReceipts() {
