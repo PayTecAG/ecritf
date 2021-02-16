@@ -241,7 +241,7 @@
                     <div class="i18n" id="trxFunctionInfo">[none]</div>
                 </div>
                 <div id="settingsPane" class="tab-pane container" role="tabpanel">
-                    <div class="row form-group info-title-1 i18n">Sprache</div>
+                    <div class="row form-group info-title-1 i18n">Language</div>
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" value="" id="browserLanguageOnTrm" onclick="javascript:storeSettings();">
                         <label class="form-check-label i18n" for="browserLanguageOnTrm">Browser language on terminal</label>
@@ -258,6 +258,11 @@
                     <div class="form-check printer-available">
                         <input class="form-check-input" type="checkbox" value="" id="printInfoReceipts" onclick="javascript:storeSettings();">
                         <label class="form-check-label i18n" for="printInfoReceipts">Information receipts</label>
+                    </div>
+                    <div class="row form-group info-title-1 i18n">Transactions</div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="manualConfirmation" onclick="javascript:storeSettings();">
+                        <label class="form-check-label i18n" for="manualConfirmation">Confirm transaction manually</label>
                     </div>
                 </div>
             </div>
@@ -294,6 +299,29 @@
                                     <i class="fas fa-check"></i>&nbsp;<span class="i18n">OK</span>
                                 </button>
                                 <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+                                    <i class="fas fa-times"></i>&nbsp;<span class="i18n">Abort</span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div id="confirmationDialog" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog">
+                    <form class="form-horizontal" role="form" method="post" action="">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 id="confirmationDialogTitle" class="modal-title i18n">Confirm Transaction</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p class="i18n" id="confirmedAmountLabel">Confirmed amount:</p>
+                                <input type="number" id="trxAmt"></input>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary" data-dismiss="modal" onclick="javascript:confirmTransaction();">
+                                    <i class="fas fa-check"></i>&nbsp;<span class="i18n">OK</span>
+                                </button>
+                                <button type="button" class="btn btn-outline-danger" data-dismiss="modal" onclick="javascript:rollbackTransaction();">
                                     <i class="fas fa-times"></i>&nbsp;<span class="i18n">Abort</span>
                                 </button>
                             </div>
@@ -348,6 +376,7 @@
                 $("#printMerchantReceipts").prop('checked', localStorage.getItem("printMerchantReceipts") == "true");
                 $("#printCardholderReceipts").prop('checked', localStorage.getItem("printCardholderReceipts") == "true");
                 $("#printInfoReceipts").prop('checked', localStorage.getItem("printInfoReceipts") == "true");
+                $("#manualConfirmation").prop('checked', localStorage.getItem("manualConfirmation") == "true");
             }
 
             trm = new PayTec.POSTerminal(pairingInfo, {
@@ -373,6 +402,8 @@
             if ($("#browserLanguageOnTrm").is(":checked")) {
                 trm.setTrmLng(language);
             }
+
+            trm.setAutoConfirm($("#manualConfirmation").prop('checked') == false);
 
             function onConnected() {
                 if (dialogTimer == undefined) {
@@ -549,8 +580,13 @@
 
             function onTransactionApproved(rsp) {
                 lastTrxSeqCnt = rsp.TrxSeqCnt;
+                $("#trxAmt")[0].value = $("#amtAuth")[0].value;
                 resetTransactionUI();
-                showDialog(i18n("Processing OK"), rsp.AttendantText, 5000);
+
+                if (trm.getAutoConfirm())
+                    showDialog(i18n("Processing OK"), rsp.AttendantText, 5000);
+                else
+                    $("#confirmationDialog").modal("show");
             }
 
             function onTransactionFailed(rsp) {
@@ -706,7 +742,6 @@
 
                 if (ONLINE_ADVICE == trxFunction) {
                     trm.confirmTransaction({
-                            Confirm: 1,
                             TrxAmt: Math.round(Number($("#amtAuth")[0].value) * 100),
                             TrxSeqCnt: Number($("#trxSeqCnt")[0].value)
                         });
@@ -748,6 +783,14 @@
 
                 $("#paymentForm").removeClass("was-validated");
                 $("#pay").hide();
+            }
+            
+            function confirmTransaction() {
+                trm.confirmTransaction({ TrxAmt: Math.round(Number($("#trxAmt")[0].value) * 100) });
+            }
+            
+            function rollbackTransaction() {
+                trm.rollbackTransaction();
             }
 
             function print(text) {
@@ -795,7 +838,10 @@
                     localStorage.setItem("printMerchantReceipts", $("#printMerchantReceipts").is(":checked") ? "true" : "false");
                     localStorage.setItem("printCardholderReceipts", $("#printCardholderReceipts").is(":checked") ? "true" : "false");
                     localStorage.setItem("printInfoReceipts", $("#printInfoReceipts").is(":checked") ? "true" : "false");
+                    localStorage.setItem("manualConfirmation", $("#manualConfirmation").is(":checked") ? "true" : "false");
                 }
+
+                trm.setAutoConfirm($("#manualConfirmation").prop('checked') == false);
             }
 
             function clearDialogTimer() {
@@ -895,10 +941,35 @@
                     "fr": "Langue du navigateur sur le terminal",
                     "it": "Lingua del browser sul terminale"
                 },
+                "Confirm Transaction": {
+                    "de": "Transaktion bestätigen",
+                    "fr": "Confirmer la transaction",
+                    "it": "Conferma della transazione"
+                },
+                "Confirm transaction manually": {
+                    "de": "Transaktion manuell bestätigen",
+                    "fr": "Confirmer la transaction manuellement",
+                    "it": "Conferma la transazione manualmente"
+                },
+                "Confirmed amount:": {
+                    "de": "Bestätigter Betrag:",
+                    "fr": "Montant confirmé:",
+                    "it": "Importo confermato:"
+                },
+                "Language": {
+                    "de": "Sprache",
+                    "fr": "Langue",
+                    "it": "Lingua"
+                },
                 "Terminal is online": {
                     "de": "Terminal ist online",
                     "fr": "Terminal online",
                     "it": "Terminale online"
+                },
+                "Transactions": {
+                    "de": "Transaktionen",
+                    "fr": "Transactions",
+                    "it": "Transazioni"
                 },
                 "Card has been read": {
                     "de": "Karte wurde gelesen",
