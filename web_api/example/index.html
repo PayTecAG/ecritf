@@ -649,8 +649,22 @@
 
                     for (var i in trxFunctions) {
                         var name = trm.getTransactionFunctionName(trxFunctions[i], language);
+                        var cssClasses;
+                        
+                        switch (trxFunctions[i]) {
+                        case trm.TransactionFunctions.PURCHASE_FORCED_ACCEPTANCE:
+                        case trm.TransactionFunctions.REVERSAL:
+                        case trm.TransactionFunctions.CREDIT:
+                        case trm.TransactionFunctions.LOAD:
+                            cssClasses = "no-kiosk";
+                            break;
+                        default:
+                            cssClasses = "";
+                            break;
+                        }
+
                         trxFunctionInfoHTML += "<div class='row'><div class='col'>" + name + "</div></div>";
-                        trxFunctionSelectHTML += "<option value='" + trxFunctions[i] + "'>" + name + "</option>";
+                        trxFunctionSelectHTML += "<option class='" + cssClasses + "' value='" + trxFunctions[i] + "'>" + name + "</option>";
 
                         if (trm.TransactionFunctions.AUTHORIZATION_PURCHASE == trxFunctions[i]) {
                             trxFunctionSelectHTML += "<option value='" + ONLINE_ADVICE + "'>" + "Online Advice" + "</option>";
@@ -660,6 +674,7 @@
                     $("#trxFunctionInfo").html(trxFunctionInfoHTML);
                     $("#trxFunctionSelect").html(trxFunctionSelectHTML);
                     onTrxFunctionChanged();
+                    applyVisibility();
                 }
             }
 
