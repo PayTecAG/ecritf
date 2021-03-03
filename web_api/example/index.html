@@ -91,7 +91,7 @@
                             <i class="fas fa-receipt"></i>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item no-kiosk">
                         <a class="nav-link" id="infoTab" data-toggle="tab" href="#infoPane" role="tab" aria-controls="infoPane" aria-selected="false">
                             <i class="fas fa-info"></i>
                         </a>
@@ -112,17 +112,17 @@
                             <a class="dropdown-item disconnected" onclick="javascript:enterPairingCode();">
                                 <i class="fas fa-link"></i>&nbsp;<span class="i18n">Connect to terminal</span>
                             </a>
-                            <a class="dropdown-item connected" onclick="javascript:unpair();">
+                            <a class="dropdown-item connected no-kiosk" onclick="javascript:unpair();">
                                 <i class="fas fa-unlink"></i>&nbsp;<span class="i18n">Disconnect from terminal</span>
                             </a>
-                            <div class="dropdown-divider"></div> 
-                            <a class="dropdown-item" id="reboot" onclick="javascript:trm.deviceCommand({ DeviceCommandCode: trm.DeviceCommands.REBOOT });">
+                            <div class="dropdown-divider no-kiosk"></div> 
+                            <a class="dropdown-item no-kiosk" id="reboot" onclick="javascript:trm.deviceCommand({ DeviceCommandCode: trm.DeviceCommands.REBOOT });">
                                 <i class="fas fa-power-off"></i>&nbsp;<span class="i18n">Reboot terminal</span>
                             </a>
-                            <a class="dropdown-item" id="swUpdate" onclick="javascript:trm.deviceCommand({ DeviceCommandCode: trm.DeviceCommands.SW_UPDATE });">
+                            <a class="dropdown-item no-kiosk" id="swUpdate" onclick="javascript:trm.deviceCommand({ DeviceCommandCode: trm.DeviceCommands.SW_UPDATE });">
                                 <i class="fas fa-cloud-download-alt"></i>&nbsp;<span class="i18n">Update software</span>
                             </a>
-                            <div class="dropdown-divider"></div> 
+                            <div class="dropdown-divider no-kiosk"></div> 
                             <a class="dropdown-item" id="reload" onclick="javascript:location.reload(true);">
                                 <i class="fas fa-redo"></i>&nbsp;<span class="i18n">Reload page</span>
                             </a>
@@ -188,26 +188,27 @@
                         </button>
                     </div>
                     <div class="connected deactivated text-center">
-                        <button type="button" class="btn btn-primary btn-block btn-lg i18n" id="activate" onclick="javascript:trm.activate()">Activate terminal</button>
+                        <button type="button" class="btn btn-primary btn-block btn-lg i18n"
+                            id="activate" onclick="javascript:trm.activate()">Activate terminal</button>
                     </div>
                     <div class="section-spacer"></div>
-                    <div class="connected activated text-center">
+                    <div class="connected activated no-kiosk text-center">
                         <button type="button" class="btn btn-primary btn-block i18n"
                             id="deactivate" onclick="javascript:trm.deactivate()">Deactivate terminal</button>
                     </div>
-                    <div class="connected deactivated text-center button-spacer">
+                    <div class="connected deactivated no-kiosk text-center button-spacer">
                         <button type="button" class="btn btn-primary btn-block i18n"
                             id="balance" onclick="javascript:trm.balance()">Final balance</button>
                     </div>
-                    <div class="connected text-center button-spacer">
+                    <div class="connected no-kiosk text-center button-spacer">
                         <button type="button" class="btn btn-primary btn-block i18n"
                             id="capture" onclick="javascript:trm.sendMessage({ BatchCaptureRequest: {}})">Submit transaction data</button>
                     </div>
-                    <div class="connected text-center button-spacer">
+                    <div class="connected no-kiosk text-center button-spacer">
                         <button type="button" class="btn btn-primary btn-block i18n"
                             id="config" onclick="javascript:trm.configure()">Configuration</button>
                     </div>
-                    <div class="connected text-center button-spacer">
+                    <div class="connected no-kiosk text-center button-spacer">
                         <div class="dropdown">
                             <button class="btn btn-primary btn-block dropdown-toggle i18n" type="button" data-toggle="dropdown">Initialisation<span class="caret"></span></button>
                             <ul class="dropdown-menu dropdown-primary" id="initAcquirerList"/>
@@ -241,27 +242,32 @@
                     <div class="i18n" id="trxFunctionInfo">[none]</div>
                 </div>
                 <div id="settingsPane" class="tab-pane container" role="tabpanel">
-                    <div class="row form-group info-title-1 i18n">Language</div>
+                    <div class="row form-group info-title-1 i18n">General</div>
                     <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="kioskMode" onclick="javascript:toggleKioskMode();">
+                        <label class="form-check-label i18n" for="kioskMode">Kiosk mode</label>
+                    </div>
+                    <div class="row no-kiosk form-group info-title-1 i18n">Language</div>
+                    <div class="form-check no-kiosk">
                         <input class="form-check-input" type="checkbox" value="" id="browserLanguageOnTrm" onclick="javascript:storeSettings();">
                         <label class="form-check-label i18n" for="browserLanguageOnTrm">Browser language on terminal</label>
                     </div>
-                    <div class="row form-group info-title-1 printer-available i18n">Automatically print receipts on terminal</div>
-                    <div class="form-check printer-available">
+                    <div class="row no-kiosk form-group info-title-1 printer-available i18n">Automatically print receipts on terminal</div>
+                    <div class="form-check no-kiosk printer-available">
                         <input class="form-check-input" type="checkbox" value="" id="printMerchantReceipts" onclick="javascript:storeSettings();">
                         <label class="form-check-label i18n" for="printMerchantReceipts">Merchant receipts</label>
                     </div>
-                    <div class="form-check printer-available">
+                    <div class="form-check no-kiosk printer-available">
                         <input class="form-check-input" type="checkbox" value="" id="printCardholderReceipts" onclick="javascript:storeSettings();">
                         <label class="form-check-label i18n" for="printCardholderReceipts">Cardholder receipts</label>
                     </div>
-                    <div class="form-check printer-available">
+                    <div class="form-check no-kiosk printer-available">
                         <input class="form-check-input" type="checkbox" value="" id="printInfoReceipts" onclick="javascript:storeSettings();">
                         <label class="form-check-label i18n" for="printInfoReceipts">Information receipts</label>
                     </div>
-                    <div class="row form-group info-title-1 i18n">Transactions</div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="manualConfirmation" onclick="javascript:storeSettings();">
+                    <div class="row no-kiosk form-group info-title-1 i18n">Transactions</div>
+                    <div class="form-check no-kiosk">
+                        <input class="form-check-input" type="checkbox" value="" id="manualConfirmation" onclick="javascript:toggleAutoConfirm();">
                         <label class="form-check-label i18n" for="manualConfirmation">Confirm transaction manually</label>
                     </div>
                 </div>
@@ -287,11 +293,11 @@
                     <form class="form-horizontal" role="form" method="post" action="">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h4 id="pairingDialogTitle" class="modal-title i18n">Pairing with Terminal</h4>
+                                <h4 class="modal-title i18n">Pairing with Terminal</h4>
                                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
                             </div>
                             <div class="modal-body">
-                                <p class="i18n" id="pairingDialogText">Please enter the pairing code:</p>
+                                <p class="i18n">Please enter the pairing code:</p>
                                 <input type="number" id="pairingCode"></input>
                             </div>
                             <div class="modal-footer">
@@ -311,10 +317,10 @@
                     <form class="form-horizontal" role="form" method="post" action="">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h4 id="confirmationDialogTitle" class="modal-title i18n">Confirm Transaction</h4>
+                                <h4 class="modal-title i18n">Confirm Transaction</h4>
                             </div>
                             <div class="modal-body">
-                                <p class="i18n" id="confirmedAmountLabel">Confirmed amount:</p>
+                                <p class="i18n">Confirmed amount:</p>
                                 <input type="number" id="trxAmt"></input>
                             </div>
                             <div class="modal-footer">
@@ -322,6 +328,68 @@
                                     <i class="fas fa-check"></i>&nbsp;<span class="i18n">OK</span>
                                 </button>
                                 <button type="button" class="btn btn-outline-danger" data-dismiss="modal" onclick="javascript:rollbackTransaction();">
+                                    <i class="fas fa-times"></i>&nbsp;<span class="i18n">Abort</span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div id="activateKioskModeDialog" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                    <form class="form-horizontal" role="form" method="post" action="">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title i18n">Activate Kiosk Mode</h4>
+                                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <span class="i18n">Deactivation password:</span>
+                                    </div>
+                                    <div class="col text-right">
+                                        <input type="password" id="newKioskModePassword" autocomplete="off"></input>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <span class="i18n">Repeat:</span>
+                                    </div>
+                                    <div class="col text-right">
+                                        <input type="password" id="repeatKioskModePassword" autocomplete="off"></input>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary" data-dismiss="modal" onclick="javascript:tryActivateKioskMode();">
+                                    <i class="fas fa-check"></i>&nbsp;<span class="i18n">OK</span>
+                                </button>
+                                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+                                    <i class="fas fa-times"></i>&nbsp;<span class="i18n">Abort</span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div id="deactivateKioskModeDialog" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                    <form class="form-horizontal" role="form" method="post" action="">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title i18n">Deactivate Kiosk Mode</h4>
+                                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+                            </div>
+                            <div class="modal-body">
+                                <p class="i18n">Enter password:</p>
+                                <input type="password" id="kioskModePassword" autocomplete="off"></input>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary" data-dismiss="modal" onclick="javascript:tryDeactivateKioskMode();">
+                                    <i class="fas fa-check"></i>&nbsp;<span class="i18n">OK</span>
+                                </button>
+                                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
                                     <i class="fas fa-times"></i>&nbsp;<span class="i18n">Abort</span>
                                 </button>
                             </div>
@@ -344,6 +412,7 @@
             var pairingInfo;
             var ONLINE_ADVICE = 0x11111111; // private function to confirm AUTHORIZATION_PURCHASE transactions (petrol use case)
             var lastTrxSeqCnt = -1;
+            var connected = false;
 
             // IE compatibility
             Math.trunc = Math.trunc || function(x) {
@@ -355,9 +424,6 @@
               }
               return Math.ceil(x);
             };
-
-            $(".connected").hide();
-            $(".activated").hide();
 
             if (typeof(Storage) !== "undefined") {
                 let info = localStorage.getItem("pairingInfo");
@@ -377,6 +443,15 @@
                 $("#printCardholderReceipts").prop('checked', localStorage.getItem("printCardholderReceipts") == "true");
                 $("#printInfoReceipts").prop('checked', localStorage.getItem("printInfoReceipts") == "true");
                 $("#manualConfirmation").prop('checked', localStorage.getItem("manualConfirmation") == "true");
+
+                // reset to current settings if dialog is aborted
+                $('#activateKioskModeDialog').on('hidden.bs.modal', function (e) { applyKioskModeSetting(); });
+                $('#deactivateKioskModeDialog').on('hidden.bs.modal', function (e) { applyKioskModeSetting(); });
+                applyKioskModeSetting();
+            }
+            else {
+                $("#kioskMode").attr("disabled", true);
+                $("#kioskMode").attr('data-original-title', i18n("Function not supported by this browser")).tooltip("enable");
             }
 
             trm = new PayTec.POSTerminal(pairingInfo, {
@@ -405,7 +480,45 @@
 
             trm.setAutoConfirm($("#manualConfirmation").prop('checked') == false);
 
+            function applyVisibility() {
+                $(".connected").show();
+                $(".disconnected").show();
+                $(".status").show();
+                $(".no-kiosk").show();
+                $(".kiosk").show();
+                $(".activated").show();
+                $(".deactivated").show();
+                $(".printer-available").show();
+
+                if (!connected) {
+                    $(".connected").hide();
+                    $(".status").hide();
+                }
+
+                if (connected)
+                    $(".disconnected").hide();
+
+                if ((trm !== undefined) && (trm.StatusFlags.SHIFT_OPEN & trmStatus))
+                    $(".deactivated").hide();
+                else
+                    $(".activated").hide();
+
+                if ((trm === undefined) || (trm.StatusFlags.PRINTER_UNAVAILABLE & trmStatus))
+                    $(".printer-available").hide();
+
+                $("#busy").toggle((trm !== undefined) && ((trm.StatusFlags.BUSY & trmStatus) != 0));
+                $("#onlineProcessing").toggle((trm !== undefined) && ((trm.StatusFlags.ONLINE_PROCESSING & trmStatus) != 0));
+                $("#cardDataAvailable").toggle((trm !== undefined) && (((trm.StatusFlags.CARD_DATA_AVAILABLE | trm.StatusFlags.APPLICATION_SELECTED) & trmStatus) != 0));
+
+                if ((typeof(Storage) !== "undefined") && (localStorage.getItem("kioskModePassword") !== null))
+                    $(".no-kiosk").hide();
+                else
+                    $(".kiosk").hide();
+            }
+
             function onConnected() {
+                connected = true;
+
                 if (dialogTimer == undefined) {
                     setDialogTimer(500);
                 }
@@ -420,10 +533,7 @@
                     + "." + pad(Math.trunc((v % 10000) / 100), 2, '0')
                     + "." + pad(Math.trunc(v % 100), 2, '0'));
 
-                $(".connected").show();
-                $(".disconnected").hide();
-                $(".activated").hide();
-                $(".deactivated").hide();
+                applyVisibility();
             }
 
             function onPairingFailed() {
@@ -460,20 +570,8 @@
                 }
 
                 trmStatus = newStatus;
+                applyVisibility();
                 applyPrinterStatus();
-
-                if (trm.StatusFlags.SHIFT_OPEN & trmStatus) {
-                    $(".deactivated").hide();
-                    $(".activated").show();
-                }
-                else {
-                    $(".deactivated").show();
-                    $(".activated").hide();
-                }
-
-                $("#busy").toggle((trm.StatusFlags.BUSY & trmStatus) != 0);
-                $("#onlineProcessing").toggle((trm.StatusFlags.ONLINE_PROCESSING & trmStatus) != 0);
-                $("#cardDataAvailable").toggle(((trm.StatusFlags.CARD_DATA_AVAILABLE | trm.StatusFlags.APPLICATION_SELECTED) & trmStatus) != 0);
 
                 if (!(trm.StatusFlags.BUSY & trmStatus)) {
                     // update acquirers
@@ -648,9 +746,8 @@
             }
 
             function onDisconnected() {
-                $(".connected").hide();
-                $(".status").hide();
-                $(".disconnected").show();
+                connected = false;
+                applyVisibility();
             }
 
             function onError(message) {
@@ -814,22 +911,53 @@
             }
 
             function applyPrinterStatus() {
-                if (trm.StatusFlags.PRINTER_UNAVAILABLE & trmStatus) {
+                if (trm.StatusFlags.PRINTER_UNAVAILABLE & trmStatus)
                     $(".print-tooltip").attr('data-original-title', i18n("Printing via browser")).tooltip("enable");
-                }
-                else if (trm.StatusFlags.OUT_OF_PAPER & trmStatus) {
+                else if (trm.StatusFlags.OUT_OF_PAPER & trmStatus)
                     $(".print-tooltip").attr('data-original-title', i18n("Printing via terminal - please exchange paper roll")).tooltip("enable");
-                }
-                else {
+                else
                     $(".print-tooltip").attr('data-original-title', i18n("Printing via terminal")).tooltip("enable");
-                }
 
-                if (trm.StatusFlags.PRINTER_UNAVAILABLE & trmStatus) {
-                    $(".printer-available").hide();
+                applyVisibility();
+            }
+
+            function toggleAutoConfirm() {
+                trm.setAutoConfirm($("#manualConfirmation").prop('checked') == false);
+                storeSettings();
+            }
+
+            function toggleKioskMode() {
+                $("#newKioskModePassword").val("");
+                $("#repeatKioskModePassword").val("");
+                $("#kioskModePassword").val("");
+
+                if ($("#kioskMode").is(":checked"))
+                    $("#activateKioskModeDialog").modal("show");
+                else
+                    $("#deactivateKioskModeDialog").modal("show");
+            }
+
+            function applyKioskModeSetting() {
+                if (localStorage.getItem("kioskModePassword") !== null)
+                    $("#kioskMode").prop('checked', true);
+                else
+                    $("#kioskMode").prop('checked', false);
+
+                applyVisibility();
+            }
+
+            function tryActivateKioskMode() {
+                if ($("#newKioskModePassword")[0].value == $("#repeatKioskModePassword")[0].value) {
+                    localStorage.setItem("kioskModePassword", $("#newKioskModePassword")[0].value);
                 }
                 else {
-                    $(".printer-available").show();
+                    showDialog(i18n("Error"), i18n("Passwords do not match"), 10000);
                 }
+            }
+
+            function tryDeactivateKioskMode() {
+                if ($("#kioskModePassword")[0].value == localStorage.getItem("kioskModePassword"))
+                    localStorage.removeItem("kioskModePassword");
             }
 
             function storeSettings() {
@@ -840,8 +968,6 @@
                     localStorage.setItem("printInfoReceipts", $("#printInfoReceipts").is(":checked") ? "true" : "false");
                     localStorage.setItem("manualConfirmation", $("#manualConfirmation").is(":checked") ? "true" : "false");
                 }
-
-                trm.setAutoConfirm($("#manualConfirmation").prop('checked') == false);
             }
 
             function clearDialogTimer() {
@@ -891,6 +1017,14 @@
                     $(this).find('#pairingCode').focus();
                 });
 
+                $("#activateKioskModeDialog").on('shown.bs.modal', function(){
+                    $(this).find('#newKioskModePassword').focus();
+                });
+
+                $("#deactivateKioskModeDialog").on('shown.bs.modal', function(){
+                    $(this).find('#kioskModePassword').focus();
+                });
+
                 $('#trxFunctionSelect').change(onTrxFunctionChanged);
 
                 var forms = document.getElementsByClassName('needs-validation');
@@ -916,6 +1050,7 @@
             }, false);
 
             function i18n(text) {
+                let translations = getTranslations();
                 let result = text;
                 let dictEntry = translations[text];
 
@@ -930,318 +1065,366 @@
                 return result;
             }
 
-            var translations = {
-                "all": {
-                    "de": "alle",
-                    "fr": "tous",
-                    "it": "tutti"
-                },
-                "Browser language on terminal": {
-                    "de": "Browser-Sprache auf Terminal",
-                    "fr": "Langue du navigateur sur le terminal",
-                    "it": "Lingua del browser sul terminale"
-                },
-                "Confirm Transaction": {
-                    "de": "Transaktion bestätigen",
-                    "fr": "Confirmer la transaction",
-                    "it": "Conferma della transazione"
-                },
-                "Confirm transaction manually": {
-                    "de": "Transaktion manuell bestätigen",
-                    "fr": "Confirmer la transaction manuellement",
-                    "it": "Conferma la transazione manualmente"
-                },
-                "Confirmed amount:": {
-                    "de": "Bestätigter Betrag:",
-                    "fr": "Montant confirmé:",
-                    "it": "Importo confermato:"
-                },
-                "Language": {
-                    "de": "Sprache",
-                    "fr": "Langue",
-                    "it": "Lingua"
-                },
-                "Terminal is online": {
-                    "de": "Terminal ist online",
-                    "fr": "Terminal online",
-                    "it": "Terminale online"
-                },
-                "Transactions": {
-                    "de": "Transaktionen",
-                    "fr": "Transactions",
-                    "it": "Transazioni"
-                },
-                "Card has been read": {
-                    "de": "Karte wurde gelesen",
-                    "fr": "La carte a été lue",
-                    "it": "La carta è stata letta"
-                },
-                "Terminal is busy": {
-                    "de": "Terminal ist beschäftigt",
-                    "fr": "Le terminal est occupé",
-                    "it": "Il terminale è occupato"
-                },
-                "Shift is open": {
-                    "de": "Schicht geöffnet",
-                    "fr": "Terminal activé",
-                    "it": "Terminale attivo"
-                },
-                "Shift is closed": {
-                    "de": "Schicht geschlossen",
-                    "fr": "Terminal pas activé",
-                    "it": "Terminale non attivo"
-                },
-                "Connected to terminal": {
-                    "de": "Verbunden mit Terminal",
-                    "fr": "Connecté au terminal",
-                    "it": "Collegato al terminale"
-                },
-                "No terminal connected": {
-                    "de": "Kein Terminal angeschlossen",
-                    "fr": "Aucun terminal connecté",
-                    "it": "Nessun terminale collegato"
-                },
-                "Connect to terminal": {
-                    "de": "Mit Terminal verbinden",
-                    "fr": "Connecter au terminal",
-                    "it": "Collegare al terminale"
-                },
-                "Disconnect from terminal": {
-                    "de": "Verbindung aufheben",
-                    "fr": "Déconnecter du terminal",
-                    "it": "Scollegamento dal terminale"
-                },
-                "Reboot terminal": {
-                    "de": "Terminal neu starten",
-                    "fr": "Redémarrer le terminal",
-                    "it": "Riavviare il terminale"
-                },
-                "Update software": {
-                    "de": "SW Update",
-                    "fr": "Téléchargement",
-                    "it": "Caricare SW"
-                },
-                "Reload page": {
-                    "de": "Seite neu laden",
-                    "fr": "Recharger la page",
-                    "it": "Ricarica la pagina"
-                },
-                "Function:": {
-                    "de": "Funktion:",
-                    "fr": "Fonction:",
-                    "it": "Funzione:"
-                },
-                "Amount:": {
-                    "de": "Betrag:",
-                    "fr": "Montant:",
-                    "it": "Importo:"
-                },
-                "Invalid amount - valid values: 0.01 - 999999.99": {
-                    "de": "Ungültiger Betrag - gültige Werte: 0.01 - 999999.99",
-                    "fr": "Montant non valable - valeurs valables : 0,01 - 99999999,99",
-                    "it": "Importo non valido - valori validi: 0,01 - 99999999.99."
-                },
-                "Abort": {
-                    "de": "Abbruch",
-                    "fr": "Interruption",
-                    "it": "Interruzione"
-                },
-                "Activate terminal": {
-                    "de": "Terminal aktivieren",
-                    "fr": "Activer le terminal",
-                    "it": "Attiva terminale"
-                },
-                "Deactivate terminal": {
-                    "de": "Terminal deaktivieren",
-                    "fr": "Désactiver terminal",
-                    "it": "Disattiva terminale"
-                },
-                "Final balance": {
-                    "de": "Tagesabschluss",
-                    "fr": "Clôture journalière",
-                    "it": "Chiusura giornaliera"
-                },
-                "Configuration": {
-                    "de": "Konfiguration",
-                    "fr": "Configuration",
-                    "it": "Configurazione"
-                },
-                "Initialisation": {
-                    "de": "Initialisierung",
-                    "fr": "Initialisation",
-                    "it": "Inizializzazione"
-                },
-                "Device model:": {
-                    "de": "Gerätemodell:",
-                    "fr": "Modèle d'appareil:",
-                    "it": "Modello di dispositivo:"
-                },
-                "never": {
-                    "de": "nie",
-                    "fr": "jamais",
-                    "it": "mai"
-                },
-                "unknown": {
-                    "de": "unbekannt",
-                    "fr": "inconnu",
-                    "it": "sconosciuto"
-                },
-                "Trm-Id:": {
-                    "de": "Trm-Id:",
-                    "fr": "Trm-Id:",
-                    "it": "Trm-Id:"
-                },
-                "Serial number:": {
-                    "de": "Seriennummer:",
-                    "fr": "Numéro de série:",
-                    "it": "Numero di serie:"
-                },
-                "Software version:": {
-                    "de": "Softwareversion:",
-                    "fr": "Version du logiciel:",
-                    "it": "Versione software:"
-                },
-                "Submit transaction data": {
-                    "de": "Transaktionsdaten einliefern",
-                    "fr": "Soumettre des données de transaction",
-                    "it": "Inviare i dati delle transazioni"
-                },
-                "Processors": {
-                    "de": "Verarbeiter",
-                    "fr": "Transformateurs",
-                    "it": "Processori"
-                },
-                "[none]": {
-                    "de": "[keine]",
-                    "fr": "[aucun]",
-                    "it": "[nessun]"
-                },
-                "Means of payment": {
-                    "de": "Zahlungsmittel",
-                    "fr": "Moyens de paiement",
-                    "it": "Mezzi di pagamento"
-                },
-                "Transaction types": {
-                    "de": "Transaktionstypen",
-                    "fr": "Types de transaction",
-                    "it": "Tipi di transazione"
-                },
-                "Pairing with Terminal": {
-                    "de": "Pairing mit Terminal",
-                    "fr": "Appairage du terminal",
-                    "it": "Accoppiare il terminale"
-                },
-                "Please enter the pairing code:": {
-                    "de": "Bitte Pairing Code eingeben:",
-                    "fr": "Veuillez entrer le code d'appariement:",
-                    "it": "Inserire il codice di accoppiamento:"
-                },
-                "Error": {
-                    "de": "Fehler",
-                    "fr": "Erreur",
-                    "it": "Errore"
-                },
-                "Failed to connect to terminal": {
-                    "de": "Es konnte keine Verbindung zum Terminal hergestellt werden",
-                    "fr": "Aucune connexion n'a pu être établie avec le terminal",
-                    "it": "Non è stato possibile stabilire un collegamento con il terminale"
-                },
-                "Printer problem": {
-                    "de": "Druckerproblem",
-                    "fr": "Problème d'imprimante",
-                    "it": "Problema stampante"
-                },
-                "Please exchange paper roll": {
-                    "de": "Bitte Papierrolle wechseln",
-                    "fr": "Remplacer le rouleau de papier",
-                    "it": "Sostituire il rotolo di carta"
-                },
-                "successfully initialised: ": {
-                    "de": "erfolgreich initialisiert: ",
-                    "fr": "initialisé avec succès: ",
-                    "it": "inizializzato con successo: "
-                },
-                "Processing OK": {
-                    "de": "Verarbeitung OK",
-                    "fr": "Traitement OK",
-                    "it": "Elaborazione OK"
-                },
-                "Processing failed": {
-                    "de": "Verarbeitung fehlgeschlagen",
-                    "fr": "Erreur de traitement",
-                    "it": "Errore di elaborazione"
-                },
-                "Connection is being established": {
-                    "de": "Verbindung wird hergestellt",
-                    "fr": "La connexion est en cours d'établissement",
-                    "it": "La connessione è in corso di realizzazione"
-                },
-                "Out of paper": {
-                    "de": "Kein Papier",
-                    "fr": "Manque de papier",
-                    "it": "Carta stampante esaurita"
-                },
-                "Please exchange paper roll on terminal printer": {
-                    "de": "Bitte Papier am Terminaldrucker wechseln",
-                    "fr": "Remplacer le rouleau de papier sur l'imprimante du terminal",
-                    "it": "Sostituire il rotolo di carta stampante del terminale"
-                },
-                "Printing via browser": {
-                    "de": "Druck via Browser",
-                    "fr": "Impression par navigateur",
-                    "it": "Stampa su Browser"
-                },
-                "Printing via terminal - please exchange paper roll": {
-                    "de": "Druck via Terminal - bitte Papier wechseln",
-                    "fr": "Impression par terminal - échangez le rouleau de papier s.v.p.",
-                    "it": "Stampa su terminale - si prega di sostituire il rotolo di carta"
-                },
-                "Printing via terminal": {
-                    "de": "Druck via Terminal",
-                    "fr": "Impression par terminal",
-                    "it": "Stampa su terminale"
-                },
-                "Please wait": {
-                    "de": "Bitte warten",
-                    "fr": "Un instant s.v.p.",
-                    "it": "Attendere prego"
-                },
-                "Merchant receipts": {
-                    "de": "Händlerbelege",
-                    "fr": "Reçus du marchand",
-                    "it": "Ricevute mercante"
-                },
-                "Cardholder receipts": {
-                    "de": "Kundenbelege",
-                    "fr": "Reçus du client",
-                    "it": "Ricevute cliente"
-                },
-                "Information receipts": {
-                    "de": "Infobelege",
-                    "fr": "Reçus d'information",
-                    "it": "Ricevute di informazione"
-                },
-                "Automatically print receipts on terminal": {
-                    "de": "Belege automatisch auf Terminal drucken",
-                    "fr": "Impression automatique des reçus sur le terminal",
-                    "it": "Stampa automaticamente le ricevute sul terminale"
-                },
-                "Authorization code:": {
-                    "de": "Autorisierungsscode:",
-                    "fr": "Code autorisation:",
-                    "it": "Codice Autorizzazione:"
-                },
-                "Sequence counter:": {
-                    "de": "Sequenznummer:",
-                    "fr": "Compteur de séquences:",
-                    "it": "Contatore di sequenza:"
-                },
-                "Reference number:": {
-                    "de": "Referenznummer:",
-                    "fr": "Numéro de référence:",
-                    "it": "Numero di riferimento:"
-                },
-            };
+            function getTranslations() {
+                let translations = {
+                    "Activate Kiosk Mode": {
+                        "de": "Kioskmodus aktivieren",
+                        "fr": "Activer Mode Kiosque",
+                        "it": "Attivare il Modo Kiosk"
+                    },
+                    "all": {
+                        "de": "alle",
+                        "fr": "tous",
+                        "it": "tutti"
+                    },
+                    "Browser language on terminal": {
+                        "de": "Browser-Sprache auf Terminal",
+                        "fr": "Langue du navigateur sur le terminal",
+                        "it": "Lingua del browser sul terminale"
+                    },
+                    "Confirm Transaction": {
+                        "de": "Transaktion bestätigen",
+                        "fr": "Confirmer la transaction",
+                        "it": "Conferma della transazione"
+                    },
+                    "Confirm transaction manually": {
+                        "de": "Transaktion manuell bestätigen",
+                        "fr": "Confirmer la transaction manuellement",
+                        "it": "Conferma la transazione manualmente"
+                    },
+                    "Confirmed amount:": {
+                        "de": "Bestätigter Betrag:",
+                        "fr": "Montant confirmé:",
+                        "it": "Importo confermato:"
+                    },
+                    "Deactivate Kiosk Mode": {
+                        "de": "Kioskmodus deaktivieren",
+                        "fr": "Désactiver Mode Kiosque",
+                        "it": "Disattivare il Modo Kiosk"
+                    },
+                    "Deactivation password:": {
+                        "de": "Deaktivierungskennwort:",
+                        "fr": "ot de passe de désactivation:",
+                        "it": "Password di disattivazione:"
+                    },
+                    "Enter password:": {
+                        "de": "Kennwort eingeben:",
+                        "fr": "Saisissez le mot de passe:",
+                        "it": "Inserisci password:"
+                    },
+                    "Function not supported by this browser": {
+                        "de": "Funktion wird von diesem Browser nicht unterstützt",
+                        "fr": "Fonction non prise en charge par ce navigateur",
+                        "it": "Funzione non supportata da questo browser"
+                    },
+                    "General": {
+                        "de": "Allgemein",
+                        "fr": "Général",
+                        "it": "Generale"
+                    },
+                    "Kiosk mode": {
+                        "de": "Kiosk-Modus",
+                        "fr": "Mode kiosque",
+                        "it": "Modalità chiosco"
+                    },
+                    "Language": {
+                        "de": "Sprache",
+                        "fr": "Langue",
+                        "it": "Lingua"
+                    },
+                    "Passwords do not match": {
+                        "de": "Passwörter stimmen nicht überein",
+                        "fr": "Les mots de passe ne correspondent pas",
+                        "it": "Le password non corrispondono"
+                    },
+                    "Repeat:": {
+                        "de": "Wiederholen:",
+                        "fr": "Répéter:",
+                        "it": "Ripetere:"
+                    },
+                    "Terminal is online": {
+                        "de": "Terminal ist online",
+                        "fr": "Terminal online",
+                        "it": "Terminale online"
+                    },
+                    "Transactions": {
+                        "de": "Transaktionen",
+                        "fr": "Transactions",
+                        "it": "Transazioni"
+                    },
+                    "Card has been read": {
+                        "de": "Karte wurde gelesen",
+                        "fr": "La carte a été lue",
+                        "it": "La carta è stata letta"
+                    },
+                    "Terminal is busy": {
+                        "de": "Terminal ist beschäftigt",
+                        "fr": "Le terminal est occupé",
+                        "it": "Il terminale è occupato"
+                    },
+                    "Shift is open": {
+                        "de": "Schicht geöffnet",
+                        "fr": "Terminal activé",
+                        "it": "Terminale attivo"
+                    },
+                    "Shift is closed": {
+                        "de": "Schicht geschlossen",
+                        "fr": "Terminal pas activé",
+                        "it": "Terminale non attivo"
+                    },
+                    "Connected to terminal": {
+                        "de": "Verbunden mit Terminal",
+                        "fr": "Connecté au terminal",
+                        "it": "Collegato al terminale"
+                    },
+                    "No terminal connected": {
+                        "de": "Kein Terminal angeschlossen",
+                        "fr": "Aucun terminal connecté",
+                        "it": "Nessun terminale collegato"
+                    },
+                    "Connect to terminal": {
+                        "de": "Mit Terminal verbinden",
+                        "fr": "Connecter au terminal",
+                        "it": "Collegare al terminale"
+                    },
+                    "Disconnect from terminal": {
+                        "de": "Verbindung aufheben",
+                        "fr": "Déconnecter du terminal",
+                        "it": "Scollegamento dal terminale"
+                    },
+                    "Reboot terminal": {
+                        "de": "Terminal neu starten",
+                        "fr": "Redémarrer le terminal",
+                        "it": "Riavviare il terminale"
+                    },
+                    "Update software": {
+                        "de": "SW Update",
+                        "fr": "Téléchargement",
+                        "it": "Caricare SW"
+                    },
+                    "Reload page": {
+                        "de": "Seite neu laden",
+                        "fr": "Recharger la page",
+                        "it": "Ricarica la pagina"
+                    },
+                    "Function:": {
+                        "de": "Funktion:",
+                        "fr": "Fonction:",
+                        "it": "Funzione:"
+                    },
+                    "Amount:": {
+                        "de": "Betrag:",
+                        "fr": "Montant:",
+                        "it": "Importo:"
+                    },
+                    "Invalid amount - valid values: 0.01 - 999999.99": {
+                        "de": "Ungültiger Betrag - gültige Werte: 0.01 - 999999.99",
+                        "fr": "Montant non valable - valeurs valables : 0,01 - 99999999,99",
+                        "it": "Importo non valido - valori validi: 0,01 - 99999999.99."
+                    },
+                    "Abort": {
+                        "de": "Abbruch",
+                        "fr": "Interruption",
+                        "it": "Interruzione"
+                    },
+                    "Activate terminal": {
+                        "de": "Terminal aktivieren",
+                        "fr": "Activer le terminal",
+                        "it": "Attiva terminale"
+                    },
+                    "Deactivate terminal": {
+                        "de": "Terminal deaktivieren",
+                        "fr": "Désactiver terminal",
+                        "it": "Disattiva terminale"
+                    },
+                    "Final balance": {
+                        "de": "Tagesabschluss",
+                        "fr": "Clôture journalière",
+                        "it": "Chiusura giornaliera"
+                    },
+                    "Configuration": {
+                        "de": "Konfiguration",
+                        "fr": "Configuration",
+                        "it": "Configurazione"
+                    },
+                    "Initialisation": {
+                        "de": "Initialisierung",
+                        "fr": "Initialisation",
+                        "it": "Inizializzazione"
+                    },
+                    "Device model:": {
+                        "de": "Gerätemodell:",
+                        "fr": "Modèle d'appareil:",
+                        "it": "Modello di dispositivo:"
+                    },
+                    "never": {
+                        "de": "nie",
+                        "fr": "jamais",
+                        "it": "mai"
+                    },
+                    "unknown": {
+                        "de": "unbekannt",
+                        "fr": "inconnu",
+                        "it": "sconosciuto"
+                    },
+                    "Trm-Id:": {
+                        "de": "Trm-Id:",
+                        "fr": "Trm-Id:",
+                        "it": "Trm-Id:"
+                    },
+                    "Serial number:": {
+                        "de": "Seriennummer:",
+                        "fr": "Numéro de série:",
+                        "it": "Numero di serie:"
+                    },
+                    "Software version:": {
+                        "de": "Softwareversion:",
+                        "fr": "Version du logiciel:",
+                        "it": "Versione software:"
+                    },
+                    "Submit transaction data": {
+                        "de": "Transaktionsdaten einliefern",
+                        "fr": "Soumettre des données de transaction",
+                        "it": "Inviare i dati delle transazioni"
+                    },
+                    "Processors": {
+                        "de": "Verarbeiter",
+                        "fr": "Transformateurs",
+                        "it": "Processori"
+                    },
+                    "[none]": {
+                        "de": "[keine]",
+                        "fr": "[aucun]",
+                        "it": "[nessun]"
+                    },
+                    "Means of payment": {
+                        "de": "Zahlungsmittel",
+                        "fr": "Moyens de paiement",
+                        "it": "Mezzi di pagamento"
+                    },
+                    "Transaction types": {
+                        "de": "Transaktionstypen",
+                        "fr": "Types de transaction",
+                        "it": "Tipi di transazione"
+                    },
+                    "Pairing with Terminal": {
+                        "de": "Pairing mit Terminal",
+                        "fr": "Appairage du terminal",
+                        "it": "Accoppiare il terminale"
+                    },
+                    "Please enter the pairing code:": {
+                        "de": "Bitte Pairing Code eingeben:",
+                        "fr": "Veuillez entrer le code d'appariement:",
+                        "it": "Inserire il codice di accoppiamento:"
+                    },
+                    "Error": {
+                        "de": "Fehler",
+                        "fr": "Erreur",
+                        "it": "Errore"
+                    },
+                    "Failed to connect to terminal": {
+                        "de": "Es konnte keine Verbindung zum Terminal hergestellt werden",
+                        "fr": "Aucune connexion n'a pu être établie avec le terminal",
+                        "it": "Non è stato possibile stabilire un collegamento con il terminale"
+                    },
+                    "Printer problem": {
+                        "de": "Druckerproblem",
+                        "fr": "Problème d'imprimante",
+                        "it": "Problema stampante"
+                    },
+                    "Please exchange paper roll": {
+                        "de": "Bitte Papierrolle wechseln",
+                        "fr": "Remplacer le rouleau de papier",
+                        "it": "Sostituire il rotolo di carta"
+                    },
+                    "successfully initialised: ": {
+                        "de": "erfolgreich initialisiert: ",
+                        "fr": "initialisé avec succès: ",
+                        "it": "inizializzato con successo: "
+                    },
+                    "Processing OK": {
+                        "de": "Verarbeitung OK",
+                        "fr": "Traitement OK",
+                        "it": "Elaborazione OK"
+                    },
+                    "Processing failed": {
+                        "de": "Verarbeitung fehlgeschlagen",
+                        "fr": "Erreur de traitement",
+                        "it": "Errore di elaborazione"
+                    },
+                    "Connection is being established": {
+                        "de": "Verbindung wird hergestellt",
+                        "fr": "La connexion est en cours d'établissement",
+                        "it": "La connessione è in corso di realizzazione"
+                    },
+                    "Out of paper": {
+                        "de": "Kein Papier",
+                        "fr": "Manque de papier",
+                        "it": "Carta stampante esaurita"
+                    },
+                    "Please exchange paper roll on terminal printer": {
+                        "de": "Bitte Papier am Terminaldrucker wechseln",
+                        "fr": "Remplacer le rouleau de papier sur l'imprimante du terminal",
+                        "it": "Sostituire il rotolo di carta stampante del terminale"
+                    },
+                    "Printing via browser": {
+                        "de": "Druck via Browser",
+                        "fr": "Impression par navigateur",
+                        "it": "Stampa su Browser"
+                    },
+                    "Printing via terminal - please exchange paper roll": {
+                        "de": "Druck via Terminal - bitte Papier wechseln",
+                        "fr": "Impression par terminal - échangez le rouleau de papier s.v.p.",
+                        "it": "Stampa su terminale - si prega di sostituire il rotolo di carta"
+                    },
+                    "Printing via terminal": {
+                        "de": "Druck via Terminal",
+                        "fr": "Impression par terminal",
+                        "it": "Stampa su terminale"
+                    },
+                    "Please wait": {
+                        "de": "Bitte warten",
+                        "fr": "Un instant s.v.p.",
+                        "it": "Attendere prego"
+                    },
+                    "Merchant receipts": {
+                        "de": "Händlerbelege",
+                        "fr": "Reçus du marchand",
+                        "it": "Ricevute mercante"
+                    },
+                    "Cardholder receipts": {
+                        "de": "Kundenbelege",
+                        "fr": "Reçus du client",
+                        "it": "Ricevute cliente"
+                    },
+                    "Information receipts": {
+                        "de": "Infobelege",
+                        "fr": "Reçus d'information",
+                        "it": "Ricevute di informazione"
+                    },
+                    "Automatically print receipts on terminal": {
+                        "de": "Belege automatisch auf Terminal drucken",
+                        "fr": "Impression automatique des reçus sur le terminal",
+                        "it": "Stampa automaticamente le ricevute sul terminale"
+                    },
+                    "Authorization code:": {
+                        "de": "Autorisierungsscode:",
+                        "fr": "Code autorisation:",
+                        "it": "Codice Autorizzazione:"
+                    },
+                    "Sequence counter:": {
+                        "de": "Sequenznummer:",
+                        "fr": "Compteur de séquences:",
+                        "it": "Contatore di sequenza:"
+                    },
+                    "Reference number:": {
+                        "de": "Referenznummer:",
+                        "fr": "Numéro de référence:",
+                        "it": "Numero di riferimento:"
+                    }
+                };
+                return translations;
+            }
         </script>
     </body>
 </html>
