@@ -402,6 +402,7 @@
         <script src="//code.jquery.com/jquery-3.3.1.slim.min.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
         <script src="//stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/forge/0.10.0/forge.min.js"></script>
         <script src="//ecritf.paytec.ch/api/v1.0/ecritf.js"></script>
 
         <script language = "javascript" type = "text/javascript">
@@ -963,7 +964,12 @@
 
             function tryActivateKioskMode() {
                 if ($("#newKioskModePassword")[0].value == $("#repeatKioskModePassword")[0].value) {
-                    localStorage.setItem("kioskModePassword", $("#newKioskModePassword")[0].value);
+                    var md = forge.md.sha256.create();
+                    var salt = Math.random().toString(16).substr(2, 8);
+                    var hash = md.update($("#newKioskModePassword")[0].value + salt).digest().toHex();
+
+                    localStorage.setItem("kioskModeSalt", salt);
+                    localStorage.setItem("kioskModePassword", hash);
                 }
                 else {
                     showDialog(i18n("Error"), i18n("Passwords do not match"), 10000);
@@ -971,8 +977,15 @@
             }
 
             function tryDeactivateKioskMode() {
-                if ($("#kioskModePassword")[0].value == localStorage.getItem("kioskModePassword"))
+                var md = forge.md.sha256.create();
+                var salt = localStorage.getItem("kioskModeSalt");
+                var hash =  md.update($("#kioskModePassword")[0].value + salt).digest().toHex();
+
+                if ((hash == localStorage.getItem("kioskModePassword"))
+                    || ($("#kioskModePassword")[0].value == localStorage.getItem("kioskModePassword")))
+                {
                     localStorage.removeItem("kioskModePassword");
+                }
             }
 
             function storeSettings() {
