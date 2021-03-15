@@ -796,6 +796,7 @@
 
                     if (trm.needsAmtAuth(selectedFunction)) {
                         $(".amt-auth-needed").show();
+                        $("#amtAuth").focus();
                     }
                     else {
                         $(".amt-auth-needed").hide();
@@ -1041,6 +1042,10 @@
             }
 
             window.addEventListener('load', function() {
+                $("#dialog").on('hidden.bs.modal', function(){
+                    $('#amtAuth').focus();
+                });
+
                 $("#pairingDialog").on('shown.bs.modal', function(){
                     $(this).find('#pairingCode').focus();
                 });
