@@ -946,7 +946,10 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         WAITING_FOR_APPLICATION_SELECTION:  0x00000080,
         ONLINE_PROCESSING:                  0x00000100,
         PRINTER_UNAVAILABLE:                0x00000200,
-        OUT_OF_PAPER:                       0x00000400
+        OUT_OF_PAPER:                       0x00000400,
+
+        // C4 specific
+        MODEM_IN_USE:                       0x40000000
     };
 
     this.DeviceCommands = {
