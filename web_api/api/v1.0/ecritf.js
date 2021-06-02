@@ -957,6 +957,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         EJECT_CARD_FORCED: 2,
         REBOOT: 501,
         SW_UPDATE: 502,
+        START_REMOTE_MAINTENANCE: 511,
         ENABLE_LANGUAGE_SELECTION: 1001,
         DISABLE_LANGUAGE_SELECTION: 1002,
         SHOW_IDLE: 2001,

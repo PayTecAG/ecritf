@@ -1132,6 +1132,7 @@ Commands to [perform](#devicecommand) some terminal actions beside payment.
 | EJECT_CARD_FORCED | 2 | Force-eject a card left within a motorized reader |
 | REBOOT | 501 | Reboot the terminal |
 | SW_UPDATE | 502 | Trigger software update on the terminal |
+| START_REMOTE_MAINTENANCE | 511 | Start a remote maintenance session if configured on the TMS. Skips waiting for the usual polling interval |
 | ENABLE_LANGUAGE_SELECTION | 1001 | Show a language selection dialog if chip card without language preference is inserted |
 | DISABLE_LANGUAGE_SELECTION | 1002 | Don't show a language selection dialog if chip card without language preference is inserted |
 | SHOW_IDLE | 2001 | Show the terminal's idle message (usually 'Welcome, present card' in activated state. |
