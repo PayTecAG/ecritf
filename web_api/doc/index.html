@@ -1050,7 +1050,7 @@ is finally reverted.</p>
 </tr>
 </tbody></table>
 <h2 id='devicecommand'>deviceCommand</h2>
-<p><code>trm.deviceCommand(commandCode, params)</code></p>
+<p><code>trm.deviceCommand(params)</code></p>
 <pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">deviceCommand</span><span class="p">({</span>
         <span class="na">DeviceCommandCode</span><span class="p">:</span> <span class="nx">trm</span><span class="p">.</span><span class="nx">DeviceCommands</span><span class="p">.</span><span class="nx">REBOOT</span>
     <span class="p">}</span>
@@ -1810,11 +1810,6 @@ the API does not do any further processing of the message.
 <td>SHOW_CARD_INSERTION</td>
 <td>2002</td>
 <td>Show the card insertion message to the cardholder</td>
-</tr>
-<tr>
-<td>CONFIGURE_DISCONNECTED_TEXT</td>
-<td>2501</td>
-<td>Configure display text that is shown on terminal when no ECR or vending ma-chine has connected. If this display text is configured, the terminal does not switch anymore to monoblock mode when ECR disconnects. To reset the display text to the default behavior, set the empty string as cardholder text.</td>
 </tr>
 </tbody></table>
 

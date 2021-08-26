@@ -400,7 +400,7 @@ ReceiptFlags | Numeric | optional | [Flags](#receiptflags) that influence printi
 
 ## deviceCommand
 
-`trm.deviceCommand(commandCode, params)`
+`trm.deviceCommand(params)`
 
 ```javascript
 trm.deviceCommand({
@@ -1138,4 +1138,3 @@ Commands to [perform](#devicecommand) some terminal actions beside payment.
 | DISABLE_LANGUAGE_SELECTION | 1002 | Don't show a language selection dialog if chip card without language preference is inserted |
 | SHOW_IDLE | 2001 | Show the terminal's idle message (usually 'Welcome, present card' in activated state. |
 | SHOW_CARD_INSERTION | 2002 | Show the card insertion message to the cardholder |
-| CONFIGURE_DISCONNECTED_TEXT | 2501 | Configure display text that is shown on terminal when no ECR or vending ma-chine has connected. If this display text is configured, the terminal does not switch anymore to monoblock mode when ECR disconnects. To reset the display text to the default behavior, set the empty string as cardholder text. |
