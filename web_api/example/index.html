@@ -155,17 +155,17 @@
                                         <div class="col-12 i18n">Invalid amount - valid values: 0.01 - 999999.99</div>
                                     </div>
                                 </div>
-                                <div class="form-group acq-id-needed">
-                                    <label for="acqIDSelect" class="i18n">Acquirer:</label>
-                                    <select class="form-control" id="acqIDSelect"></select>
-                                </div>
                                 <div class="form-group auth-c-needed">
                                     <label for="authC" class="i18n">Authorization code:</label>
                                     <input type="text" class="form-control" id="authC"></input>
                                 </div>
-                                <div class="form-group trx-ref-num-needed">
+                                <div class="form-group trx-ref-num-supported no-kiosk">
                                     <label for="trxRefNum" class="i18n">Reference number:</label>
                                     <input type="text" class="form-control" id="trxRefNum"></input>
+                                </div>
+                                <div class="form-group acq-id-supported no-kiosk">
+                                    <label for="acqIDSelect" class="i18n">Acquirer:</label>
+                                    <select class="form-control" id="acqIDSelect"></select>
                                 </div>
                                 <div class="form-group trx-seq-cnt-needed">
                                     <label for="trxSeqCnt" class="i18n">Sequence counter:</label>
@@ -781,17 +781,17 @@
                 if (ONLINE_ADVICE == selectedFunction) {
                     $(".trx-seq-cnt-needed").show();
                     $(".amt-auth-needed").show();
-                    $(".acq-id-needed").hide();
+                    $(".acq-id-supported").hide();
                     $(".amt-other-needed").hide();
                     $(".auth-c-needed").hide();
-                    $(".trx-ref-num-needed").hide();
+                    $(".trx-ref-num-supported").hide();
                 }
                 else {
-                    if (trm.needsAcqID(selectedFunction)) {
-                        $(".acq-id-needed").show();
+                    if (trm.supportsAcqID(selectedFunction)) {
+                        $(".acq-id-supported").show();
                     }
                     else {
-                        $(".acq-id-needed").hide();
+                        $(".acq-id-supported").hide();
                     }
 
                     if (trm.needsAmtAuth(selectedFunction)) {
@@ -816,11 +816,11 @@
                         $(".auth-c-needed").hide();
                     }
 
-                    if (trm.needsTrxRefNum(selectedFunction)) {
-                        $(".trx-ref-num-needed").show();
+                    if (trm.supportsTrxRefNum(selectedFunction)) {
+                        $(".trx-ref-num-supported").show();
                     }
                     else {
-                        $(".trx-ref-num-needed").hide();
+                        $(".trx-ref-num-supported").hide();
                     }
 
                     $(".trx-seq-cnt-needed").hide();
@@ -877,16 +877,13 @@
                         req.AmtOther = Math.round(Number($("#amtOther")[0].value) * 100);
                     }
 
-                    if (trm.needsAcqID(trxFunction)) {
-                        req.AcqID = Number($("#acqIDSelect").find(":selected")[0].value);
-                    }
-
                     if (trm.needsAuthC(trxFunction)) {
                         req.AuthC = String($("#authC")[0].value);
                     }
 
-                    if (trm.needsTrxRefNum(trxFunction)) {
+                    if (trm.supportsTrxRefNum(trxFunction) && ($("#trxRefNum")[0].value !== "")) {
                         req.TrxRefNum = String($("#trxRefNum")[0].value);
+                        req.AcqID = Number($("#acqIDSelect").find(":selected")[0].value);
                     }
 
                     trm.setTransactionTimeout(trm.TransactionFunctions.AUTHORIZATION_PURCHASE == trxFunction ? 3600000 : 70000);

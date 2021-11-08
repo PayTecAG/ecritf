@@ -296,6 +296,9 @@
                     <a href="#sendmessage" class="toc-h2 toc-link" data-title="sendMessage">sendMessage</a>
                   </li>
                   <li>
+                    <a href="#supportsacqid" class="toc-h2 toc-link" data-title="supportsAcqID">supportsAcqID</a>
+                  </li>
+                  <li>
                     <a href="#needsacqid" class="toc-h2 toc-link" data-title="needsAcqID">needsAcqID</a>
                   </li>
                   <li>
@@ -309,6 +312,9 @@
                   </li>
                   <li>
                     <a href="#needsauthc" class="toc-h2 toc-link" data-title="needsAuthC">needsAuthC</a>
+                  </li>
+                  <li>
+                    <a href="#supportstrxrefnum" class="toc-h2 toc-link" data-title="supportsTrxRefNum">supportsTrxRefNum</a>
                   </li>
                   <li>
                     <a href="#needstrxrefnum" class="toc-h2 toc-link" data-title="needsTrxRefNum">needsTrxRefNum</a>
@@ -1089,6 +1095,10 @@ is finally reverted.</p>
 <p><code>trm.sendMessage(message)</code></p>
 
 <p>Sends a JSON message to the terminal. This function is meant for use cases not yet reflected in the API.</p>
+<h2 id='supportsacqid'>supportsAcqID</h2>
+<p><code>trm.supportsAcqID(trxFunction)</code></p>
+
+<p>Tells whether a <a href="#transactionfunctions">transaction function</a> supports an Acquirer Identifier.</p>
 <h2 id='needsacqid'>needsAcqID</h2>
 <p><code>trm.needsAcqID(trxFunction)</code></p>
 
@@ -1109,6 +1119,10 @@ is finally reverted.</p>
 <p><code>trm.needsAuthC(trxFunction)</code></p>
 
 <p>Tells whether a <a href="#transactionfunctions">transaction function</a> needs an Authorisation Code.</p>
+<h2 id='supportstrxrefnum'>supportsTrxRefNum</h2>
+<p><code>trm.supportsTrxRefNum(trxFunction)</code></p>
+
+<p>Tells whether a <a href="#transactionfunctions">transaction function</a> supports a Transaction Reference Number.</p>
 <h2 id='needstrxrefnum'>needsTrxRefNum</h2>
 <p><code>trm.needsTrxRefNum(trxFunction)</code></p>
 

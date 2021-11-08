@@ -783,10 +783,12 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     this.sendMessage = sendMessage; // for not yet API-ed use cases
     this.needsAmount = needsAmount;
     this.needsAcqID = needsAcqID;
+    this.supportsAcqID = supportsAcqID;
     this.needsAmtAuth = needsAmount;
     this.needsAmtOther = needsAmtOther;
     this.needsAuthC = needsAuthC;
     this.needsTrxRefNum = needsTrxRefNum;
+    this.supportsTrxRefNum = supportsTrxRefNum;
     this.supportsUnsolicitedReceipts = supportsUnsolicitedReceipts;
     this.hasPairing = hasPairing;
     this.getPairingInfo = getPairingInfo;
@@ -1332,6 +1334,10 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         return needsTrxRefNum(trxFunction);
     }
 
+    function supportsAcqID(trxFunction) {
+        return supportsTrxRefNum(trxFunction);
+    }
+
     function needsAmtOther(trxFunction) {
         switch (parseInt(trxFunction)) {
         case self.TransactionFunctions.PURCHASE_WITH_CASHBACK:
@@ -1358,6 +1364,20 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         case self.TransactionFunctions.CONFIRM_PHONE_AUTH_RESERVATION:
         case self.TransactionFunctions.CANCEL_RESERVATION:
             return true;
+        default:
+            return false;
+        }
+    }
+    
+    function supportsTrxRefNum(trxFunction) {
+        if (needsTrxRefNum(trxFunction)) {
+            return true;
+        }
+
+        switch (parseInt(trxFunction)) {
+        case self.TransactionFunctions.PURCHASE:
+        case self.TransactionFunctions.CREDIT:
+            return (getSoftwareVersion() >= 191000);
         default:
             return false;
         }

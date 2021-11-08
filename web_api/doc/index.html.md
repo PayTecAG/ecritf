@@ -429,6 +429,13 @@ CardholderText | String | for CONFIGURE_DISCONNECTED_TEXT | Text to be shown to 
 Sends a JSON message to the terminal. This function is meant for use cases not yet reflected in the API.
 
 
+## supportsAcqID
+
+`trm.supportsAcqID(trxFunction)`
+
+Tells whether a [transaction function](#transactionfunctions) supports an Acquirer Identifier.
+
+
 ## needsAcqID
 
 `trm.needsAcqID(trxFunction)`
@@ -462,6 +469,13 @@ Tells whether a [transaction function](#transactionfunctions) needs an Amount, O
 `trm.needsAuthC(trxFunction)`
 
 Tells whether a [transaction function](#transactionfunctions) needs an Authorisation Code.
+
+
+## supportsTrxRefNum
+
+`trm.supportsTrxRefNum(trxFunction)`
+
+Tells whether a [transaction function](#transactionfunctions) supports a Transaction Reference Number.
 
 
 ## needsTrxRefNum
