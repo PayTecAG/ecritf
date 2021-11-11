@@ -789,6 +789,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     this.needsAuthC = needsAuthC;
     this.needsTrxRefNum = needsTrxRefNum;
     this.supportsTrxRefNum = supportsTrxRefNum;
+    this.supportsTrxReasonC = supportsTrxReasonC;
     this.supportsUnsolicitedReceipts = supportsUnsolicitedReceipts;
     this.hasPairing = hasPairing;
     this.getPairingInfo = getPairingInfo;
@@ -910,7 +911,8 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         AUTHORIZATION_CREDIT:           0x00400000,
         ACTIVATE_CARD:                  0x00800000,
         LOAD:                           0x01000000,
-        CANCEL_RESERVATION:             0x02000000
+        CANCEL_RESERVATION:             0x02000000,
+        ACCOUNT_VERIFICATION:           0x04000000
     };
 
     this.TransactionAbortFlags = {
@@ -1324,6 +1326,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         case self.TransactionFunctions.CLIENT_ID_REQUEST:
         case self.TransactionFunctions.ACTIVATE_CARD:
         case self.TransactionFunctions.CANCEL_RESERVATION:
+        case self.TransactionFunctions.ACCOUNT_VERIFICATION:
             return false;
         default:
             return true;
@@ -1378,6 +1381,15 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         case self.TransactionFunctions.PURCHASE:
         case self.TransactionFunctions.CREDIT:
             return (getSoftwareVersion() >= 191000);
+        default:
+            return false;
+        }
+    }
+
+    function supportsTrxReasonC(trxFunction) {
+        switch (parseInt(trxFunction)) {
+        case self.TransactionFunctions.ACCOUNT_VERIFICATION:
+            return true;
         default:
             return false;
         }
@@ -1475,6 +1487,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         names[self.TransactionFunctions.ACTIVATE_CARD]                    = { en: "Card Activation",            de: "Karte aktivieren",         fr: "Activation Carte",         it: "Attivazione Carta" };
         names[self.TransactionFunctions.LOAD]                             = { en: "Load",                       de: "Laden",                    fr: "Chargement",               it: "Carica" };
         names[self.TransactionFunctions.CANCEL_RESERVATION]               = { en: "Cancel Reservation",         de: "Storno Reservation",       fr: "Annuler Réservation",      it: "Storno Riservazione" };
+        names[self.TransactionFunctions.ACCOUNT_VERIFICATION]             = { en: "Account Verification",       de: "Konto überprüfen",         fr: "Vérification du compte",   it: "Verifica dell’account" };
         var result = "";
         var translations = names[trxFunction];
 

@@ -320,6 +320,9 @@
                     <a href="#needstrxrefnum" class="toc-h2 toc-link" data-title="needsTrxRefNum">needsTrxRefNum</a>
                   </li>
                   <li>
+                    <a href="#supportstrxreasonc" class="toc-h2 toc-link" data-title="supportsTrxReasonC">supportsTrxReasonC</a>
+                  </li>
+                  <li>
                     <a href="#haspairing" class="toc-h2 toc-link" data-title="hasPairing">hasPairing</a>
                   </li>
                   <li>
@@ -900,6 +903,12 @@ For details concerning parameters which depend on certain transaction types,
 <td>For reference based transactions like e.g. Purchase Reservation</td>
 <td>Original Transaction Reference Number</td>
 </tr>
+<tr>
+<td>TrxReasonC</td>
+<td>String</td>
+<td>For Account Verification transactions</td>
+<td>Transaction Reason Code</td>
+</tr>
 </tbody></table>
 <h2 id='aborttransaction'>abortTransaction</h2>
 <p><code>trm.abortTransaction(params)</code></p>
@@ -1127,6 +1136,10 @@ is finally reverted.</p>
 <p><code>trm.needsTrxRefNum(trxFunction)</code></p>
 
 <p>Tells whether a <a href="#transactionfunctions">transaction function</a> needs a Transaction Reference Number.</p>
+<h2 id='supportstrxreasonc'>supportsTrxReasonC</h2>
+<p><code>trm.supportsTrxReasonC(trxFunction)</code></p>
+
+<p>Tells whether a <a href="#transactionfunctions">transaction function</a> supports a Transaction Reason Code.</p>
 <h2 id='haspairing'>hasPairing</h2>
 <p><code>trm.hasPairing()</code></p>
 
@@ -1589,6 +1602,11 @@ the API does not do any further processing of the message.
 <td>CANCEL_RESERVATION</td>
 <td>0x02000000</td>
 <td>Cancellation of any reservation transaction (even if it is submitted) to fulfil MasterCard’s requirement: &quot;Processing of Authorisations and Pre-authorisations in the Europe Region.&quot;</td>
+</tr>
+<tr>
+<td>ACCOUNT_VERIFICATION</td>
+<td>0x04000000</td>
+<td>Verify cardholder account for Credentials on File transactions</td>
 </tr>
 </tbody></table>
 <h2 id='transactionabortflags'>TransactionAbortFlags</h2>

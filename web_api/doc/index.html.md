@@ -279,6 +279,7 @@ CVC2 | String | If PAN-key entry transaction and known by the attendant | Card V
 TrxCurrC | Numeric | For amount based transaction types | Transaction Currency Code (ISO-4217)
 TrxFunction | Numeric | **Mandatory** | [Transaction function](#transactionfunctions) to be used
 TrxRefNum | String | For reference based transactions like e.g. Purchase Reservation | Original Transaction Reference Number
+TrxReasonC | String | For Account Verification transactions | Transaction Reason Code
 
 
 ## abortTransaction
@@ -483,6 +484,13 @@ Tells whether a [transaction function](#transactionfunctions) supports a Transac
 `trm.needsTrxRefNum(trxFunction)`
 
 Tells whether a [transaction function](#transactionfunctions) needs a Transaction Reference Number.
+
+
+## supportsTrxReasonC
+
+`trm.supportsTrxReasonC(trxFunction)`
+
+Tells whether a [transaction function](#transactionfunctions) supports a Transaction Reason Code.
 
 
 ## hasPairing
@@ -1073,6 +1081,7 @@ The transaction function is a mandatory paramater to [start a payment transactio
 | ACTIVATE_CARD | 0x00800000 | An Activate Card transaction is used to activate a new, often pre-funded prepaid card
 | LOAD | 0x01000000 | Load transaction is used to load a prepaid card with a chosen load amount
 | CANCEL_RESERVATION | 0x02000000 | Cancellation of any reservation transaction (even if it is submitted) to fulfil MasterCard’s requirement: "Processing of Authorisations and Pre-authorisations in the Europe Region."
+| ACCOUNT_VERIFICATION | 0x04000000 | Verify cardholder account for Credentials on File transactions
 
 ## TransactionAbortFlags
 
