@@ -903,7 +903,7 @@
                         req.TrxReasonC = String($("#trxReasonC")[0].value);
                     }
 
-                    trm.setTransactionTimeout(trm.TransactionFunctions.AUTHORIZATION_PURCHASE == trxFunction ? 3600000 : 70000);
+                    trm.setTransactionTimeout(trm.TransactionFunctions.AUTHORIZATION_PURCHASE == trxFunction ? 3600000 : 90000);
 
                     trm.startTransaction(req);
                     $("#abortTransactionButton").show();
