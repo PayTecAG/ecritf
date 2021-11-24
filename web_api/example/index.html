@@ -491,6 +491,60 @@
                 $(".deactivated").show();
                 $(".printer-available").show();
 
+                if (trm !== undefined) {
+                    var selectedFunction = $("#trxFunctionSelect").val();
+
+                    if (ONLINE_ADVICE == selectedFunction) {
+                        $(".trx-seq-cnt-needed").show();
+                        $(".amt-auth-needed").show();
+                        $(".acq-id-supported").hide();
+                        $(".amt-other-needed").hide();
+                        $(".auth-c-needed").hide();
+                        $(".trx-ref-num-supported").hide();
+                    }
+                    else {
+                        if (trm.supportsAcqID(selectedFunction)) {
+                            $(".acq-id-supported").show();
+                        }
+                        else {
+                            $(".acq-id-supported").hide();
+                        }
+
+                        if (trm.needsAmtAuth(selectedFunction)) {
+                            $(".amt-auth-needed").show();
+                            $("#amtAuth").focus();
+                        }
+                        else {
+                            $(".amt-auth-needed").hide();
+                        }
+
+                        if (trm.needsAmtOther(selectedFunction)) {
+                            $(".amt-other-needed").show();
+                        }
+                        else {
+                            $(".amt-other-needed").hide();
+                        }
+
+                        if (trm.needsAuthC(selectedFunction)) {
+                            $(".auth-c-needed").show();
+                        }
+                        else {
+                            $(".auth-c-needed").hide();
+                        }
+
+                        if (trm.supportsTrxRefNum(selectedFunction)) {
+                            $(".trx-ref-num-supported").show();
+                        }
+                        else {
+                            $(".trx-ref-num-supported").hide();
+                        }
+
+                        $(".trx-seq-cnt-needed").hide();
+                    }
+
+                    $("#paymentForm").removeClass("was-validated");
+                }
+
                 if (!connected) {
                     $(".connected").hide();
                     $(".status").hide();
@@ -571,8 +625,6 @@
                 }
 
                 trmStatus = newStatus;
-                applyVisibility();
-                applyPrinterStatus();
 
                 if (!(trm.StatusFlags.BUSY & trmStatus)) {
                     // update acquirers
@@ -674,9 +726,9 @@
 
                     $("#trxFunctionInfo").html(trxFunctionInfoHTML);
                     $("#trxFunctionSelect").html(trxFunctionSelectHTML);
-                    onTrxFunctionChanged();
-                    applyVisibility();
                 }
+
+                applyPrinterStatus();
             }
 
             function resetTransactionUI() {
@@ -689,7 +741,8 @@
                 $("#trxRefNum")[0].value = "";
                 $("#trxSeqCnt")[0].value = lastTrxSeqCnt;
                 $("#trxFunctionSelect").val($("#trxFunctionSelect option:first").val());
-                $("#trxFunctionSelect").trigger("change");
+
+                applyVisibility();
             }
 
             function onTransactionApproved(rsp) {
@@ -773,60 +826,6 @@
                     // payment not started due to error
                     resetTransactionUI();
                 }
-            }
-
-            function onTrxFunctionChanged() {
-                var selectedFunction = $("#trxFunctionSelect").val();
-
-                if (ONLINE_ADVICE == selectedFunction) {
-                    $(".trx-seq-cnt-needed").show();
-                    $(".amt-auth-needed").show();
-                    $(".acq-id-supported").hide();
-                    $(".amt-other-needed").hide();
-                    $(".auth-c-needed").hide();
-                    $(".trx-ref-num-supported").hide();
-                }
-                else {
-                    if (trm.supportsAcqID(selectedFunction)) {
-                        $(".acq-id-supported").show();
-                    }
-                    else {
-                        $(".acq-id-supported").hide();
-                    }
-
-                    if (trm.needsAmtAuth(selectedFunction)) {
-                        $(".amt-auth-needed").show();
-                        $("#amtAuth").focus();
-                    }
-                    else {
-                        $(".amt-auth-needed").hide();
-                    }
-
-                    if (trm.needsAmtOther(selectedFunction)) {
-                        $(".amt-other-needed").show();
-                    }
-                    else {
-                        $(".amt-other-needed").hide();
-                    }
-
-                    if (trm.needsAuthC(selectedFunction)) {
-                        $(".auth-c-needed").show();
-                    }
-                    else {
-                        $(".auth-c-needed").hide();
-                    }
-
-                    if (trm.supportsTrxRefNum(selectedFunction)) {
-                        $(".trx-ref-num-supported").show();
-                    }
-                    else {
-                        $(".trx-ref-num-supported").hide();
-                    }
-
-                    $(".trx-seq-cnt-needed").hide();
-                }
-
-                $("#paymentForm").removeClass("was-validated");
             }
 
             function enterPairingCode() {
@@ -1055,7 +1054,7 @@
                     $(this).find('#kioskModePassword').focus();
                 });
 
-                $('#trxFunctionSelect').change(onTrxFunctionChanged);
+                $('#trxFunctionSelect').change(applyVisibility);
 
                 var forms = document.getElementsByClassName('needs-validation');
 
