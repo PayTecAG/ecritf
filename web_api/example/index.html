@@ -171,10 +171,6 @@
                                     <label for="trxSeqCnt" class="i18n">Sequence counter:</label>
                                     <input type="text" class="form-control" id="trxSeqCnt"></input>
                                 </div>
-                                <div class="form-group trx-reason-code-supported no-kiosk">
-                                    <label for="trxReasonC" class="i18n">Reason code:</label>
-                                    <input type="text" class="form-control" id="trxReasonC"></input>
-                                </div>
                                 <div class="form-group">
                                     <button type="submit" class="btn btn-primary btn-block btn-lg" id="pay">
                                         <i class="fas fa-check"></i>&nbsp;<span class="i18n">OK</span>
@@ -692,7 +688,6 @@
                 $("#authC")[0].value = "";
                 $("#trxRefNum")[0].value = "";
                 $("#trxSeqCnt")[0].value = lastTrxSeqCnt;
-                $("#trxReasonC")[0].value = "";
                 $("#trxFunctionSelect").val($("#trxFunctionSelect option:first").val());
                 $("#trxFunctionSelect").trigger("change");
             }
@@ -790,7 +785,6 @@
                     $(".amt-other-needed").hide();
                     $(".auth-c-needed").hide();
                     $(".trx-ref-num-supported").hide();
-                    $(".trx-reason-code-supported").hide();
                 }
                 else {
                     if (trm.supportsAcqID(selectedFunction)) {
@@ -827,13 +821,6 @@
                     }
                     else {
                         $(".trx-ref-num-supported").hide();
-                    }
-
-                    if (trm.supportsTrxReasonC(selectedFunction)) {
-                        $(".trx-reason-code-supported").show();
-                    }
-                    else {
-                        $(".trx-reason-code-supported").hide();
                     }
 
                     $(".trx-seq-cnt-needed").hide();
@@ -897,10 +884,6 @@
                     if (trm.supportsTrxRefNum(trxFunction) && ($("#trxRefNum")[0].value !== "")) {
                         req.TrxRefNum = String($("#trxRefNum")[0].value);
                         req.AcqID = Number($("#acqIDSelect").find(":selected")[0].value);
-                    }
-
-                    if (trm.supportsTrxReasonC(trxFunction) && ($("#trxReasonC")[0].value !== "")) {
-                        req.TrxReasonC = String($("#trxReasonC")[0].value);
                     }
 
                     trm.setTransactionTimeout(trm.TransactionFunctions.AUTHORIZATION_PURCHASE == trxFunction ? 3600000 : 90000);
@@ -1469,11 +1452,6 @@
                         "fr": "Numéro de référence:",
                         "it": "Numero di riferimento:"
                     },
-                    "Reason code:": {
-                        "de": "Reason code:",
-                        "fr": "Reason code:",
-                        "it": "Reason code:"
-                    }
                 };
                 return translations;
             }
