@@ -201,8 +201,14 @@
                             id="balance" onclick="javascript:trm.balance()">Final balance</button>
                     </div>
                     <div class="connected no-kiosk text-center button-spacer">
-                        <button type="button" class="btn btn-primary btn-block i18n"
-                            id="capture" onclick="javascript:trm.sendMessage({ BatchCaptureRequest: {}})">Submit transaction data</button>
+                        <div class="dropdown">
+                            <button class="btn btn-primary btn-block dropdown-toggle i18n" type="button" data-toggle="dropdown">Submit transaction data<span class="caret"></span></button>
+                            <ul class="dropdown-menu dropdown-primary">
+                                <li><a class="dropdown-item i18n" onclick="javascript:trm.sendMessage({ BatchCaptureRequest: {}})">all</a></li>
+                                <li><a class="dropdown-item" onclick="javascript:trm.sendMessage({ BatchCaptureRequest: { BatchCaptureFlags: 5 }})">Submission</a></li>
+                                <li><a class="dropdown-item" onclick="javascript:trm.sendMessage({ BatchCaptureRequest: { BatchCaptureFlags: 3 }})">Transmission</a></li>
+                            </ul>
+                        </div>
                     </div>
                     <div class="connected no-kiosk text-center button-spacer">
                         <button type="button" class="btn btn-primary btn-block i18n"
