@@ -857,6 +857,11 @@
             }
 
             function transaction() {
+                if ((trm !== undefined) && ((trm.StatusFlags.BUSY & trmStatus) != 0)) {
+                    showDialog(i18n("Please wait"), i18n("Terminal is busy"), Infinity);
+                    return;
+                }
+
                 var trxFunction = Number($("#trxFunctionSelect").find(":selected")[0].value);
 
                 if (ONLINE_ADVICE == trxFunction) {
