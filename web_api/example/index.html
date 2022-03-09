@@ -418,6 +418,8 @@
             var trmStatus = 0;
             var pairingInfo;
             var ONLINE_ADVICE = 0x11111111; // private function to confirm AUTHORIZATION_PURCHASE transactions (petrol use case)
+            var FOLLOW_ON_PURCHASE = 0x11111112; // private transaction function to map follow-on purchase use case
+            var FOLLOW_ON_CREDIT = 0x11111113; // private transaction function to map follow-on credit use case
             var lastTrxSeqCnt = -1;
             var connected = false;
 
@@ -508,8 +510,18 @@
                         $(".auth-c-needed").hide();
                         $(".trx-ref-num-supported").hide();
                     }
+                    else if ((FOLLOW_ON_PURCHASE == selectedFunction) || (FOLLOW_ON_CREDIT == selectedFunction)) {
+                        $(".trx-seq-cnt-needed").hide();
+                        $(".amt-auth-needed").show();
+                        $(".acq-id-supported").show();
+                        $(".amt-other-needed").hide();
+                        $(".auth-c-needed").hide();
+                        $(".trx-ref-num-supported").show();
+                    }
                     else {
-                        if (trm.supportsAcqID(selectedFunction)) {
+                        if (trm.supportsAcqID(selectedFunction)
+                            && (trm.TransactionFunctions.PURCHASE != selectedFunction) // handled separately as FOLLOW_ON_PURCHASE & FOLLOW_ON_CREDIT
+                            && (trm.TransactionFunctions.CREDIT != selectedFunction)) {
                             $(".acq-id-supported").show();
                         }
                         else {
@@ -538,7 +550,9 @@
                             $(".auth-c-needed").hide();
                         }
 
-                        if (trm.supportsTrxRefNum(selectedFunction)) {
+                        if (trm.supportsTrxRefNum(selectedFunction)
+                            && (trm.TransactionFunctions.PURCHASE != selectedFunction) // handled separately as FOLLOW_ON_PURCHASE & FOLLOW_ON_CREDIT
+                            && (trm.TransactionFunctions.CREDIT != selectedFunction)) {
                             $(".trx-ref-num-supported").show();
                         }
                         else {
@@ -728,6 +742,12 @@
                         if (trm.TransactionFunctions.AUTHORIZATION_PURCHASE == trxFunctions[i]) {
                             trxFunctionSelectHTML += "<option value='" + ONLINE_ADVICE + "'>" + "Online Advice" + "</option>";
                         }
+                        else if ((trm.TransactionFunctions.PURCHASE == trxFunctions[i]) && trm.supportsTrxRefNum(trxFunctions[i])) {
+                            trxFunctionSelectHTML += "<option value='" + FOLLOW_ON_PURCHASE + "'>" + "Follow on " + name + "</option>";
+                        }
+                        else if ((trm.TransactionFunctions.CREDIT == trxFunctions[i]) && trm.supportsTrxRefNum(trxFunctions[i])) {
+                            trxFunctionSelectHTML += "<option value='" + FOLLOW_ON_CREDIT + "'>" + "Follow on " + name + "</option>";
+                        }
                     }
 
                     $("#trxFunctionInfo").html(trxFunctionInfoHTML);
@@ -871,6 +891,13 @@
                         });
                 }
                 else {
+                    if (FOLLOW_ON_PURCHASE == trxFunction) {
+                        trxFunction = trm.TransactionFunctions.PURCHASE
+                    }
+                    else if (FOLLOW_ON_CREDIT == trxFunction) {
+                        trxFunction = trm.TransactionFunctions.CREDIT
+                    }
+
                     var req = {
                         TrxFunction: trxFunction
                     };
