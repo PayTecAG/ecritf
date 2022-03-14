@@ -729,6 +729,7 @@
                         case trm.TransactionFunctions.REVERSAL:
                         case trm.TransactionFunctions.CREDIT:
                         case trm.TransactionFunctions.LOAD:
+                        case trm.TransactionFunctions.AUTHORIZATION_PURCHASE:
                             cssClasses = "no-kiosk";
                             break;
                         default:
@@ -740,13 +741,13 @@
                         trxFunctionSelectHTML += "<option class='" + cssClasses + "' value='" + trxFunctions[i] + "'>" + name + "</option>";
 
                         if (trm.TransactionFunctions.AUTHORIZATION_PURCHASE == trxFunctions[i]) {
-                            trxFunctionSelectHTML += "<option value='" + ONLINE_ADVICE + "'>" + "Online Advice" + "</option>";
+                            trxFunctionSelectHTML += "<option class='no-kiosk' value='" + ONLINE_ADVICE + "'>" + "Online Advice" + "</option>";
                         }
                         else if ((trm.TransactionFunctions.PURCHASE == trxFunctions[i]) && trm.supportsTrxRefNum(trxFunctions[i])) {
-                            trxFunctionSelectHTML += "<option value='" + FOLLOW_ON_PURCHASE + "'>" + "Follow on " + name + "</option>";
+                            trxFunctionSelectHTML += "<option class='no-kiosk' value='" + FOLLOW_ON_PURCHASE + "'>" + "Follow on " + name + "</option>";
                         }
                         else if ((trm.TransactionFunctions.CREDIT == trxFunctions[i]) && trm.supportsTrxRefNum(trxFunctions[i])) {
-                            trxFunctionSelectHTML += "<option value='" + FOLLOW_ON_CREDIT + "'>" + "Follow on " + name + "</option>";
+                            trxFunctionSelectHTML += "<option class='no-kiosk' value='" + FOLLOW_ON_CREDIT + "'>" + "Follow on " + name + "</option>";
                         }
                     }
 

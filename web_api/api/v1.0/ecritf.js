@@ -1057,6 +1057,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     var currentAcqID = -1;
     var neverActivated = true;
     var receiptText = "";
+    var localSocket = undefined;
     var smq = undefined;
     var peerPTID = 0;
     var timer = undefined;
@@ -1064,7 +1065,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
 
     createSMQ();
 
-    if (hasPairing() && (smq !== undefined) && autoConnect)
+    if (autoConnect)
         connect();
 
     function pair(code, friendlyName) {
@@ -1100,8 +1101,54 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         if ((smq === undefined) || (smq.getsock() === undefined) || (smq.getsock() == null))
             createSMQ();
 
-        smq.subscribe(pairing.Channel, undefined, { datatype: "json", onmsg: onMessage } );
-        changeState(State.CONNECTING);
+        if (hasPairing() && (smq !== undefined)) {
+            smq.subscribe(pairing.Channel, undefined, { datatype: "json", onmsg: onMessage } );
+            changeState(State.CONNECTING);
+        }
+        else if (navigator.userAgent.includes ('wv')) {
+            console.log("Running in WebView; trying local web socket connection");
+
+            try {
+                localSocket = new WebSocket("ws://localhost:18307");
+                localSocket.binaryType = 'arraybuffer';
+                changeState(State.CONNECTING);
+
+                localSocket.onmessage = function(evt) {
+                    var text = new TextDecoder().decode(evt.data);
+                    var messages = text.split("\n");
+                    
+                    messages.forEach(function (value, index, array) {
+                        if (value.length > 0)
+                            onMessage(JSON.parse(value), null, null, null);
+                    });
+                };
+
+                localSocket.onopen = function() {
+                    if (undefined !== trmLng) {
+                        sendMessage({ ConnectRequest: { TrmLng: trmLng, PrinterWidth: printerWidth, UnsolicitedReceipts: 1 }});
+                    }
+                    else {
+                        sendMessage({ ConnectRequest: { PrinterWidth: printerWidth, UnsolicitedReceipts: 1 }});
+                    }
+
+                    sendMessage({ StatusRequest: {}});
+                };
+
+                localSocket.onclose = function() {
+                    console.log("WebSocket close event");
+                    disconnect();
+                };
+
+                localSocket.onerror = function(evt) {
+                    console.log("WebSocket error: ", event);
+                    disconnect();
+                };
+            }
+            catch (e) {
+                console.log(e);
+                localSocket = undefined;
+            }
+        }
     }
 
     function disconnect() {
@@ -1112,6 +1159,17 @@ PayTec.POSTerminal = function(pairingInfo, options) {
             catch (e) {
                 console.log(e);
             }
+        }
+        
+        if (localSocket !== undefined) {
+            try {
+                localSocket.close();
+            }
+            catch (e) {
+                console.log(e);
+            }
+
+            localSocket = undefined;
         }
 
         changeState(State.DISCONNECTED);
@@ -1315,7 +1373,13 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     }
 
     function sendMessage(message) {
-        smq.publish(JSON.stringify(message), peerPTID);
+        if (localSocket !== undefined) {
+            localSocket.send(new TextEncoder().encode(JSON.stringify(message) + "\n"));
+        }
+        else if (smq !== undefined) {
+            smq.publish(JSON.stringify(message), peerPTID);
+        }
+
         onMessageSent(message);
     }
 
@@ -1919,6 +1983,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
             break;
         }
 
+        var oldState = state;
         state = newState;
 
         // entry actions
@@ -1944,19 +2009,21 @@ PayTec.POSTerminal = function(pairingInfo, options) {
             setTimer(defaultTimeout);
             break;
         case State.DISCONNECTED:
-            if (peerPTID) {
+            if (peerPTID)
                 peerPTID = 0;
 
+            if (state != oldState) {
                 try {
                     onDisconnected();
                 }
                 catch (e) {
                     console.log("Callback failed: " + e + "\n" + e.stack);
                 }
-            }
 
-            if (hasPairing() && autoReconnect) {
-                setTimeout(connect, 3000);
+                if (autoReconnect) {
+                    console.log("Reconnecting in 3 seconds");
+                    setTimeout(connect, 3000);
+                }
             }
 
             break;
@@ -2021,9 +2088,14 @@ PayTec.POSTerminal = function(pairingInfo, options) {
                 onEFTHello(message.EFTHello);
             }
             else if (message.ConnectResponse) {
-                if (undefined === trmLng) {
+                if (undefined === trmLng)
                     trmLng = message.ConnectResponse.TrmLng;
-                }
+
+                if (undefined === serialNumber)
+                    serialNumber = message.ConnectResponse.IFDSerialNum;
+
+                if ((undefined === terminalID) && (undefined !== message.ConnectResponse.TrmID))
+                    terminalID = message.ConnectResponse.TrmID;
 
                 softwareVersion = message.ConnectResponse.SoftwareVersion;
                 changeState(State.CONNECTED);
@@ -2038,6 +2110,9 @@ PayTec.POSTerminal = function(pairingInfo, options) {
                 onActivationFailed();
             }
             else if (message.ActivationResponse) {
+                if (undefined === terminalID)
+                    terminalID = message.ActivationResponse.TrmID;
+
                 onActivationResponse(message.ActivationResponse);
                 changeState(State.CONNECTED);
                 onActivationSucceeded();
@@ -2502,6 +2577,10 @@ PayTec.POSTerminal = function(pairingInfo, options) {
                     return "PayTec Castles MP200";
                 case "CMD":
                     return "PayTec Castles MP200 (Development)";
+                case "N86":
+                    return "PayTec Nexgo N86";
+                case "D86":
+                    return "PayTec Nexgo N86 (Development)";
             }
         }
 
