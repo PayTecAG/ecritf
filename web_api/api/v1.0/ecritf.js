@@ -2581,6 +2581,10 @@ PayTec.POSTerminal = function(pairingInfo, options) {
                     return "PayTec Nexgo N86";
                 case "D86":
                     return "PayTec Nexgo N86 (Development)";
+                case "N6P":
+                    return "PayTec Nexgo N6";
+                case "N6D":
+                    return "PayTec Nexgo N6 (Development)";
             }
         }
 
