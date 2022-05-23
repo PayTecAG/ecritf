@@ -744,10 +744,10 @@
                             trxFunctionSelectHTML += "<option class='no-kiosk' value='" + ONLINE_ADVICE + "'>" + "Online Advice" + "</option>";
                         }
                         else if ((trm.TransactionFunctions.PURCHASE == trxFunctions[i]) && trm.supportsTrxRefNum(trxFunctions[i])) {
-                            trxFunctionSelectHTML += "<option class='no-kiosk' value='" + FOLLOW_ON_PURCHASE + "'>" + "Follow on " + name + "</option>";
+                            trxFunctionSelectHTML += "<option class='no-kiosk' value='" + FOLLOW_ON_PURCHASE + "'>" + name + " (follow on)</option>";
                         }
                         else if ((trm.TransactionFunctions.CREDIT == trxFunctions[i]) && trm.supportsTrxRefNum(trxFunctions[i])) {
-                            trxFunctionSelectHTML += "<option class='no-kiosk' value='" + FOLLOW_ON_CREDIT + "'>" + "Follow on " + name + "</option>";
+                            trxFunctionSelectHTML += "<option class='no-kiosk' value='" + FOLLOW_ON_CREDIT + "'>" + name + " (follow on)</option>";
                         }
                     }
 
