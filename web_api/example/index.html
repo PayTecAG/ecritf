@@ -591,6 +591,31 @@
                     $(".kiosk").hide();
             }
 
+            function applyRequiredFields() {
+                $("#authC").prop("required", false);
+                $("#trxSeqCnt").prop("required", false);
+                $("#acqID").prop("required", false);
+                $("#trxRefNum").prop("required", false);
+                $("#amtOther").prop("required", false);
+
+                if (trm !== undefined) {
+                    var selectedFunction = $("#trxFunctionSelect").val();
+
+                    if (ONLINE_ADVICE == selectedFunction) {
+                        $("#trxSeqCnt").prop("required", true);
+                    }
+                    else if ((FOLLOW_ON_PURCHASE == selectedFunction) || (FOLLOW_ON_CREDIT == selectedFunction)) {
+                        $("#acqID").prop("required", true);
+                        $("#trxRefNum").prop("required", true);
+                    }
+                    else {
+                        if (trm.needsAuthC(selectedFunction)) {
+                            $("#authC").prop("required", true);
+                        }
+                    }
+                }
+            }
+
             function onConnected() {
                 connected = true;
 
@@ -770,6 +795,7 @@
                 $("#trxFunctionSelect").val($("#trxFunctionSelect option:first").val());
 
                 applyVisibility();
+                applyRequiredFields();
             }
 
             function onTransactionApproved(rsp) {
@@ -878,7 +904,7 @@
             }
 
             function transaction() {
-                if ((trm !== undefined) && ((trm.StatusFlags.BUSY & trmStatus) != 0)) {
+                if ((trm !== undefined) && ((trm.StatusFlags.BUSY & trmStatus) != 0) && (0 == (trm.StatusFlags.CARD_DATA_AVAILABLE & trmStatus))) {
                     showDialog(i18n("Please wait"), i18n("Terminal is busy"), Infinity);
                     return;
                 }
@@ -1093,7 +1119,10 @@
                     $(this).find('#kioskModePassword').focus();
                 });
 
-                $('#trxFunctionSelect').change(applyVisibility);
+                $('#trxFunctionSelect').change(function() {
+                    applyVisibility();
+                    applyRequiredFields();
+                });
 
                 var forms = document.getElementsByClassName('needs-validation');
 
