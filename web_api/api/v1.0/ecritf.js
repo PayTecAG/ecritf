@@ -2103,6 +2103,12 @@ PayTec.POSTerminal = function(pairingInfo, options) {
             }
             break;
         case State.CONNECTED:
+            if (message.ActivationResponse) {
+                if (undefined === terminalID)
+                    terminalID = message.ActivationResponse.TrmID;
+
+                onActivationResponse(message.ActivationResponse);
+            }
             break;
         case State.ACTIVATE:
             if (message.ErrorNotification) {
