@@ -1417,7 +1417,6 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     function needsAuthC(trxFunction) {
         switch (parseInt(trxFunction)) {
         case self.TransactionFunctions.PURCHASE_PHONE_AUTH:
-        case self.TransactionFunctions.CONFIRM_PHONE_AUTH_RESERVATION:
             return true;
         default:
             return false;
