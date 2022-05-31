@@ -189,30 +189,30 @@
                     </div>
                     <div class="connected deactivated text-center">
                         <button type="button" class="btn btn-primary btn-block btn-lg i18n"
-                            id="activate" onclick="javascript:trm.activate()">Activate terminal</button>
+                            id="activate" onclick="javascript:activate()">Activate terminal</button>
                     </div>
                     <div class="section-spacer"></div>
                     <div class="connected activated no-kiosk text-center">
                         <button type="button" class="btn btn-primary btn-block i18n"
-                            id="deactivate" onclick="javascript:trm.deactivate()">Deactivate terminal</button>
+                            id="deactivate" onclick="javascript:deactivate()">Deactivate terminal</button>
                     </div>
                     <div class="connected deactivated no-kiosk text-center button-spacer">
                         <button type="button" class="btn btn-primary btn-block i18n"
-                            id="balance" onclick="javascript:trm.balance()">Final balance</button>
+                            id="balance" onclick="javascript:balance()">Final balance</button>
                     </div>
                     <div class="connected no-kiosk text-center button-spacer">
                         <div class="dropdown">
                             <button class="btn btn-primary btn-block dropdown-toggle i18n" type="button" data-toggle="dropdown">Submit transaction data<span class="caret"></span></button>
                             <ul class="dropdown-menu dropdown-primary">
                                 <li><a class="dropdown-item i18n" onclick="javascript:trm.sendMessage({ BatchCaptureRequest: {}})">all</a></li>
-                                <li><a class="dropdown-item" onclick="javascript:trm.sendMessage({ BatchCaptureRequest: { BatchCaptureFlags: 5 }})">Submission</a></li>
-                                <li><a class="dropdown-item" onclick="javascript:trm.sendMessage({ BatchCaptureRequest: { BatchCaptureFlags: 3 }})">Transmission</a></li>
+                                <li><a class="dropdown-item" onclick="javascript:capture(5)">Submission</a></li>
+                                <li><a class="dropdown-item" onclick="javascript:capture(3)">Transmission</a></li>
                             </ul>
                         </div>
                     </div>
                     <div class="connected no-kiosk text-center button-spacer">
                         <button type="button" class="btn btn-primary btn-block i18n"
-                            id="config" onclick="javascript:trm.configure()">Configuration</button>
+                            id="config" onclick="javascript:configure()">Configuration</button>
                     </div>
                     <div class="connected no-kiosk text-center button-spacer">
                         <div class="dropdown">
@@ -675,7 +675,7 @@
                     // update acquirers
                     var acquirerInfoHTML = "";
                     var acqIDSelectHTML = "";
-                    var initAcquirerListHTML = "<li><a class='dropdown-item' onclick='javascript:trm.initialize(-1);'>" + i18n("all") + "</a></li>";
+                    var initAcquirerListHTML = "<li><a class='dropdown-item' onclick='javascript:initialize(-1);'>" + i18n("all") + "</a></li>";
                     var acquirers = trm.getAcquirers();
 
                     for (var i in acquirers) {
@@ -689,14 +689,14 @@
                                 + "<div class='col text-left'>" + i18n("successfully initialised: ") + lastInitDate
                                 + "</div>"
                                 + "<div class='col text-right'>"
-                                    + "<button type='button' class='btn btn-primary connected' onclick='javascript:trm.initialize(" + acqInfo.AcqID + ");'>"
+                                    + "<button type='button' class='btn btn-primary connected' onclick='javascript:initialize(" + acqInfo.AcqID + ");'>"
                                         + "<i class=\"fas fa-redo\"></i>"
                                     + "</button>"
                                 + "</div>"
                             + "</div>";
 
                         acqIDSelectHTML += "<option value='" + acqInfo.AcqID + "'>" + acqInfo.AcqID + "</option>";
-                        initAcquirerListHTML += "<li><a class='dropdown-item' onclick='javascript:trm.initialize(" + acqInfo.AcqID + ");'>Acq&nbsp;" + acqInfo.AcqID + "</a></li>";
+                        initAcquirerListHTML += "<li><a class='dropdown-item' onclick='javascript:initialize(" + acqInfo.AcqID + ");'>Acq&nbsp;" + acqInfo.AcqID + "</a></li>";
                     }
 
                     $("#acquirerInfo").html(acquirerInfoHTML);
@@ -904,7 +904,7 @@
             }
 
             function transaction() {
-                if ((trm !== undefined) && ((trm.StatusFlags.BUSY & trmStatus) != 0) && (0 == (trm.StatusFlags.CARD_DATA_AVAILABLE & trmStatus))) {
+                if ((trm !== undefined) && (((trm.StatusFlags.BUSY | trm.StatusFlags.READER_SLOT_OCCUPIED) & trmStatus) != 0) && (0 == (trm.StatusFlags.CARD_DATA_AVAILABLE & trmStatus))) {
                     showDialog(i18n("Please wait"), i18n("Terminal is busy"), Infinity);
                     return;
                 }
@@ -966,6 +966,72 @@
             
             function rollbackTransaction() {
                 trm.rollbackTransaction();
+            }
+
+            function activate() {
+                if (trm !== undefined) {
+                    if (((trm.StatusFlags.BUSY | trm.StatusFlags.READER_SLOT_OCCUPIED) & trmStatus) != 0) {
+                        showDialog(i18n("Please wait"), i18n("Terminal is busy"), Infinity);
+                        return;
+                    }
+
+                    trm.activate();
+                }
+            }
+
+            function deactivate() {
+                if (trm !== undefined) {
+                    if (((trm.StatusFlags.BUSY | trm.StatusFlags.READER_SLOT_OCCUPIED) & trmStatus) != 0) {
+                        showDialog(i18n("Please wait"), i18n("Terminal is busy"), Infinity);
+                        return;
+                    }
+
+                    trm.deactivate();
+                }
+            }
+
+            function balance() {
+                if (trm !== undefined) {
+                    if (((trm.StatusFlags.BUSY | trm.StatusFlags.READER_SLOT_OCCUPIED) & trmStatus) != 0) {
+                        showDialog(i18n("Please wait"), i18n("Terminal is busy"), Infinity);
+                        return;
+                    }
+
+                    trm.balance();
+                }
+            }
+
+            function configure() {
+                if (trm !== undefined) {
+                    if (((trm.StatusFlags.BUSY | trm.StatusFlags.READER_SLOT_OCCUPIED) & trmStatus) != 0) {
+                        showDialog(i18n("Please wait"), i18n("Terminal is busy"), Infinity);
+                        return;
+                    }
+
+                    trm.configure();
+                }
+            }
+
+            function initialize(acqID) {
+                if (trm !== undefined) {
+                    if (((trm.StatusFlags.BUSY | trm.StatusFlags.READER_SLOT_OCCUPIED) & trmStatus) != 0) {
+                        showDialog(i18n("Please wait"), i18n("Terminal is busy"), Infinity);
+                        return;
+                    }
+
+                    trm.initialize(acqID);
+                }
+            }
+
+            function capture(flags) {
+                if (trm !== undefined) {
+                    if (((trm.StatusFlags.BUSY | trm.StatusFlags.READER_SLOT_OCCUPIED) & trmStatus) != 0) {
+                        showDialog(i18n("Please wait"), i18n("Terminal is busy"), Infinity);
+                        return;
+                    }
+
+                    trm.sendMessage({ BatchCaptureRequest: { BatchCaptureFlags: flags }});
+                }
             }
 
             function print(text) {
