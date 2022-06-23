@@ -542,6 +542,7 @@
 <li>Works from any modern web browser</li>
 <li>Terminal and client may run in separate networks, e.g. cash register in LAN and terminal on 4G</li>
 <li>Keeps connection while roaming between networks</li>
+<li>Can also be used when running your web application on a PayTec Android terminal</li>
 <li>Secure TLS 1.2 connection</li>
 </ul>
 
@@ -567,7 +568,13 @@ is not blocked! Inbound communication is not used.
 
 <p><code>trm = new PayTec.POSTerminal(undefined, { OnConnected: onConnected, ... });</code></p>
 <h2 id='pairing'>Pairing</h2>
-<p>Before a web application can communicate with the POS terminal, it establishes
+<aside class="notice">
+When running your web application on a PayTec Android terminal, the API will automatically
+connect to the local payment application, so you don't need to pair your application with
+the terminal. You can therefore skip this chapter!
+</aside>
+
+<p>Before a web application can communicate with a remote POS terminal, it establishes
 a trusted connection providing a temporary pairing code. This code is generated
 on the POS terminal via the attendant menu...</p>
 

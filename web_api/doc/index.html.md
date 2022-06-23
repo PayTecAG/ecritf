@@ -19,6 +19,7 @@ Use the PayTec Terminal Web API to access your PayTec POS Terminal from any web-
 - Works from any modern web browser
 - Terminal and client may run in separate networks, e.g. cash register in LAN and terminal on 4G
 - Keeps connection while roaming between networks
+- Can also be used when running your web application on a PayTec Android terminal
 - Secure TLS 1.2 connection
 
 A comprehensive example application can be found [here](//ecritf.paytec.ch).
@@ -50,7 +51,13 @@ Instantiate a [POSTerminal](#posterminal) object using its [constructor](#constr
 
 ## Pairing
 
-Before a web application can communicate with the POS terminal, it establishes
+<aside class="notice">
+When running your web application on a PayTec Android terminal, the API will automatically
+connect to the local payment application, so you don't need to pair your application with
+the terminal. You can therefore skip this chapter!
+</aside>
+
+Before a web application can communicate with a remote POS terminal, it establishes
 a trusted connection providing a temporary pairing code. This code is generated
 on the POS terminal via the attendant menu...
 
