@@ -396,6 +396,11 @@ trm.print({
 trm.print({
         ReceiptText: "jumps over\nthe lazy dog"
     });
+
+trm.print({
+        ReceiptText: "iVBORw0KGgoAAAANSUhEUgAAAHgAAAAlCAYAAACJdC37AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAFiIAABYiARsWgo8AAASRSURBVHhe7ZxdU90gEIZztDq2Y79rO73qdfv/f4veO9Oq9atV69haa9+Xs0SChEAgCefoM8NAwrIsLCAJOc6qqrpFGJ3b20GqPZ/NZs8lXRQDtbeTGSrOUjM6VlLhoOqfiF7Or8qhT1u6KNnBNxJ7QaesSjKakRof1A6S0pY2SnZwbg7RgVuSVsCEc0RFLq1tmLN8KueFMIWDFfYyWHInuVgUB69IPDqL5tBFZTIH29gz+pE8FONgF3R6W/BwJiGWM9Hbp2wop3Y7dEiAexpTz3d1V5jsbzCxG0ZTYhtrm2+Wj2labLlI+RPIv5G0l0Cbg/UVPYNDMDs6Ae7iB4H2hTqDdLUnVl+xDsZIPuZobgnHIqZo65SuztJArn5Eo/5cuOqH/hOjHc76Ytpj69JB5xWzRPcxo618rN4+doSUMWWIT3eXbIwuk8lmsG1wBi4lLoJYhzjyjyS+R6hzySQO7jsafUDnM0k26BpIZj7suJBkVkLbB7lDSdKud5LsbIOPnA4+oiEhYWgSBsymxFPReIXrAm3jAU0w2RwMx9UjLhQY+yPBGSVzKvEQRJ2+TfY3WBz7Sl34aV0ZQvHInkhMe7I5BfW9lqTCtLkr5CbbLto2LlFtr4N7u07TJpc9Xfk+fGXtvuiL1ptkJwrElWghxQiTlM6x6+2yKanjPGXtNqT0B0mxc7Il2oXdMYQN8gUfyK+XYIfu+mUJ5KI2LotEUQ42CXFgAK2v9ODwt5IkWT8bKmnAlOTgMTqlfs4cmCG/M4t6Vi/mb7C9hIbqCKnXlkm1lXTpsPJ5BPlifhWPqYvE2FzMDIbRY82u0YGDejuXoG/qvUQsJS3RnW9xbOyR3QY6qD4ODC2Tij3LEutt7CVidBW7yepohPqKIQLnM3XMUtcH6G8cGNBmj92XOt8l4xowHl13X3mgYJZWmpWlqPQY3YmvXpfeXHZ26Ln3mXAIbTpj+6e4GRza6ZSLcZAtG1M2ka2cdcXqyuZgVqxDKoauxuaC1zpPo6/Ne2MQW68pj2C368zKlxw3lmz9Dh3pIytv2i86xiRiSV0qit1kPZKHB+Hghzp7ydI7OHbXuWwstYNt51qz9wr59a8AkN5H2EH4JdfqzZodE6QPEDW+pcY9bpzUhgdpPv+qjZSU0xuh+sNAkWFMoxofG+DeHsI2wje5rk++kD5AYKxsR8zHMObrupUsYqV/aAfzN7mjBTSKDauDiWNp3kAwfwd8A5nPiLcRviK9pu7ewb76O0+qtP0TF+bpLzlWUb+WZcX6PgfVMQKd829+q6IzrxGrwxak91D3R4QvuFznPQOW+yBt0YNiBdc8GVN1MA0dl4jVJ1RDO5gdOGZwgsY6T6qkM/RMXEd6F/EmYp4GNT4nElk6guktkWnjGjLvJf1EYrJBPZKn+36N19D3VK5N9CBQspBROhEz0q8vVbtxz3yXfyVxUY9Jg/x/DV/zUB9/PWGeC2vunf5Als+YalaYaRfI30U+VwjtEFc9dJ45wTh41KoBea4itJ2zWOlDdGFc7yDN1UaB631Ev3Hv0/xO9QcBs7+q/gO+N9k5oy3IOgAAAABJRU5ErkJggg==",
+        ReceiptFlags: trm.ReceiptFlags.IS_PNG_IMAGE
+    });
 ```
 
 Prints a text on the terminal's thermal printer.
@@ -1129,6 +1134,8 @@ Flags that modify receipt printing.
 |------|-------|-------------|
 | MORE_DATA_AVAILABLE | 0x00000001 | The receipt is not yet finished; more data will be sent. |
 | DOUBLE_HEIGHT | 0x00000004 | Use a font with doubled height. |
+| INVERSE | 0x00000010 | (From SW Version >= 20) Print inverse text. |
+| IS_PNG_IMAGE | 0x00000020 | (From SW Version >= 20) Receipt text is the base64 representation of a PNG image. <aside class="notice">For best printing results, use a black on white (monochrome) image, not wider than 384 pixels. Maximum image size is 14 KB</aside> |
 
 ## StatusFlags
 

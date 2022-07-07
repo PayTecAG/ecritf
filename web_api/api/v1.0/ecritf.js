@@ -936,7 +936,9 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         MORE_DATA_AVAILABLE:    0x00000001,
         FIRST_PART:             0x00000002,
         DOUBLE_HEIGHT:          0x00000004,
-        DOUBLE_WIDTH:           0x00000008
+        DOUBLE_WIDTH:           0x00000008,
+        INVERSE:                0x00000010,
+        IS_PNG_IMAGE:           0x00000020
     };
 
     this.StatusFlags = {
