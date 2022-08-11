@@ -820,6 +820,9 @@
             }
 
             function onReceipt(receiptType, receiptText) {
+                // printinf of electronic signature not implemented in example
+                receiptText = receiptText.replace("<ESignature />", "");
+
                 $("#receipts").html("<div>"
                             + "<span class='print-tooltip' data-toggle='tooltip' title=''>"
                                 + "<button type='button' class='print-button btn btn-primary connected' onclick='javascript:print(\"" + receiptText.replace(/\n/g, "\\n") + "\");'><i class=\"fas fa-print\"></i>"
