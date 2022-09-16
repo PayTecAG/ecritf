@@ -321,7 +321,7 @@ void processSerialData(int length, const unsigned char *data)
                 changeSerialReceiveState(SERIAL_RECEIVE_IDLE_ESCAPE);
                 break;
             default:
-                fprintf(stderr, "Undecodable data '%02X'\n");
+                fprintf(stderr, "Undecodable data '%02X'\n", byte);
                 break;
             }
             break;
