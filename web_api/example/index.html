@@ -793,6 +793,8 @@
                 $("#trxRefNum")[0].value = "";
                 $("#trxSeqCnt")[0].value = lastTrxSeqCnt;
                 $("#trxFunctionSelect").val($("#trxFunctionSelect option:first").val());
+                $("#confirmationDialog").modal("hide");
+                $('.modal-backdrop').remove();
 
                 applyVisibility();
                 applyRequiredFields();
@@ -810,6 +812,10 @@
             }
 
             function onTransactionFailed(rsp) {
+                if (rsp.AttendantText === undefined) {
+                    rsp.AttendantText = i18n("Abort");
+                }
+
                 resetTransactionUI();
                 showDialog(i18n("Processing failed"), rsp.AttendantText, 30000);
             }
