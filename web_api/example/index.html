@@ -327,7 +327,7 @@
                             </div>
                             <div class="modal-body">
                                 <p class="i18n">Confirmed amount:</p>
-                                <input type="number" id="trxAmt"></input>
+                                <input type="text" inputmode="numeric" id="trxAmt"></input>
                             </div>
                             <div class="modal-footer">
                                 <button type="submit" class="btn btn-primary" data-dismiss="modal" onclick="javascript:confirmTransaction();">
@@ -793,8 +793,11 @@
                 $("#trxRefNum")[0].value = "";
                 $("#trxSeqCnt")[0].value = lastTrxSeqCnt;
                 $("#trxFunctionSelect").val($("#trxFunctionSelect option:first").val());
-                $("#confirmationDialog").modal("hide");
-                $('.modal-backdrop').remove();
+                
+                if (!$("#confirmationDialog").is(":hidden")) {
+                    $("#confirmationDialog").modal("hide");
+                    $('.modal-backdrop').remove();
+                }
 
                 applyVisibility();
                 applyRequiredFields();
@@ -802,7 +805,13 @@
 
             function onTransactionApproved(rsp) {
                 lastTrxSeqCnt = rsp.TrxSeqCnt;
-                $("#trxAmt")[0].value = $("#amtAuth")[0].value;
+
+                if (rsp.AmtAuth !== undefined) {
+                    $("#trxAmt")[0].value = (rsp.AmtAuth / 100).toFixed(2).toString();
+                } else {
+                    $("#trxAmt")[0].value = $("#amtAuth")[0].value;
+                }
+
                 resetTransactionUI();
 
                 if (trm.getAutoConfirm())
@@ -882,7 +891,7 @@
             }
 
             function onError(message) {
-                showDialog("Fehler", message, 60000);
+                showDialog(i18n("Error"), message, 60000);
 
                 if (!$("#abortTransactionButton").is(":hidden")) {
                     // payment not started due to error
