@@ -1382,7 +1382,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
             smq.publish(JSON.stringify(message), peerPTID);
         }
 
-        onMessageSent(message);
+        onMessageSent(message, peerPTID);
     }
 
     function needsAmount(trxFunction) {
@@ -1939,16 +1939,26 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         onMessageSent = callback;
     }
 
-    function myOnMessageSent(message) {
-        console.log(timeStamp() + ">> " + JSON.stringify(message) + "\n");
+    function myOnMessageSent(message, peerPTID) {
+        if (peerTID == null) {
+            console.log(timeStamp() + ">> (local) " + JSON.stringify(message) + "\n");
+        }
+        else {
+            console.log(timeStamp() + ">> " + JSON.stringify(message) + "\n");
+        }
     }
 
     function setOnMessageReceived(callback) {
         onMessageReceived = callback;
     }
 
-    function myOnMessageReceived(message) {
-        console.log(timeStamp() + "<< " + JSON.stringify(message) + "\n");
+    function myOnMessageReceived(message, ptid, tid, subtid) {
+        if (tid == null) {
+            console.log(timeStamp() + "<< (local) " + JSON.stringify(message) + "\n");
+        }
+        else {
+            console.log(timeStamp() + "<< " + JSON.stringify(message) + "\n");
+        }
         return false;
     }
 
@@ -2045,7 +2055,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         peerPTID = ptid;
 
         try {
-            if (onMessageReceived(message))
+            if (onMessageReceived(message, ptid, tid, subtid))
                 return; // message already handled by onMessageReceived()
         }
         catch (e) {
