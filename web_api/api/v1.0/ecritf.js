@@ -1377,12 +1377,12 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     function sendMessage(message) {
         if (localSocket !== undefined) {
             localSocket.send(new TextEncoder().encode(JSON.stringify(message) + "\n"));
+            onMessageSent(message);
         }
         else if (smq !== undefined) {
             smq.publish(JSON.stringify(message), peerPTID);
+            onMessageSent(message, peerPTID);
         }
-
-        onMessageSent(message, peerPTID);
     }
 
     function needsAmount(trxFunction) {
@@ -1940,7 +1940,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     }
 
     function myOnMessageSent(message, peerPTID) {
-        if (peerTID == null) {
+        if ((peerPTID === undefined) || (peerPTID == null)) {
             console.log(timeStamp() + ">> (local) " + JSON.stringify(message) + "\n");
         }
         else {
