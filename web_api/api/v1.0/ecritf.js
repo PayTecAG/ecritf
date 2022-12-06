@@ -1100,7 +1100,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     }
 
     function connect() {
-        if ((smq === undefined) || (smq.getsock() === undefined) || (smq.getsock() == null))
+        if (smq === undefined)
             createSMQ();
 
         if (hasPairing() && (smq !== undefined)) {
