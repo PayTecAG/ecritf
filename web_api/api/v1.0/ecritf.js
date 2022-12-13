@@ -806,6 +806,9 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     this.getTransactionFunctions = getTransactionFunctions;
     this.getTransactionFunctionName = getTransactionFunctionName;
 
+    this.setPeerURL = getPeerURL;
+    this.setPeerURL = setPeerURL;
+
     this.getTrmLng = getTrmLng;
     this.setTrmLng = setTrmLng;
 
@@ -995,6 +998,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     var serialNumber = undefined;
     var terminalID = undefined;
     var softwareVersion = 0;
+    var peerURL = (undefined !== options && undefined !== options.PeerURL) ? options.PeerURL : undefined;
     var trmLng = (undefined !== options && undefined !== options.TrmLng) ? options.TrmLng : undefined;
     var printerWidth = (undefined !== options && undefined !== options.PrinterWidth) ? options.PrinterWidth : 34;
     var autoConnect = (undefined !== options && undefined !== options.AutoConnect) ? (options.AutoConnect ? true : false) : true;
@@ -1060,6 +1064,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     var neverActivated = true;
     var receiptText = "";
     var localSocket = undefined;
+    var localSocketFragment = "";
     var smq = undefined;
     var peerPTID = 0;
     var timer = undefined;
@@ -1082,6 +1087,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         smq.publish(JSON.stringify({ Pairing: pairing}), code.substring(0, 4));
         smq.subscribe(pairing.Channel, undefined, { "datatype": "json", "onmsg": onMessage } );
 
+        peerURL = undefined;
         changeState(State.PAIRING);
     }
 
@@ -1107,22 +1113,31 @@ PayTec.POSTerminal = function(pairingInfo, options) {
             smq.subscribe(pairing.Channel, undefined, { datatype: "json", onmsg: onMessage } );
             changeState(State.CONNECTING);
         }
-        else if (navigator.userAgent.includes ('wv')) {
-            console.log("Running in WebView; trying local web socket connection");
+        else if (navigator.userAgent.includes ('wv') || (peerURL !== undefined)) {
+            let webSocketURL = (peerURL !== undefined ? peerURL : "ws://localhost:18307");
+
+            console.log("Trying direct web socket connection at " + webSocketURL);
 
             try {
-                localSocket = new WebSocket("ws://localhost:18307");
+                localSocket = new WebSocket(webSocketURL);
                 localSocket.binaryType = 'arraybuffer';
                 changeState(State.CONNECTING);
 
                 localSocket.onmessage = function(evt) {
-                    var text = new TextDecoder().decode(evt.data);
-                    var messages = text.split("\n");
-                    
-                    messages.forEach(function (value, index, array) {
-                        if (value.length > 0)
-                            onMessage(JSON.parse(value), null, null, null);
-                    });
+                    var text = localSocketFragment + new TextDecoder().decode(evt.data);
+
+                    if (text.endsWith("\n")) {
+                        localSocketFragment = "";
+                        
+                        text.split("\n").forEach(function (value, index, array) {
+                            if (value.length > 0) {
+                                onMessage(JSON.parse(value), null, null, null);
+                            }
+                        });
+                    }
+                    else {
+                        localSocketFragment = text;
+                    }
                 };
 
                 localSocket.onopen = function() {
@@ -1572,6 +1587,15 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         return result;
     }
 
+    function getPeerURL() {
+        return peerURL;
+    }
+
+    function setPeerURL(value) {
+        peerURL = value;
+        return self;
+    }
+
     function getTrmLng() {
         return trmLng;
     }
@@ -1941,7 +1965,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
 
     function myOnMessageSent(message, peerPTID) {
         if ((peerPTID === undefined) || (peerPTID == null)) {
-            console.log(timeStamp() + ">> (local) " + JSON.stringify(message) + "\n");
+            console.log(timeStamp() + ">> (" + localSocket.url + ") " + JSON.stringify(message) + "\n");
         }
         else {
             console.log(timeStamp() + ">> " + JSON.stringify(message) + "\n");
@@ -1954,7 +1978,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
 
     function myOnMessageReceived(message, ptid, tid, subtid) {
         if (tid == null) {
-            console.log(timeStamp() + "<< (local) " + JSON.stringify(message) + "\n");
+            console.log(timeStamp() + "<< (" + localSocket.url + ") " + JSON.stringify(message) + "\n");
         }
         else {
             console.log(timeStamp() + "<< " + JSON.stringify(message) + "\n");
@@ -2039,6 +2063,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
 
             break;
         case State.CONNECTED:
+            localSocketFragment = "";
             break;
         }
     }
