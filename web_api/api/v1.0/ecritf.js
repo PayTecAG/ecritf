@@ -1106,6 +1106,13 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     }
 
     function connect() {
+        switch (state) {
+        case State.DISCONNECTED:
+            break;
+        default:
+            return;
+        }
+
         if (smq === undefined)
             createSMQ();
 
