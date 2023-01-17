@@ -2560,6 +2560,10 @@ PayTec.POSTerminal = function(pairingInfo, options) {
                     return "PayTec PRIMUS Self Inside";
                 case "DSI":
                     return "PayTec PRIMUS Self Inside (development)";
+                case "PTC":
+                    return "PayTec C2";
+                case "DTC":
+                    return "PayTec C2 (Development)";
                 case "RPI":
                 case "RPS":
                     return "PayTec Reader Push Short";
