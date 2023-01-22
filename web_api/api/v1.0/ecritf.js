@@ -1273,10 +1273,19 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         changeState(State.CONNECTED);
     }
 
-    function balance() {
+    function balance(params) {
+        var req = {
+        };
+
+        if (undefined !== params) {
+            for (var i in params) {
+                req[i] = params[i];
+            }
+        }
+
         switch (state) {
         case State.CONNECTED:
-            sendMessage({ BalanceRequest: {}});
+            sendMessage({ BalanceRequest: req });
             changeState(State.BALANCE);
             break;
         case State.DISCONNECTED:
@@ -1285,14 +1294,23 @@ PayTec.POSTerminal = function(pairingInfo, options) {
             break;
         default:
             // let the terminal generate an approriate error message
-            sendMessage({ BalanceRequest: {}});
+            sendMessage({ BalanceRequest: req });
         }
     }
 
-    function configure() {
+    function configure(params) {
+        var req = {
+        };
+
+        if (undefined !== params) {
+            for (var i in params) {
+                req[i] = params[i];
+            }
+        }
+
         switch (state) {
         case State.CONNECTED:
-            sendMessage({ ConfigurationRequest: {}});
+            sendMessage({ ConfigurationRequest: req });
             changeState(State.CONFIG);
             break;
         case State.DISCONNECTED:
@@ -1301,14 +1319,24 @@ PayTec.POSTerminal = function(pairingInfo, options) {
             break;
         default:
             // let the terminal generate an approriate error message
-            sendMessage({ ConfigurationRequest: {}});
+            sendMessage({ ConfigurationRequest: req });
         }
     }
 
-    function initialize(acqID) {
+    function initialize(acqID, params) {
+        var req = {
+            "AcqID": acqID
+        };
+
+        if (undefined !== params) {
+            for (var i in params) {
+                req[i] = params[i];
+            }
+        }
+
         switch (state) {
         case State.CONNECTED:
-            sendMessage({ InitializationRequest: { "AcqID": acqID }});
+            sendMessage({ InitializationRequest: req});
             currentAcqID = acqID;
             changeState(State.INIT);
             break;
@@ -1318,7 +1346,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
             break;
         default:
             // let the terminal generate an approriate error message
-            sendMessage({ InitializationRequest: { "AcqID": acqID }});
+            sendMessage({ InitializationRequest: req});
         }
     }
 
@@ -2182,6 +2210,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         case State.TRANSACTION:
             if (message.ErrorNotification) {
                 abortTransaction();
+                changeState(State.CONNECTED);
             }
             else if (message.TransactionResponse) {
                 let rsp = message.TransactionResponse;
