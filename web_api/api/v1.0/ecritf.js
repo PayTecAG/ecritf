@@ -1073,7 +1073,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     createSMQ();
 
     if (autoConnect)
-        connect();
+        setTimeout(connect, 1);
 
     function pair(code, friendlyName) {
         unpair();
@@ -2159,13 +2159,13 @@ PayTec.POSTerminal = function(pairingInfo, options) {
                 onEFTHello(message.EFTHello);
             }
             else if (message.ConnectResponse) {
-                if (undefined === trmLng)
+                if (undefined !== message.ConnectResponse.TrmLng)
                     trmLng = message.ConnectResponse.TrmLng;
 
-                if (undefined === serialNumber)
+                if (undefined !== message.ConnectResponse.IFDSerialNum)
                     serialNumber = message.ConnectResponse.IFDSerialNum;
 
-                if ((undefined === terminalID) && (undefined !== message.ConnectResponse.TrmID))
+                if (undefined !== message.ConnectResponse.TrmID)
                     terminalID = message.ConnectResponse.TrmID;
 
                 softwareVersion = message.ConnectResponse.SoftwareVersion;
