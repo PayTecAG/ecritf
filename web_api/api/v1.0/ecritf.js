@@ -971,7 +971,8 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         DISABLE_LANGUAGE_SELECTION: 1002,
         SHOW_IDLE: 2001,
         SHOW_CARD_INSERTION: 2002,
-        CONFIGURE_DISCONNECTED_TEXT: 2501
+        CONFIGURE_DISCONNECTED_TEXT: 2501,
+        SCAN_SYMBOL: 2601
     };
 
 
@@ -2320,7 +2321,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
             }
             if (message.DeviceCommandResponse) {
                 changeState(State.CONNECTED);
-                onDeviceCommandSucceeded();
+                onDeviceCommandSucceeded(message.DeviceCommandResponse);
             }
             break;
         }

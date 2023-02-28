@@ -422,17 +422,31 @@ trm.deviceCommand({
 );
 
 trm.deviceCommand({
-        DeviceCommandCode: trm.DeviceCommands.CONFIGURE_DISCONNECTED_TEXT,
-        CardholderText: "Welcome"
+        DeviceCommandCode: trm.DeviceCommands.SCAN_SYMBOL,
+        Title: "POS Scanner",
+        Text: "Please scan QR or bar code!",
+        Timeout: 60000
     }
 );
 ```
 Let the terminal perform some [actions](#devicecommands) in addition to payment.
 
+Request format:
+
 Parameter -| Format  | Condition | Description
 -----------|---------|-----------|------------
 DeviceCommandCode | Numeric | mandatory | [action](#devicecommands) to perform.
-CardholderText | String | for CONFIGURE_DISCONNECTED_TEXT | Text to be shown to the cardholder if no ECR or vending machine has connected.
+Timeout | Numeric | for SCAN_SYMBOL | Timeout in milliseconds
+Title | String | for SCAN_SYMBOL | Title for the scanner user interface.
+Text | String | for SCAN_SYMBOL | Hint text for the scanner user interface.
+
+Response format (when [onDeviceCommandSucceeded](#ondevicecommandsucceeded) is called):
+
+Parameter -| Format  | Condition | Description
+-----------|---------|-----------|------------
+DeviceCommandCode | Numeric | mandatory | performed [action](#devicecommands).
+ScannedData | String | for SCAN_SYMBOL | Decoded symbol data.
+
 
 
 ## sendMessage
@@ -996,7 +1010,7 @@ Called when [initialize](#initialize) has timed out.
 
 ## OnDeviceCommandSucceeded
 
-`function onDeviceCommandSucceeded() {}`  
+`function onDeviceCommandSucceeded(deviceCommandResponse) {}`  
 `trm.setOnDeviceCommandSucceeded(onDeviceCommandSucceeded)`
 
 Called when [deviceCommand](#devicecommand) has succeeded.
@@ -1150,7 +1164,7 @@ Flags that describe the terminal's [current state](#getStatus).
 | BUSY | 0x00000004 | The terminal is busy with a use case. In the state, the POS may not be able to start a new use case. |
 | READER_SLOT_OCCUPIED | 0x00000008 | A card is inserted into the chip or combined chip/magnetic stripe reader |
 | LOCKED | 0x00000010 | The terminal is locked and cannot perform payment use cases; usually due to an ongoing cardholder dialog initiated by the POS. |
-| APPLICATION_SELECTED | 0x00000020 | A payment application hs been selected to process the current transaction |
+| APPLICATION_SELECTED | 0x00000020 | A payment application has been selected to process the current transaction |
 | WAITING_FOR_TRANSACTION_REQUEST | 0x00000040 | The terminal needs a [transaction request](#starttransaction) to proceed. |
 | WAITING_FOR_APPLICATION_SELECTION | 0x00000080 | The terminal is waiting for the cardholder to select a payment application |
 | ONLINE_PROCESSING | 0x00000100 | The terminal is currently connected to an acquirer or to the TMS/Service Center |
@@ -1175,3 +1189,4 @@ Commands to [perform](#devicecommand) some terminal actions beside payment.
 | DISABLE_LANGUAGE_SELECTION | 1002 | Don't show a language selection dialog if chip card without language preference is inserted |
 | SHOW_IDLE | 2001 | Show the terminal's idle message (usually 'Welcome, present card' in activated state. |
 | SHOW_CARD_INSERTION | 2002 | Show the card insertion message to the cardholder |
+| SCAN_SYMBOL | 2601 | Scans a 1D/2D bar code. Available on Android devices equipped with a scanner and PayTec EP2 software equal or higher than 21.01.11 |

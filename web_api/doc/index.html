@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>PayTec Terminal Web API</title>
 
-    <style>
+    <style media="screen">
       .highlight table td { padding: 5px; }
 .highlight table pre { margin: 0; }
 .highlight .gh {
@@ -42,7 +42,7 @@
 .highlight .cs {
   color: #75715e;
 }
-.highlight .c, .highlight .cd {
+.highlight .c, .highlight .ch, .highlight .cd, .highlight .cpf {
   color: #75715e;
 }
 .highlight .err {
@@ -126,7 +126,7 @@
 .highlight .s1 {
   color: #e6db74;
 }
-.highlight .s {
+.highlight .s, .highlight .sa, .highlight .dl {
   color: #e6db74;
 }
 .highlight .na {
@@ -141,16 +141,13 @@
 .highlight .ne {
   color: #a6e22e;
 }
-.highlight .nf {
+.highlight .nf, .highlight .fm {
   color: #a6e22e;
 }
 .highlight .vc {
   color: #ffffff;
 }
 .highlight .nn {
-  color: #ffffff;
-}
-.highlight .nl {
   color: #ffffff;
 }
 .highlight .ni {
@@ -165,7 +162,7 @@
 .highlight .vi {
   color: #ffffff;
 }
-.highlight .nv {
+.highlight .nv, .highlight .vm {
   color: #ffffff;
 }
 .highlight .w {
@@ -176,6 +173,9 @@
 }
 .highlight .n, .highlight .py, .highlight .nx {
   color: #ffffff;
+}
+.highlight .nl {
+  color: #f92672;
 }
 .highlight .ow {
   color: #f92672;
@@ -196,20 +196,107 @@
   color: #f92672;
 }
     </style>
-    <link href="stylesheets/screen.css" rel="stylesheet" media="screen" />
-    <link href="stylesheets/print.css" rel="stylesheet" media="print" />
-      <script src="javascripts/all.js"></script>
+    <style media="print">
+      * {
+        -webkit-transition:none!important;
+        transition:none!important;
+      }
+      .highlight table td { padding: 5px; }
+.highlight table pre { margin: 0; }
+.highlight, .highlight .w {
+  color: #586e75;
+}
+.highlight .err {
+  color: #002b36;
+  background-color: #dc322f;
+}
+.highlight .c, .highlight .ch, .highlight .cd, .highlight .cm, .highlight .cpf, .highlight .c1, .highlight .cs {
+  color: #657b83;
+}
+.highlight .cp {
+  color: #b58900;
+}
+.highlight .nt {
+  color: #b58900;
+}
+.highlight .o, .highlight .ow {
+  color: #93a1a1;
+}
+.highlight .p, .highlight .pi {
+  color: #93a1a1;
+}
+.highlight .gi {
+  color: #859900;
+}
+.highlight .gd {
+  color: #dc322f;
+}
+.highlight .gh {
+  color: #268bd2;
+  background-color: #002b36;
+  font-weight: bold;
+}
+.highlight .k, .highlight .kn, .highlight .kp, .highlight .kr, .highlight .kv {
+  color: #6c71c4;
+}
+.highlight .kc {
+  color: #cb4b16;
+}
+.highlight .kt {
+  color: #cb4b16;
+}
+.highlight .kd {
+  color: #cb4b16;
+}
+.highlight .s, .highlight .sb, .highlight .sc, .highlight .dl, .highlight .sd, .highlight .s2, .highlight .sh, .highlight .sx, .highlight .s1 {
+  color: #859900;
+}
+.highlight .sa {
+  color: #6c71c4;
+}
+.highlight .sr {
+  color: #2aa198;
+}
+.highlight .si {
+  color: #d33682;
+}
+.highlight .se {
+  color: #d33682;
+}
+.highlight .nn {
+  color: #b58900;
+}
+.highlight .nc {
+  color: #b58900;
+}
+.highlight .no {
+  color: #b58900;
+}
+.highlight .na {
+  color: #268bd2;
+}
+.highlight .m, .highlight .mb, .highlight .mf, .highlight .mh, .highlight .mi, .highlight .il, .highlight .mo, .highlight .mx {
+  color: #859900;
+}
+.highlight .ss {
+  color: #859900;
+}
+    </style>
+    <link href="stylesheets/screen-9c19b03a.css" rel="stylesheet" media="screen" />
+    <link href="stylesheets/print-966d6edc.css" rel="stylesheet" media="print" />
+      <script src="javascripts/all-b12a2749.js"></script>
+
   </head>
 
   <body class="index" data-languages="[&quot;javascript&quot;]">
     <a href="#" id="nav-button">
       <span>
         NAV
-        <img src="images/navbar.png" alt="Navbar" />
+        <img src="images/navbar-cad8cdcb.png" alt="" />
       </span>
     </a>
     <div class="toc-wrapper">
-      <img src="images/logo.png" class="logo" alt="Logo" />
+      <img src="images/logo-e74b41a9.png" class="logo" alt="" />
         <div class="lang-selector">
               <a href="#" data-language-name="javascript">javascript</a>
         </div>
@@ -578,7 +665,7 @@ the terminal. You can therefore skip this chapter!
 a trusted connection providing a temporary pairing code. This code is generated
 on the POS terminal via the attendant menu...</p>
 
-<p><img src="images/start_pairing.png" alt="Screenshot start pairing" /> <strong>click &#39;Go&#39; =&gt;</strong> <img src="images/pairing_code.png" alt="Screenshot pairing code" /></p>
+<p><img src="images/start_pairing-a954ad10.png" alt="Screenshot start pairing" /> <strong>click &#39;Go&#39; =&gt;</strong> <img src="images/pairing_code-7af8fd54.png" alt="Screenshot pairing code" /></p>
 
 <p>... and used by the web application via the <a href="#pair">pair</a> method:</p>
 
@@ -586,19 +673,19 @@ on the POS terminal via the attendant menu...</p>
 
 <p>=&gt; the following message will be shown for a few seconds on the terminal:</p>
 
-<p><img src="images/pairing_successful.png" alt="Screenshot pairing successful" /></p>
-<pre class="highlight javascript tab-javascript"><code><span class="c1">// store the current pairing info in local browser storage</span>
+<p><img src="images/pairing_successful-db9db480.png" alt="Screenshot pairing successful" /></p>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="c1">// store the current pairing info in local browser storage</span>
 <span class="kd">function</span> <span class="nx">onConnected</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="nx">Storage</span><span class="p">)</span> <span class="o">!==</span> <span class="s2">"undefined"</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">localStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="s2">"pairingInfo"</span><span class="p">,</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">trm</span><span class="p">.</span><span class="nx">getPairingInfo</span><span class="p">()));</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="nx">Storage</span><span class="p">)</span> <span class="o">!==</span> <span class="dl">"</span><span class="s2">undefined</span><span class="dl">"</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">localStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="dl">"</span><span class="s2">pairingInfo</span><span class="dl">"</span><span class="p">,</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">trm</span><span class="p">.</span><span class="nx">getPairingInfo</span><span class="p">()));</span>
     <span class="p">}</span>
 <span class="p">}</span>
 
 <span class="c1">// reuse it in a later session</span>
 <span class="kd">var</span> <span class="nx">pairingInfo</span><span class="p">;</span>
 
-<span class="k">if</span> <span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="nx">Storage</span><span class="p">)</span> <span class="o">!==</span> <span class="s2">"undefined"</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">let</span> <span class="nx">info</span> <span class="o">=</span> <span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s2">"pairingInfo"</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="nx">Storage</span><span class="p">)</span> <span class="o">!==</span> <span class="dl">"</span><span class="s2">undefined</span><span class="dl">"</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">info</span> <span class="o">=</span> <span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="dl">"</span><span class="s2">pairingInfo</span><span class="dl">"</span><span class="p">);</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="nx">info</span> <span class="o">!==</span> <span class="kc">undefined</span><span class="p">)</span> <span class="p">{</span>
         <span class="nx">pairingInfo</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">info</span><span class="p">);</span>
@@ -606,11 +693,11 @@ on the POS terminal via the attendant menu...</p>
 <span class="p">}</span>
 
 <span class="nx">trm</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">PayTec</span><span class="p">.</span><span class="nx">POSTerminal</span><span class="p">(</span><span class="nx">pairingInfo</span><span class="p">,</span> <span class="p">...</span>
-</code></pre>
+</code></pre></div>
 <p>Once pairing was successful, pairing info can be <a href="#getpairinginfo">retrieved</a> and stored
 for further sessions.</p>
-<h2 id='transactions'>Transactions</h2><pre class="highlight javascript tab-javascript"><code><span class="kd">function</span> <span class="nx">onTransactionApproved</span><span class="p">()</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"All ok\n"</span><span class="p">);</span>
+<h2 id='transactions'>Transactions</h2><div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="kd">function</span> <span class="nx">onTransactionApproved</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">All ok</span><span class="se">\n</span><span class="dl">"</span><span class="p">);</span>
 <span class="p">}</span>
 
 <span class="nx">trm</span><span class="p">.</span><span class="nx">setOnTransactionApproved</span><span class="p">(</span><span class="nx">onTransactionApproved</span><span class="p">);</span>
@@ -623,7 +710,7 @@ for further sessions.</p>
         <span class="p">}</span>
     <span class="p">);</span>
 <span class="p">}</span>
-</code></pre>
+</code></pre></div>
 <p>Once <a href="#activate">activated</a>, the terminal is ready to <a href="#starttransaction">start a transaction</a>.
 The result of this operation is reported through the <a href="#ontransactionapproved">OnTransactionApproved</a>,
 <a href="#ontransactiondeclined">OnTransactionDeclined</a>, <a href="#ontransactionaborted">OnTransactionaborted</a> and
@@ -632,12 +719,12 @@ The result of this operation is reported through the <a href="#ontransactionappr
 <p>This object represents the POS terminal to interact with. </p>
 <h2 id='constructor'>Constructor</h2>
 <p><code>trm = new PayTec.POSTerminal(pairingInfo, options);</code></p>
-<pre class="highlight javascript tab-javascript"><code>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code>
 <span class="c1">// not yet paired:</span>
 <span class="nx">trm</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">PayTec</span><span class="p">.</span><span class="nx">POSTerminal</span><span class="p">(</span>
     <span class="kc">undefined</span><span class="p">,</span>
     <span class="p">{</span>
-        <span class="na">TrmLng</span><span class="p">:</span> <span class="s1">'en'</span><span class="p">,</span>
+        <span class="na">TrmLng</span><span class="p">:</span> <span class="dl">'</span><span class="s1">en</span><span class="dl">'</span><span class="p">,</span>
         <span class="na">PrinterWidth</span><span class="p">:</span> <span class="mi">34</span><span class="p">,</span>
         <span class="na">OnConnected</span><span class="p">:</span> <span class="nx">myOnConnected</span>
     <span class="p">}</span>
@@ -645,11 +732,11 @@ The result of this operation is reported through the <a href="#ontransactionappr
 
 <span class="c1">// pairing info available e.g. from local storage:</span>
 <span class="nx">trm</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">PayTec</span><span class="p">.</span><span class="nx">POSTerminal</span><span class="p">(</span>
-    <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s2">"pairingInfo"</span><span class="p">)),</span>
+    <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="dl">"</span><span class="s2">pairingInfo</span><span class="dl">"</span><span class="p">)),</span>
     <span class="nx">options</span>
 <span class="p">);</span>
 
-</code></pre>
+</code></pre></div>
 <table><thead>
 <tr>
 <th>Available options:</th>
@@ -803,8 +890,8 @@ The result of this operation is reported through the <a href="#ontransactionappr
 </tbody></table>
 <h2 id='pair'>pair</h2>
 <p><code>trm.pair(code, friendlyName);</code></p>
-<pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">pair</span><span class="p">(</span><span class="s2">"6017087"</span><span class="p">,</span> <span class="s2">"Awesome POS 1234"</span><span class="p">);</span>
-</code></pre>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">pair</span><span class="p">(</span><span class="dl">"</span><span class="s2">6017087</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">Awesome POS 1234</span><span class="dl">"</span><span class="p">);</span>
+</code></pre></div>
 <p>Establishes a trusted connection between the web application and the POS terminal.</p>
 <h2 id='unpair'>unpair</h2>
 <p><code>trm.unpair();</code></p>
@@ -828,13 +915,13 @@ The result of this operation is reported through the <a href="#ontransactionappr
 <p>Deactivates the terminal. In deactivated state, no transactions can be done.</p>
 <h2 id='starttransaction'>startTransaction</h2>
 <p><code>trm.startTransaction(params)</code></p>
-<pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">startTransaction</span><span class="p">({</span>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">startTransaction</span><span class="p">({</span>
         <span class="na">TrxFunction</span><span class="p">:</span> <span class="nx">trm</span><span class="p">.</span><span class="nx">TransactionFunctions</span><span class="p">.</span><span class="nx">PURCHASE_WITH_CASHBACK</span><span class="p">,</span>
         <span class="na">TrxCurrC</span><span class="p">:</span> <span class="mi">756</span><span class="p">,</span>
         <span class="na">AmtAuth</span><span class="p">:</span> <span class="mi">1575</span><span class="p">,</span>
         <span class="na">AmtOther</span><span class="p">:</span> <span class="mi">1000</span>
     <span class="p">});</span>
-</code></pre>
+</code></pre></div>
 <p>Starts a new payment transaction.</p>
 <h3 id='parameters'>Parameters:</h3>
 <aside class="notice">
@@ -919,11 +1006,11 @@ For details concerning parameters which depend on certain transaction types,
 </tbody></table>
 <h2 id='aborttransaction'>abortTransaction</h2>
 <p><code>trm.abortTransaction(params)</code></p>
-<pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">abortTransaction</span><span class="p">({</span>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">abortTransaction</span><span class="p">({</span>
         <span class="na">TrxAbortFlags</span><span class="p">:</span> <span class="nx">trm</span><span class="p">.</span><span class="nx">TransactionAbortFlags</span><span class="p">.</span><span class="nx">ABORT_TRX_SILENT</span>
     <span class="p">}</span>
 <span class="p">);</span>
-</code></pre>
+</code></pre></div>
 <p>Aborts a ongoing payment transaction.</p>
 
 <table><thead>
@@ -943,11 +1030,11 @@ For details concerning parameters which depend on certain transaction types,
 </tbody></table>
 <h2 id='confirmtransaction'>confirmTransaction</h2>
 <p><code>trm.confirmTransaction(params)</code></p>
-<pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">confirmTransaction</span><span class="p">({</span>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">confirmTransaction</span><span class="p">({</span>
         <span class="na">TrxAmt</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span>
         <span class="na">TrxSeqCnt</span><span class="p">:</span> <span class="mi">1234</span>
     <span class="p">});</span>
-</code></pre>
+</code></pre></div>
 <p>Confirms a successfully authorized payment transaction. Without this, no money will be
 transferred from the cardholder&#39;s to the merchant&#39;s account, and the authorized amount
 is finally reverted.</p>
@@ -975,8 +1062,8 @@ is finally reverted.</p>
 </tbody></table>
 <h2 id='rollbacktransaction'>rollbackTransaction</h2>
 <p><code>trm.rollbackTransaction(params)</code></p>
-<pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">rollbackTransaction</span><span class="p">({</span> <span class="na">TrxSeqCnt</span><span class="p">:</span> <span class="mi">1234</span> <span class="p">});</span>
-</code></pre>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">rollbackTransaction</span><span class="p">({</span> <span class="na">TrxSeqCnt</span><span class="p">:</span> <span class="mi">1234</span> <span class="p">});</span>
+</code></pre></div>
 <p>Cancels an approved but not yet confirmed transaction, e.g. if a vending machine cannot deliver the purchased goods.</p>
 
 <table><thead>
@@ -1008,11 +1095,11 @@ is finally reverted.</p>
 <p>Advises the terminal to update its initialization data from its acquirer(s). If acqID is -1, all acquirers will be reinitialized.</p>
 <h2 id='requestreceipt'>requestReceipt</h2>
 <p><code>trm.requestReceipt(params)</code></p>
-<pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">requestReceipt</span><span class="p">({</span>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">requestReceipt</span><span class="p">({</span>
         <span class="na">ReceiptType</span><span class="p">:</span> <span class="nx">trm</span><span class="p">.</span><span class="nx">ReceiptTypes</span><span class="p">.</span><span class="nx">TRX_COPY</span><span class="p">,</span>
         <span class="na">ReceiptID</span><span class="p">:</span> <span class="mi">1234</span>
     <span class="p">});</span>
-</code></pre>
+</code></pre></div>
 <p>Request a certain receipt from the terminal. When the receipt is available, <a href="#setonreceipt">OnReceipt</a> will be called.</p>
 
 <table><thead>
@@ -1038,21 +1125,21 @@ is finally reverted.</p>
 </tbody></table>
 <h2 id='print'>print</h2>
 <p><code>trm.print(params)</code></p>
-<pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">print</span><span class="p">({</span>
-        <span class="na">ReceiptText</span><span class="p">:</span> <span class="s2">"THE QUICK BROWN FOX"</span><span class="p">,</span>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">print</span><span class="p">({</span>
+        <span class="na">ReceiptText</span><span class="p">:</span> <span class="dl">"</span><span class="s2">THE QUICK BROWN FOX</span><span class="dl">"</span><span class="p">,</span>
         <span class="na">ReceiptFlags</span><span class="p">:</span> <span class="nx">trm</span><span class="p">.</span><span class="nx">ReceiptFlags</span><span class="p">.</span><span class="nx">MORE_DATA_AVAILABLE</span>
                     <span class="o">|</span> <span class="nx">trm</span><span class="p">.</span><span class="nx">ReceiptFlags</span><span class="p">.</span><span class="nx">DOUBLE_HEIGHT</span>
     <span class="p">});</span>
 
 <span class="nx">trm</span><span class="p">.</span><span class="nx">print</span><span class="p">({</span>
-        <span class="na">ReceiptText</span><span class="p">:</span> <span class="s2">"jumps over\nthe lazy dog"</span>
+        <span class="na">ReceiptText</span><span class="p">:</span> <span class="dl">"</span><span class="s2">jumps over</span><span class="se">\n</span><span class="s2">the lazy dog</span><span class="dl">"</span>
     <span class="p">});</span>
 
 <span class="nx">trm</span><span class="p">.</span><span class="nx">print</span><span class="p">({</span>
-        <span class="na">ReceiptText</span><span class="p">:</span> <span class="s2">"iVBORw0KGgoAAAANSUhEUgAAAHgAAAAlCAYAAACJdC37AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAFiIAABYiARsWgo8AAASRSURBVHhe7ZxdU90gEIZztDq2Y79rO73qdfv/f4veO9Oq9atV69haa9+Xs0SChEAgCefoM8NAwrIsLCAJOc6qqrpFGJ3b20GqPZ/NZs8lXRQDtbeTGSrOUjM6VlLhoOqfiF7Or8qhT1u6KNnBNxJ7QaesSjKakRof1A6S0pY2SnZwbg7RgVuSVsCEc0RFLq1tmLN8KueFMIWDFfYyWHInuVgUB69IPDqL5tBFZTIH29gz+pE8FONgF3R6W/BwJiGWM9Hbp2wop3Y7dEiAexpTz3d1V5jsbzCxG0ZTYhtrm2+Wj2labLlI+RPIv5G0l0Cbg/UVPYNDMDs6Ae7iB4H2hTqDdLUnVl+xDsZIPuZobgnHIqZo65SuztJArn5Eo/5cuOqH/hOjHc76Ytpj69JB5xWzRPcxo618rN4+doSUMWWIT3eXbIwuk8lmsG1wBi4lLoJYhzjyjyS+R6hzySQO7jsafUDnM0k26BpIZj7suJBkVkLbB7lDSdKud5LsbIOPnA4+oiEhYWgSBsymxFPReIXrAm3jAU0w2RwMx9UjLhQY+yPBGSVzKvEQRJ2+TfY3WBz7Sl34aV0ZQvHInkhMe7I5BfW9lqTCtLkr5CbbLto2LlFtr4N7u07TJpc9Xfk+fGXtvuiL1ptkJwrElWghxQiTlM6x6+2yKanjPGXtNqT0B0mxc7Il2oXdMYQN8gUfyK+XYIfu+mUJ5KI2LotEUQ42CXFgAK2v9ODwt5IkWT8bKmnAlOTgMTqlfs4cmCG/M4t6Vi/mb7C9hIbqCKnXlkm1lXTpsPJ5BPlifhWPqYvE2FzMDIbRY82u0YGDejuXoG/qvUQsJS3RnW9xbOyR3QY6qD4ODC2Tij3LEutt7CVidBW7yepohPqKIQLnM3XMUtcH6G8cGNBmj92XOt8l4xowHl13X3mgYJZWmpWlqPQY3YmvXpfeXHZ26Ln3mXAIbTpj+6e4GRza6ZSLcZAtG1M2ka2cdcXqyuZgVqxDKoauxuaC1zpPo6/Ne2MQW68pj2C368zKlxw3lmz9Dh3pIytv2i86xiRiSV0qit1kPZKHB+Hghzp7ydI7OHbXuWwstYNt51qz9wr59a8AkN5H2EH4JdfqzZodE6QPEDW+pcY9bpzUhgdpPv+qjZSU0xuh+sNAkWFMoxofG+DeHsI2wje5rk++kD5AYKxsR8zHMObrupUsYqV/aAfzN7mjBTSKDauDiWNp3kAwfwd8A5nPiLcRviK9pu7ewb76O0+qtP0TF+bpLzlWUb+WZcX6PgfVMQKd829+q6IzrxGrwxak91D3R4QvuFznPQOW+yBt0YNiBdc8GVN1MA0dl4jVJ1RDO5gdOGZwgsY6T6qkM/RMXEd6F/EmYp4GNT4nElk6guktkWnjGjLvJf1EYrJBPZKn+36N19D3VK5N9CBQspBROhEz0q8vVbtxz3yXfyVxUY9Jg/x/DV/zUB9/PWGeC2vunf5Als+YalaYaRfI30U+VwjtEFc9dJ45wTh41KoBea4itJ2zWOlDdGFc7yDN1UaB631Ev3Hv0/xO9QcBs7+q/gO+N9k5oy3IOgAAAABJRU5ErkJggg=="</span><span class="p">,</span>
+        <span class="na">ReceiptText</span><span class="p">:</span> <span class="dl">"</span><span class="s2">iVBORw0KGgoAAAANSUhEUgAAAHgAAAAlCAYAAACJdC37AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAFiIAABYiARsWgo8AAASRSURBVHhe7ZxdU90gEIZztDq2Y79rO73qdfv/f4veO9Oq9atV69haa9+Xs0SChEAgCefoM8NAwrIsLCAJOc6qqrpFGJ3b20GqPZ/NZs8lXRQDtbeTGSrOUjM6VlLhoOqfiF7Or8qhT1u6KNnBNxJ7QaesSjKakRof1A6S0pY2SnZwbg7RgVuSVsCEc0RFLq1tmLN8KueFMIWDFfYyWHInuVgUB69IPDqL5tBFZTIH29gz+pE8FONgF3R6W/BwJiGWM9Hbp2wop3Y7dEiAexpTz3d1V5jsbzCxG0ZTYhtrm2+Wj2labLlI+RPIv5G0l0Cbg/UVPYNDMDs6Ae7iB4H2hTqDdLUnVl+xDsZIPuZobgnHIqZo65SuztJArn5Eo/5cuOqH/hOjHc76Ytpj69JB5xWzRPcxo618rN4+doSUMWWIT3eXbIwuk8lmsG1wBi4lLoJYhzjyjyS+R6hzySQO7jsafUDnM0k26BpIZj7suJBkVkLbB7lDSdKud5LsbIOPnA4+oiEhYWgSBsymxFPReIXrAm3jAU0w2RwMx9UjLhQY+yPBGSVzKvEQRJ2+TfY3WBz7Sl34aV0ZQvHInkhMe7I5BfW9lqTCtLkr5CbbLto2LlFtr4N7u07TJpc9Xfk+fGXtvuiL1ptkJwrElWghxQiTlM6x6+2yKanjPGXtNqT0B0mxc7Il2oXdMYQN8gUfyK+XYIfu+mUJ5KI2LotEUQ42CXFgAK2v9ODwt5IkWT8bKmnAlOTgMTqlfs4cmCG/M4t6Vi/mb7C9hIbqCKnXlkm1lXTpsPJ5BPlifhWPqYvE2FzMDIbRY82u0YGDejuXoG/qvUQsJS3RnW9xbOyR3QY6qD4ODC2Tij3LEutt7CVidBW7yepohPqKIQLnM3XMUtcH6G8cGNBmj92XOt8l4xowHl13X3mgYJZWmpWlqPQY3YmvXpfeXHZ26Ln3mXAIbTpj+6e4GRza6ZSLcZAtG1M2ka2cdcXqyuZgVqxDKoauxuaC1zpPo6/Ne2MQW68pj2C368zKlxw3lmz9Dh3pIytv2i86xiRiSV0qit1kPZKHB+Hghzp7ydI7OHbXuWwstYNt51qz9wr59a8AkN5H2EH4JdfqzZodE6QPEDW+pcY9bpzUhgdpPv+qjZSU0xuh+sNAkWFMoxofG+DeHsI2wje5rk++kD5AYKxsR8zHMObrupUsYqV/aAfzN7mjBTSKDauDiWNp3kAwfwd8A5nPiLcRviK9pu7ewb76O0+qtP0TF+bpLzlWUb+WZcX6PgfVMQKd829+q6IzrxGrwxak91D3R4QvuFznPQOW+yBt0YNiBdc8GVN1MA0dl4jVJ1RDO5gdOGZwgsY6T6qkM/RMXEd6F/EmYp4GNT4nElk6guktkWnjGjLvJf1EYrJBPZKn+36N19D3VK5N9CBQspBROhEz0q8vVbtxz3yXfyVxUY9Jg/x/DV/zUB9/PWGeC2vunf5Als+YalaYaRfI30U+VwjtEFc9dJ45wTh41KoBea4itJ2zWOlDdGFc7yDN1UaB631Ev3Hv0/xO9QcBs7+q/gO+N9k5oy3IOgAAAABJRU5ErkJggg==</span><span class="dl">"</span><span class="p">,</span>
         <span class="na">ReceiptFlags</span><span class="p">:</span> <span class="nx">trm</span><span class="p">.</span><span class="nx">ReceiptFlags</span><span class="p">.</span><span class="nx">IS_PNG_IMAGE</span>
     <span class="p">});</span>
-</code></pre>
+</code></pre></div>
 <p>Prints a text on the terminal&#39;s thermal printer.</p>
 
 <table><thead>
@@ -1078,18 +1165,22 @@ is finally reverted.</p>
 </tbody></table>
 <h2 id='devicecommand'>deviceCommand</h2>
 <p><code>trm.deviceCommand(params)</code></p>
-<pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">deviceCommand</span><span class="p">({</span>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">deviceCommand</span><span class="p">({</span>
         <span class="na">DeviceCommandCode</span><span class="p">:</span> <span class="nx">trm</span><span class="p">.</span><span class="nx">DeviceCommands</span><span class="p">.</span><span class="nx">REBOOT</span>
     <span class="p">}</span>
 <span class="p">);</span>
 
 <span class="nx">trm</span><span class="p">.</span><span class="nx">deviceCommand</span><span class="p">({</span>
-        <span class="na">DeviceCommandCode</span><span class="p">:</span> <span class="nx">trm</span><span class="p">.</span><span class="nx">DeviceCommands</span><span class="p">.</span><span class="nx">CONFIGURE_DISCONNECTED_TEXT</span><span class="p">,</span>
-        <span class="na">CardholderText</span><span class="p">:</span> <span class="s2">"Welcome"</span>
+        <span class="na">DeviceCommandCode</span><span class="p">:</span> <span class="nx">trm</span><span class="p">.</span><span class="nx">DeviceCommands</span><span class="p">.</span><span class="nx">SCAN_SYMBOL</span><span class="p">,</span>
+        <span class="na">Title</span><span class="p">:</span> <span class="dl">"</span><span class="s2">POS Scanner</span><span class="dl">"</span><span class="p">,</span>
+        <span class="na">Text</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Please scan QR or bar code!</span><span class="dl">"</span><span class="p">,</span>
+        <span class="na">Timeout</span><span class="p">:</span> <span class="mi">60000</span>
     <span class="p">}</span>
 <span class="p">);</span>
-</code></pre>
+</code></pre></div>
 <p>Let the terminal perform some <a href="#devicecommands">actions</a> in addition to payment.</p>
+
+<p>Request format:</p>
 
 <table><thead>
 <tr>
@@ -1106,10 +1197,46 @@ is finally reverted.</p>
 <td><a href="#devicecommands">action</a> to perform.</td>
 </tr>
 <tr>
-<td>CardholderText</td>
+<td>Timeout</td>
+<td>Numeric</td>
+<td>for SCAN_SYMBOL</td>
+<td>Timeout in milliseconds</td>
+</tr>
+<tr>
+<td>Title</td>
 <td>String</td>
-<td>for CONFIGURE_DISCONNECTED_TEXT</td>
-<td>Text to be shown to the cardholder if no ECR or vending machine has connected.</td>
+<td>for SCAN_SYMBOL</td>
+<td>Title for the scanner user interface.</td>
+</tr>
+<tr>
+<td>Text</td>
+<td>String</td>
+<td>for SCAN_SYMBOL</td>
+<td>Hint text for the scanner user interface.</td>
+</tr>
+</tbody></table>
+
+<p>Response format (when <a href="#ondevicecommandsucceeded">onDeviceCommandSucceeded</a> is called):</p>
+
+<table><thead>
+<tr>
+<th>Parameter -</th>
+<th>Format</th>
+<th>Condition</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>DeviceCommandCode</td>
+<td>Numeric</td>
+<td>mandatory</td>
+<td>performed <a href="#devicecommands">action</a>.</td>
+</tr>
+<tr>
+<td>ScannedData</td>
+<td>String</td>
+<td>for SCAN_SYMBOL</td>
+<td>Decoded symbol data.</td>
 </tr>
 </tbody></table>
 <h2 id='sendmessage'>sendMessage</h2>
@@ -1174,13 +1301,13 @@ is finally reverted.</p>
 <p>Returns the device model name of the terminal.</p>
 <h2 id='getsoftwareversion'>getSoftwareVersion</h2>
 <p><code>trm.getSoftwareVersion()</code></p>
-<pre class="highlight javascript tab-javascript"><code><span class="nx">v</span> <span class="o">=</span> <span class="nx">trm</span><span class="p">.</span><span class="nx">getSoftwareVersion</span><span class="p">();</span>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="nx">v</span> <span class="o">=</span> <span class="nx">trm</span><span class="p">.</span><span class="nx">getSoftwareVersion</span><span class="p">();</span>
 
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"Software version: "</span>
-    <span class="o">+</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">trunc</span><span class="p">(</span><span class="nx">v</span> <span class="o">/</span> <span class="mi">10000</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"."</span>
-    <span class="o">+</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">trunc</span><span class="p">((</span><span class="nx">v</span> <span class="o">%</span> <span class="mi">10000</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"."</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">Software version: </span><span class="dl">"</span>
+    <span class="o">+</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">trunc</span><span class="p">(</span><span class="nx">v</span> <span class="o">/</span> <span class="mi">10000</span><span class="p">)</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">.</span><span class="dl">"</span>
+    <span class="o">+</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">trunc</span><span class="p">((</span><span class="nx">v</span> <span class="o">%</span> <span class="mi">10000</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">.</span><span class="dl">"</span>
     <span class="o">+</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">trunc</span><span class="p">(</span><span class="nx">v</span> <span class="o">%</span> <span class="mi">100</span><span class="p">));</span>
-</code></pre>
+</code></pre></div>
 <p>returns the terminal software version as a number.</p>
 <h2 id='getstatus'>getStatus</h2>
 <p><code>status = trm.getStatus()</code></p>
@@ -1192,55 +1319,55 @@ is finally reverted.</p>
 <p>Tells whether the terminal is <a href="#activate">activated</a>, not <a href="#statusflags">locked</a> and not <a href="#statusflags">busy</a> with another use case.</p>
 <h2 id='getacquirers'>getAcquirers</h2>
 <p><code>trm.getAcquirers()</code></p>
-<pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">getAcquirers</span><span class="p">();</span>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">getAcquirers</span><span class="p">();</span>
 <span class="o">-&gt;</span> <span class="p">[</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span> <span class="p">]</span>
-</code></pre>
+</code></pre></div>
 <p>Return an array containing the configured acquirer IDs.</p>
 <h2 id='getacquirerinfo'>getAcquirerInfo</h2>
 <p><code>trm.getAcquirerInfo(acqID)</code></p>
-<pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">getAcquirerInfo</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">getAcquirerInfo</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
 <span class="o">-&gt;</span>
 <span class="p">{</span>
     <span class="na">AcqID</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
-    <span class="na">LastAcqInitDate</span><span class="p">:</span> <span class="s2">"2019-05-26 06:32:26"</span>
+    <span class="na">LastAcqInitDate</span><span class="p">:</span> <span class="dl">"</span><span class="s2">2019-05-26 06:32:26</span><span class="dl">"</span>
 <span class="p">}</span>
-</code></pre>
+</code></pre></div>
 <p>Returns information to a given acquirer ID as an object.</p>
 <h2 id='getbrands'>getBrands</h2>
 <p><code>trm.getBrands()</code></p>
-<pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">getBrands</span><span class="p">();</span>
-<span class="o">-&gt;</span> <span class="p">[</span> <span class="s2">"MAESTRO"</span><span class="p">,</span> <span class="s2">"MASTERCARD"</span><span class="p">,</span> <span class="s2">"V PAY"</span><span class="p">,</span> <span class="s2">"VISA"</span> <span class="p">]</span>
-</code></pre>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">getBrands</span><span class="p">();</span>
+<span class="o">-&gt;</span> <span class="p">[</span> <span class="dl">"</span><span class="s2">MAESTRO</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">MASTERCARD</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">V PAY</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">VISA</span><span class="dl">"</span> <span class="p">]</span>
+</code></pre></div>
 <p>Returns an array containing the initialized payment brands</p>
 <h2 id='getcurrencies'>getCurrencies</h2>
 <p><code>trm.getCurrencies()</code></p>
-<pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">getCurrencies</span><span class="p">();</span>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">getCurrencies</span><span class="p">();</span>
 <span class="o">-&gt;</span> <span class="p">[</span> <span class="mi">756</span><span class="p">,</span> <span class="mi">840</span><span class="p">,</span> <span class="mi">978</span> <span class="p">]</span>
-</code></pre>
+</code></pre></div>
 <p>Returns an array of supported ISO-4217 currency codes.</p>
 <h2 id='gettransactionfunctions'>getTransactionFunctions</h2>
 <p><code>trm.getTransactionFunctions()</code></p>
-<pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">getTransactionFunctions</span><span class="p">();</span>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">getTransactionFunctions</span><span class="p">();</span>
 <span class="o">-&gt;</span> <span class="p">[</span> <span class="mi">32768</span><span class="p">,</span> <span class="mi">2048</span><span class="p">,</span> <span class="mi">32</span> <span class="p">]</span>
-</code></pre>
+</code></pre></div>
 <p>Returns an array of supported <a href="#transactionfunctions">transaction functions</a>.</p>
 <h2 id='gettransactionfunctionname'>getTransactionFunctionName</h2>
 <p><code>trm.getTransactionFunctionName(trxFunction, language)</code></p>
-<pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">getTransactionFunctionName</span><span class="p">(</span>
-    <span class="nx">trm</span><span class="p">.</span><span class="nx">TransactionFunctions</span><span class="p">.</span><span class="nx">PURCHASE_RESERVATION</span><span class="p">,</span> <span class="s2">"fr"</span><span class="p">);</span>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">getTransactionFunctionName</span><span class="p">(</span>
+    <span class="nx">trm</span><span class="p">.</span><span class="nx">TransactionFunctions</span><span class="p">.</span><span class="nx">PURCHASE_RESERVATION</span><span class="p">,</span> <span class="dl">"</span><span class="s2">fr</span><span class="dl">"</span><span class="p">);</span>
 
-<span class="o">-&gt;</span> <span class="s2">"Vente Réservation"</span>
-</code></pre>
+<span class="o">-&gt;</span> <span class="dl">"</span><span class="s2">Vente Réservation</span><span class="dl">"</span>
+</code></pre></div>
 <p>Returns the name of a transaction function in English, German, French or Italian.
 If <code>language</code> is <code>undefined</code>, the current <a href="#trmlng">terminal language</a> is used.</p>
 <h2 id='trmlng'>TrmLng</h2>
 <p><code>trm.getTrmLng()</code><br>
 <code>trm.setTrmLng(value)</code></p>
-<pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">setTrmLng</span><span class="p">(</span><span class="s2">"en"</span><span class="p">);</span>
-<span class="nx">trm</span><span class="p">.</span><span class="nx">setTrmLng</span><span class="p">(</span><span class="s2">"de"</span><span class="p">);</span>
-<span class="nx">trm</span><span class="p">.</span><span class="nx">setTrmLng</span><span class="p">(</span><span class="s2">"fr"</span><span class="p">);</span>
-<span class="nx">trm</span><span class="p">.</span><span class="nx">setTrmLng</span><span class="p">(</span><span class="s2">"it"</span><span class="p">);</span>
-</code></pre>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">setTrmLng</span><span class="p">(</span><span class="dl">"</span><span class="s2">en</span><span class="dl">"</span><span class="p">);</span>
+<span class="nx">trm</span><span class="p">.</span><span class="nx">setTrmLng</span><span class="p">(</span><span class="dl">"</span><span class="s2">de</span><span class="dl">"</span><span class="p">);</span>
+<span class="nx">trm</span><span class="p">.</span><span class="nx">setTrmLng</span><span class="p">(</span><span class="dl">"</span><span class="s2">fr</span><span class="dl">"</span><span class="p">);</span>
+<span class="nx">trm</span><span class="p">.</span><span class="nx">setTrmLng</span><span class="p">(</span><span class="dl">"</span><span class="s2">it</span><span class="dl">"</span><span class="p">);</span>
+</code></pre></div>
 <p>Terminal language as ISO 639-1 2 letter code.</p>
 
 <p>Default value: Language as configured on the TMS</p>
@@ -1463,7 +1590,7 @@ after <a href="#starttransaction">startTransaction</a>.</p>
 
 <p>Called when <a href="#initialize">initialize</a> has timed out.</p>
 <h2 id='ondevicecommandsucceeded'>OnDeviceCommandSucceeded</h2>
-<p><code>function onDeviceCommandSucceeded() {}</code><br>
+<p><code>function onDeviceCommandSucceeded(deviceCommandResponse) {}</code><br>
 <code>trm.setOnDeviceCommandSucceeded(onDeviceCommandSucceeded)</code></p>
 
 <p>Called when <a href="#devicecommand">deviceCommand</a> has succeeded.</p>
@@ -1775,7 +1902,7 @@ the API does not do any further processing of the message.
 <tr>
 <td>APPLICATION_SELECTED</td>
 <td>0x00000020</td>
-<td>A payment application hs been selected to process the current transaction</td>
+<td>A payment application has been selected to process the current transaction</td>
 </tr>
 <tr>
 <td>WAITING_FOR_TRANSACTION_REQUEST</td>
@@ -1864,6 +1991,11 @@ the API does not do any further processing of the message.
 <td>SHOW_CARD_INSERTION</td>
 <td>2002</td>
 <td>Show the card insertion message to the cardholder</td>
+</tr>
+<tr>
+<td>SCAN_SYMBOL</td>
+<td>2601</td>
+<td>Scans a 1D/2D bar code. Available on Android devices equipped with a scanner and PayTec EP2 software equal or higher than 21.01.11</td>
 </tr>
 </tbody></table>
 
