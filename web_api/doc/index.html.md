@@ -407,7 +407,7 @@ Prints a text on the terminal's thermal printer.
 
 Parameter -| Format  | Condition | Description
 -----------|---------|-----------|------------
-ReceiptText | String | mandatory | Text to print. Use '\n' for line breaks.
+ReceiptText | String | mandatory | Text to print. Use '\n' for line breaks. Maximum length is 1000 characters (resp. 1KB UTF8), except for [IS_PNG_IMAGE](#receiptflags)
 ReceiptFlags | Numeric | optional | [Flags](#receiptflags) that influence printing.
 
 
