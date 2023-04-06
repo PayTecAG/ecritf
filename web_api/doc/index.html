@@ -452,6 +452,9 @@
                     <a href="#gettransactionfunctionname" class="toc-h2 toc-link" data-title="getTransactionFunctionName">getTransactionFunctionName</a>
                   </li>
                   <li>
+                    <a href="#posid" class="toc-h2 toc-link" data-title="POSID">POSID</a>
+                  </li>
+                  <li>
                     <a href="#trmlng" class="toc-h2 toc-link" data-title="TrmLng">TrmLng</a>
                   </li>
                   <li>
@@ -742,6 +745,9 @@ The result of this operation is reported through the <a href="#ontransactionappr
 <th>Available options:</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><a href="#posid">POSID</a></td>
+</tr>
 <tr>
 <td><a href="#trmlng">TrmLng</a></td>
 </tr>
@@ -1360,6 +1366,12 @@ is finally reverted.</p>
 </code></pre></div>
 <p>Returns the name of a transaction function in English, German, French or Italian.
 If <code>language</code> is <code>undefined</code>, the current <a href="#trmlng">terminal language</a> is used.</p>
+<h2 id='posid'>POSID</h2>
+<p><code>trm.getPOSID()</code><br>
+<code>trm.setPOSID(value)</code></p>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="nx">trm</span><span class="p">.</span><span class="nx">setPOSID</span><span class="p">(</span><span class="dl">"</span><span class="s2">pos_1234</span><span class="dl">"</span><span class="p">);</span>
+</code></pre></div>
+<p>Identifier of the Point of Sale, e.g. a cash register number.</p>
 <h2 id='trmlng'>TrmLng</h2>
 <p><code>trm.getTrmLng()</code><br>
 <code>trm.setTrmLng(value)</code></p>

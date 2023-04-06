@@ -809,6 +809,9 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     this.setPeerURL = getPeerURL;
     this.setPeerURL = setPeerURL;
 
+    this.getPOSID = getPOSID;
+    this.setPOSID = setPOSID;
+
     this.getTrmLng = getTrmLng;
     this.setTrmLng = setTrmLng;
 
@@ -1000,6 +1003,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     var terminalID = undefined;
     var softwareVersion = 0;
     var peerURL = (undefined !== options && undefined !== options.PeerURL) ? options.PeerURL : undefined;
+    var posID = (undefined !== options && undefined !== options.POSID) ? options.POSID : undefined;
     var trmLng = (undefined !== options && undefined !== options.TrmLng) ? options.TrmLng : undefined;
     var printerWidth = (undefined !== options && undefined !== options.PrinterWidth) ? options.PrinterWidth : 34;
     var autoConnect = (undefined !== options && undefined !== options.AutoConnect) ? (options.AutoConnect ? true : false) : true;
@@ -1149,13 +1153,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
                 };
 
                 localSocket.onopen = function() {
-                    if (undefined !== trmLng) {
-                        sendMessage({ ConnectRequest: { TrmLng: trmLng, PrinterWidth: printerWidth, UnsolicitedReceipts: 1 }});
-                    }
-                    else {
-                        sendMessage({ ConnectRequest: { PrinterWidth: printerWidth, UnsolicitedReceipts: 1 }});
-                    }
-
+                    sendConnectRequest();
                     sendMessage({ StatusRequest: {}});
                 };
 
@@ -1629,6 +1627,15 @@ PayTec.POSTerminal = function(pairingInfo, options) {
 
     function setPeerURL(value) {
         peerURL = value;
+        return self;
+    }
+
+    function getPOSID() {
+        return posID;
+    }
+
+    function setPOSID(value) {
+        posID = value;
         return self;
     }
 
@@ -2388,6 +2395,39 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         }
     }
 
+    function sendConnectRequest() {
+        var connectReq = {
+            ConnectRequest: {
+                PrinterWidth: printerWidth,
+                UnsolicitedReceipts: 1
+            }
+        };
+
+        if (undefined !== trmLng) {
+            connectReq.ConnectRequest.TrmLng = trmLng;
+        }
+
+        if (undefined !== posID) {
+            connectReq.ConnectRequest.POSID = posID;
+        }
+
+        connectReq.POSInterface = "KIT";
+
+        if (localSocket !== undefined) {
+            if (peerURL == "ws://localhost:28307") {
+                connectReq.POSInterfaceTransport = "Serial";
+            }
+            else {
+                connectReq.POSInterfaceTransport = "Local";
+            }
+        }
+        else {
+            connectReq.POSInterfaceTransport = "Cloud";
+        }
+
+        sendMessage(connectReq);
+    }
+
     function onStatusResponse(rsp) {
         trmStatus = rsp.TrmStatus;
         setAcqInfo = rsp.SetAcqInfo;
@@ -2479,13 +2519,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         serialNumber = rsp.IFDSerialNum;
         terminalID = rsp.TrmID;
 
-        if (undefined !== trmLng) {
-            sendMessage({ ConnectRequest: { TrmLng: trmLng, PrinterWidth: printerWidth, UnsolicitedReceipts: 1 }});
-        }
-        else {
-            sendMessage({ ConnectRequest: { PrinterWidth: printerWidth, UnsolicitedReceipts: 1 }});
-        }
-
+        sendConnectRequest();
         sendMessage({ StatusRequest: {}});
     }
 

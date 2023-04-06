@@ -154,6 +154,7 @@ trm = new PayTec.POSTerminal(
 
 | Available options: |
 |--------|
+|[POSID](#posid)|
 |[TrmLng](#trmlng)|
 |[PrinterWidth](#printerwidth)|
 |[AutoConnect](#autoconnect)|
@@ -661,6 +662,18 @@ trm.getTransactionFunctionName(
 
 Returns the name of a transaction function in English, German, French or Italian.
 If `language` is `undefined`, the current [terminal language](#trmlng) is used.
+
+
+## POSID
+
+`trm.getPOSID()`  
+`trm.setPOSID(value)`
+
+```javascript
+trm.setPOSID("pos_1234");
+```
+
+Identifier of the Point of Sale, e.g. a cash register number.
 
 
 ## TrmLng
