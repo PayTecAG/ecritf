@@ -2148,6 +2148,11 @@ PayTec.POSTerminal = function(pairingInfo, options) {
             }
         }
 
+        if (message.EFTHello) {
+            // triggers ConnectRequest, also in case of SMQ reconnection
+            onEFTHello(message.EFTHello);
+        }
+
         switch (state) {
         case State.DISCONNECTED:
             break;
@@ -2157,16 +2162,12 @@ PayTec.POSTerminal = function(pairingInfo, options) {
                 onPairingFailed();
             }
             else if (message.EFTHello) {
-                onEFTHello(message.EFTHello);
                 changeState(State.CONNECTING);
                 onPairingSucceeded();
             }
             break;
         case State.CONNECTING:
-            if (message.EFTHello) {
-                onEFTHello(message.EFTHello);
-            }
-            else if (message.ConnectResponse) {
+            if (message.ConnectResponse) {
                 if (undefined !== message.ConnectResponse.TrmLng)
                     trmLng = message.ConnectResponse.TrmLng;
 
