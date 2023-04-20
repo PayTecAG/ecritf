@@ -2711,6 +2711,10 @@ PayTec.POSTerminal = function(pairingInfo, options) {
                     return "PayTec Nexgo P200";
                 case "P2D":
                     return "PayTec Nexgo P200 (Development)";
+                case "UN2":
+                    return "PayTec Nexgo UN20";
+                case "UND":
+                    return "PayTec Nexgo UN20 (Development)";
             }
         }
 
