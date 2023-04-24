@@ -2734,7 +2734,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     function timeStamp() {
         now = new Date();
 
-        return pad(now.getFullYear(), 2) + "-" + pad(now.getMonth(), 2) + "-" + pad(now.getDate(), 2)
+        return pad(now.getFullYear(), 2) + "-" + pad(now.getMonth() + 1, 2) + "-" + pad(now.getDate(), 2)
             + " " + pad(now.getHours(), 2) + ":" + pad(now.getMinutes(), 2) + ":" + pad(now.getSeconds(), 2)
             + "." + pad(now.getMilliseconds(), 3) + ": ";
     }
