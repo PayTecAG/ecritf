@@ -581,7 +581,7 @@
                 if ((trm === undefined) || (trm.StatusFlags.PRINTER_UNAVAILABLE & trmStatus))
                     $(".printer-available").hide();
 
-                $("#busy").toggle((trm !== undefined) && ((trm.StatusFlags.BUSY & trmStatus) != 0));
+                $("#busy").toggle((trm !== undefined) && (((trm.StatusFlags.BUSY | trm.StatusFlags.LOCKED) & trmStatus) != 0));
                 $("#onlineProcessing").toggle((trm !== undefined) && ((trm.StatusFlags.ONLINE_PROCESSING & trmStatus) != 0));
                 $("#cardDataAvailable").toggle((trm !== undefined) && (((trm.StatusFlags.CARD_DATA_AVAILABLE | trm.StatusFlags.APPLICATION_SELECTED) & trmStatus) != 0));
 
@@ -658,8 +658,8 @@
                     $("#amtAuth").focus();
                     hideDialog();
                 }
-                else if (((trm.StatusFlags.BUSY & newStatus) != (trm.StatusFlags.BUSY & trmStatus)) && $("#abortTransactionButton").is(":hidden")) {
-                    if (trm.StatusFlags.BUSY & newStatus) {
+                else if ((((trm.StatusFlags.BUSY | trm.StatusFlags.LOCKED) & newStatus) != ((trm.StatusFlags.BUSY | trm.StatusFlags.LOCKED) & trmStatus)) && $("#abortTransactionButton").is(":hidden")) {
+                    if ((trm.StatusFlags.BUSY | trm.StatusFlags.LOCKED) & newStatus) {
                         showDialog(i18n("Please wait"), i18n("Please wait"), Infinity);
                     }
                     else {
@@ -671,7 +671,7 @@
 
                 trmStatus = newStatus;
 
-                if (!(trm.StatusFlags.BUSY & trmStatus)) {
+                if (!isBusy()) {
                     // update acquirers
                     var acquirerInfoHTML = "";
                     var acqIDSelectHTML = "";
@@ -922,7 +922,7 @@
             }
 
             function transaction() {
-                if ((trm !== undefined) && (((trm.StatusFlags.BUSY | trm.StatusFlags.READER_SLOT_OCCUPIED) & trmStatus) != 0) && (0 == (trm.StatusFlags.CARD_DATA_AVAILABLE & trmStatus))) {
+                if ((trm !== undefined) && isBusy() && (0 == (trm.StatusFlags.CARD_DATA_AVAILABLE & trmStatus))) {
                     showDialog(i18n("Please wait"), i18n("Terminal is busy"), Infinity);
                     return;
                 }
@@ -987,69 +987,27 @@
             }
 
             function activate() {
-                if (trm !== undefined) {
-                    if (((trm.StatusFlags.BUSY | trm.StatusFlags.READER_SLOT_OCCUPIED) & trmStatus) != 0) {
-                        showDialog(i18n("Please wait"), i18n("Terminal is busy"), Infinity);
-                        return;
-                    }
-
-                    trm.activate();
-                }
+                checkNotBusy() && trm.activate();
             }
 
             function deactivate() {
-                if (trm !== undefined) {
-                    if (((trm.StatusFlags.BUSY | trm.StatusFlags.READER_SLOT_OCCUPIED) & trmStatus) != 0) {
-                        showDialog(i18n("Please wait"), i18n("Terminal is busy"), Infinity);
-                        return;
-                    }
-
-                    trm.deactivate();
-                }
+                checkNotBusy() && trm.deactivate();
             }
 
             function balance() {
-                if (trm !== undefined) {
-                    if (((trm.StatusFlags.BUSY | trm.StatusFlags.READER_SLOT_OCCUPIED) & trmStatus) != 0) {
-                        showDialog(i18n("Please wait"), i18n("Terminal is busy"), Infinity);
-                        return;
-                    }
-
-                    trm.balance();
-                }
+                checkNotBusy() && trm.balance();
             }
 
             function configure() {
-                if (trm !== undefined) {
-                    if (((trm.StatusFlags.BUSY | trm.StatusFlags.READER_SLOT_OCCUPIED) & trmStatus) != 0) {
-                        showDialog(i18n("Please wait"), i18n("Terminal is busy"), Infinity);
-                        return;
-                    }
-
-                    trm.configure();
-                }
+                checkNotBusy() && trm.configure();
             }
 
             function initialize(acqID) {
-                if (trm !== undefined) {
-                    if (((trm.StatusFlags.BUSY | trm.StatusFlags.READER_SLOT_OCCUPIED) & trmStatus) != 0) {
-                        showDialog(i18n("Please wait"), i18n("Terminal is busy"), Infinity);
-                        return;
-                    }
-
-                    trm.initialize(acqID);
-                }
+                checkNotBusy() && trm.initialize(acqID);
             }
 
             function capture(flags) {
-                if (trm !== undefined) {
-                    if (((trm.StatusFlags.BUSY | trm.StatusFlags.READER_SLOT_OCCUPIED) & trmStatus) != 0) {
-                        showDialog(i18n("Please wait"), i18n("Terminal is busy"), Infinity);
-                        return;
-                    }
-
-                    trm.sendMessage({ BatchCaptureRequest: { BatchCaptureFlags: flags }});
-                }
+                checkNotBusy() && trm.sendMessage({ BatchCaptureRequest: { BatchCaptureFlags: flags }});
             }
 
             function print(text) {
@@ -1178,6 +1136,24 @@
             function clearReceipts() {
                 $("#receipts").html("");
                 $("#clearReceipts").addClass("d-none");
+            }
+
+            function isBusy() {
+                return (trm !== undefined) && (((trm.StatusFlags.BUSY | trm.StatusFlags.LOCKED | trm.StatusFlags.READER_SLOT_OCCUPIED) & trmStatus) != 0);
+            }
+
+            function checkNotBusy() {
+                var result = false;
+
+                if (trm !== undefined) {
+                    if (isBusy()) {
+                        showDialog(i18n("Please wait"), i18n("Terminal is busy"), Infinity);
+                    } else {
+                        result = true;
+                    }
+                }
+
+                return result;
             }
 
             function pad(num, padlen, padchar) {
