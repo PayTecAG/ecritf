@@ -288,6 +288,7 @@ TrxCurrC | Numeric | For amount based transaction types | Transaction Currency C
 TrxFunction | Numeric | **Mandatory** | [Transaction function](#transactionfunctions) to be used
 TrxRefNum | String | For reference based transactions like e.g. Purchase Reservation | Original Transaction Reference Number
 TrxReasonC | String | For Account Verification transactions | Transaction Reason Code
+TrxReqFlags | Numeric | [Flags](#transactionrequestflags) that impact the behaviour when starting a transaction
 
 
 ## abortTransaction
@@ -1047,10 +1048,12 @@ Called when [deviceCommand](#devicecommand) has timed out.
 
 ## OnStatusChanged
 
-`function onStatusChanged() {}`  
+`function onStatusChanged(statusResponse) {}`  
 `trm.setOnStatusChanged(onStatusChanged)`
 
 Called whenever the terminal [status flags](#statusflags) have changed.
+
+Please refer to the PayTec ECR Interface Specification for further information about the content of `statusResponse`.
 
 
 ## OnReceipt
@@ -1121,6 +1124,17 @@ The transaction function is a mandatory paramater to [start a payment transactio
 | LOAD | 0x01000000 | Load transaction is used to load a prepaid card with a chosen load amount
 | CANCEL_RESERVATION | 0x02000000 | Cancellation of any reservation transaction (even if it is submitted) to fulfil MasterCard’s requirement: "Processing of Authorisations and Pre-authorisations in the Europe Region."
 | ACCOUNT_VERIFICATION | 0x04000000 | Verify cardholder account for Credentials on File transactions
+
+## TransactionRequestFlags
+
+`trm.TransactionRequestFlags.TRX_REPORT_UNKNOWN_NFC_UID`
+
+Flags that impact the behaviour when [starting a transaction](#starttransaction).
+
+| Flag | Value | Description |
+|------|-------|-------------|
+| TRX_SILENT | 0x00000001 | Start transaction without showing 'Insert card' or the like and don't display idle screen after transaction
+| TRX_REPORT_UNKNOWN_NFC_UID | 0x00000004 | Report UID of unknown NFC tags in [onStatusChanged()](#onstatuschanged), e.g. Mifare cards with a data structure unknown to the terminal. If this flag is not set, the transaction will be aborted in this case. What kind of tags are supported at all depends on the terminal device type. Available if PayTec EP2 software equal or higher than 23.00.04
 
 ## TransactionAbortFlags
 

@@ -640,7 +640,7 @@
                 showDialog(i18n("Error"), i18n("Failed to connect to terminal"), 10000);
             }
 
-            function onStatusChanged() {
+            function onStatusChanged(statusResponse) {
                 var newStatus = trm.getStatus();
                 var oldStatus = trmStatus;
 

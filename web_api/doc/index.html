@@ -601,6 +601,9 @@
                     <a href="#transactionfunctions" class="toc-h2 toc-link" data-title="TransactionFunctions">TransactionFunctions</a>
                   </li>
                   <li>
+                    <a href="#transactionrequestflags" class="toc-h2 toc-link" data-title="TransactionRequestFlags">TransactionRequestFlags</a>
+                  </li>
+                  <li>
                     <a href="#transactionabortflags" class="toc-h2 toc-link" data-title="TransactionAbortFlags">TransactionAbortFlags</a>
                   </li>
                   <li>
@@ -668,7 +671,7 @@ the terminal. You can therefore skip this chapter!
 a trusted connection providing a temporary pairing code. This code is generated
 on the POS terminal via the attendant menu...</p>
 
-<p><img src="images/start_pairing-a954ad10.png" alt="Screenshot start pairing" /> <strong>click &#39;Go&#39; =&gt;</strong> <img src="images/pairing_code-7af8fd54.png" alt="Screenshot pairing code" /></p>
+<p><img src="images/images/start_pairing.png" alt="Screenshot start pairing" /> <strong>click &#39;Go&#39; =&gt;</strong> <img src="images/images/pairing_code.png" alt="Screenshot pairing code" /></p>
 
 <p>... and used by the web application via the <a href="#pair">pair</a> method:</p>
 
@@ -676,7 +679,7 @@ on the POS terminal via the attendant menu...</p>
 
 <p>=&gt; the following message will be shown for a few seconds on the terminal:</p>
 
-<p><img src="images/pairing_successful-db9db480.png" alt="Screenshot pairing successful" /></p>
+<p><img src="images/images/pairing_successful.png" alt="Screenshot pairing successful" /></p>
 <div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="c1">// store the current pairing info in local browser storage</span>
 <span class="kd">function</span> <span class="nx">onConnected</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="nx">Storage</span><span class="p">)</span> <span class="o">!==</span> <span class="dl">"</span><span class="s2">undefined</span><span class="dl">"</span><span class="p">)</span> <span class="p">{</span>
@@ -1008,6 +1011,12 @@ For details concerning parameters which depend on certain transaction types,
 <td>String</td>
 <td>For Account Verification transactions</td>
 <td>Transaction Reason Code</td>
+</tr>
+<tr>
+<td>TrxReqFlags</td>
+<td>Numeric</td>
+<td><a href="#transactionrequestflags">Flags</a> that impact the behaviour when starting a transaction</td>
+<td></td>
 </tr>
 </tbody></table>
 <h2 id='aborttransaction'>abortTransaction</h2>
@@ -1617,10 +1626,12 @@ after <a href="#starttransaction">startTransaction</a>.</p>
 
 <p>Called when <a href="#devicecommand">deviceCommand</a> has timed out.</p>
 <h2 id='onstatuschanged'>OnStatusChanged</h2>
-<p><code>function onStatusChanged() {}</code><br>
+<p><code>function onStatusChanged(statusResponse) {}</code><br>
 <code>trm.setOnStatusChanged(onStatusChanged)</code></p>
 
 <p>Called whenever the terminal <a href="#statusflags">status flags</a> have changed.</p>
+
+<p>Please refer to the PayTec ECR Interface Specification for further information about the content of <code>statusResponse</code>.</p>
 <h2 id='onreceipt'>OnReceipt</h2>
 <p><code>function onReceipt(receiptType, receiptText) {}</code><br>
 <code>trm.setOnReceipt(onReceipt)</code></p>
@@ -1758,6 +1769,29 @@ the API does not do any further processing of the message.
 <td>ACCOUNT_VERIFICATION</td>
 <td>0x04000000</td>
 <td>Verify cardholder account for Credentials on File transactions</td>
+</tr>
+</tbody></table>
+<h2 id='transactionrequestflags'>TransactionRequestFlags</h2>
+<p><code>trm.TransactionRequestFlags.TRX_REPORT_UNKNOWN_NFC_UID</code></p>
+
+<p>Flags that impact the behaviour when <a href="#starttransaction">starting a transaction</a>.</p>
+
+<table><thead>
+<tr>
+<th>Flag</th>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>TRX_SILENT</td>
+<td>0x00000001</td>
+<td>Start transaction without showing &#39;Insert card&#39; or the like and don&#39;t display idle screen after transaction</td>
+</tr>
+<tr>
+<td>TRX_REPORT_UNKNOWN_NFC_UID</td>
+<td>0x00000004</td>
+<td>Report UID of unknown NFC tags in <a href="#onstatuschanged">onStatusChanged()</a>, e.g. Mifare cards with a data structure unknown to the terminal. If this flag is not set, the transaction will be aborted in this case. What kind of tags are supported at all depends on the terminal device type. Available if PayTec EP2 software equal or higher than 23.00.04</td>
 </tr>
 </tbody></table>
 <h2 id='transactionabortflags'>TransactionAbortFlags</h2>

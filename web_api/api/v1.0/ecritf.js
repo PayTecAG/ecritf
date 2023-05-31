@@ -921,6 +921,11 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         ACCOUNT_VERIFICATION:           0x04000000
     };
 
+    this.TransactionRequestFlags = {
+        TRX_SILENT:                     0x00000001,
+        TRX_REPORT_UNKNOWN_NFC_UID:     0x00000004
+    };
+
     this.TransactionAbortFlags = {
         ABORT_TRX_SILENT: 0x00000001
     };
@@ -1059,6 +1064,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     var onMessageSent = (undefined !== options && undefined !== options.OnMessageSent) ? options.OnMessageSent : myOnMessageSent;
     var onMessageReceived = (undefined !== options && undefined !== options.OnMessageReceived) ? options.OnMessageReceived : myOnMessageReceived;
     var onError = (undefined !== options && undefined !== options.OnError) ? options.OnError : myOnError;
+    var lastStatusResponse = {};
     var trmStatus = 0;
     var setAcqInfo = [];
     var brands = [];
@@ -1990,7 +1996,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         onStatusChanged = callback;
     }
 
-    function myOnStatusChanged() {
+    function myOnStatusChanged(lastStatusResponse) {
         console.log("New status: " + getStatus() + "\n");
     }
 
@@ -2430,6 +2436,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     }
 
     function onStatusResponse(rsp) {
+        lastStatusResponse = rsp;
         trmStatus = rsp.TrmStatus;
         setAcqInfo = rsp.SetAcqInfo;
 
@@ -2439,7 +2446,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         }
         else {
             try {
-                onStatusChanged();
+                onStatusChanged(rsp);
             }
             catch (e) {
                 console.log("Callback failed: " + e + "\n" + e.stack);
@@ -2463,7 +2470,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         neverActivated = false;
 
         try {
-            onStatusChanged();
+            onStatusChanged(lastStatusResponse);
         }
         catch (e) {
             console.log("Callback failed: " + e + "\n" + e.stack);
