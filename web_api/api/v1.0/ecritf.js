@@ -2194,6 +2194,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
                     terminalID = message.ActivationResponse.TrmID;
 
                 onActivationResponse(message.ActivationResponse);
+                onActivationSucceeded();
             }
             break;
         case State.ACTIVATE:
