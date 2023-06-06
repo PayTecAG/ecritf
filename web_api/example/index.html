@@ -656,10 +656,13 @@
                 }
                 else if ((trm.StatusFlags.WAITING_FOR_TRANSACTION_REQUEST & newStatus) && !(trm.StatusFlags.WAITING_FOR_TRANSACTION_REQUEST & trmStatus)) {
                     $("#amtAuth").focus();
-                    hideDialog();
+
+                    if (dialogTimer == undefined) {
+                        setDialogTimer(500);
+                    }
                 }
                 else if ((((trm.StatusFlags.BUSY | trm.StatusFlags.LOCKED) & newStatus) != ((trm.StatusFlags.BUSY | trm.StatusFlags.LOCKED) & trmStatus)) && $("#abortTransactionButton").is(":hidden")) {
-                    if ((trm.StatusFlags.BUSY | trm.StatusFlags.LOCKED) & newStatus) {
+                    if (((trm.StatusFlags.BUSY | trm.StatusFlags.LOCKED) & newStatus) && !(trm.StatusFlags.CARD_DATA_AVAILABLE & newStatus)) {
                         showDialog(i18n("Please wait"), i18n("Please wait"), Infinity);
                     }
                     else {
