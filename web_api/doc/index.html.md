@@ -110,7 +110,7 @@ trm.setOnTransactionApproved(onTransactionApproved);
 
 if (trm.canPerformTransactions()) {
     trm.startTransaction({
-            TrxFunction: PURCHASE,
+            TrxFunction: trm.TransactionFunctions.PURCHASE,
             TrxCurrC: 756,
             AmtAuth: 1000
         }

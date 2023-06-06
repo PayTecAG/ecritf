@@ -710,7 +710,7 @@ for further sessions.</p>
 
 <span class="k">if</span> <span class="p">(</span><span class="nx">trm</span><span class="p">.</span><span class="nx">canPerformTransactions</span><span class="p">())</span> <span class="p">{</span>
     <span class="nx">trm</span><span class="p">.</span><span class="nx">startTransaction</span><span class="p">({</span>
-            <span class="na">TrxFunction</span><span class="p">:</span> <span class="nx">PURCHASE</span><span class="p">,</span>
+            <span class="na">TrxFunction</span><span class="p">:</span> <span class="nx">trm</span><span class="p">.</span><span class="nx">TransactionFunctions</span><span class="p">.</span><span class="nx">PURCHASE</span><span class="p">,</span>
             <span class="na">TrxCurrC</span><span class="p">:</span> <span class="mi">756</span><span class="p">,</span>
             <span class="na">AmtAuth</span><span class="p">:</span> <span class="mi">1000</span>
         <span class="p">}</span>
