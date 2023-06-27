@@ -1086,7 +1086,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     if (autoConnect)
         setTimeout(connect, 1);
 
-    function pair(code, friendlyName) {
+    function pair(code, friendlyName, params) {
         unpair();
 
         pairing = {
@@ -1094,6 +1094,12 @@ PayTec.POSTerminal = function(pairingInfo, options) {
             Channel: generateUUID(),
             PeerName: friendlyName
         };
+
+        if (undefined !== params) {
+            for (var i in params) {
+                pairing[i] = params[i];
+            }
+        }
 
         smq.publish(JSON.stringify({ Pairing: pairing}), code.substring(0, 4));
         smq.subscribe(pairing.Channel, undefined, { "datatype": "json", "onmsg": onMessage } );
