@@ -59,6 +59,7 @@ Add @paytecag/ecritf to your package dependencies:
 Import and instantiate a [POSTerminal](#posterminal) object:
 
 `import POSTerminal from '@paytecag/ecritf';`
+
 `trm = new POSTerminal(undefined, { OnConnected: onConnected, ... });`
 
 There is a very basic [example](https://github.com/PayTecAG/ecritf/tree/main/examples/react-native/SimplePOS) available for react-native.
