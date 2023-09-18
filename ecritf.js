@@ -1,5 +1,5 @@
 
-SMQ={};
+var SMQ={};
 
 SMQ.utf8={
     length: function(inp) {
@@ -25,7 +25,7 @@ SMQ.utf8={
         for(var i = 0; i<inp.length; i++) {
 	    var charCode = inp.charCodeAt(i);
 	    if(0xD800 <= charCode && charCode <= 0xDBFF) {
-	        lowCharCode = inp.charCodeAt(++i);
+	        var lowCharCode = inp.charCodeAt(++i);
 	        if(isNaN(lowCharCode)) return null;
 	        charCode = ((charCode-0xD800)<<10)+(lowCharCode-0xDC00)+0x10000;
 	    }
@@ -88,19 +88,27 @@ SMQ.utf8={
 
 
 SMQ.wsURL = function(path) {
-    var l = window.location;
-    if(path == undefined) path = l.pathname;
-    return ((l.protocol === "https:") ? "wss://" : "ws://") +
-        l.hostname +
-        (l.port!=80 && l.port!=443 && l.port.length!=0 ? ":" + l.port : "") +
-        path;
+    if ((global.window !== undefined) && (global.window.location !== undefined)) {
+        var l = global.window.location;
+        if(path == undefined) path = l.pathname;
+        return ((l.protocol === "https:") ? "wss://" : "ws://") +
+            l.hostname +
+            (l.port!=80 && l.port!=443 && l.port.length!=0 ? ":" + l.port : "") +
+            path;
+    } else {
+        return "wss://ecritf.paytec.ch/smq.lsp";
+    }
 };
 
 
 SMQ.websocket = function() {
-    if("WebSocket" in window && window.WebSocket != undefined)
-        return true;
-    return false;
+    if (global.window !== undefined) {
+        if("WebSocket" in global.window && global.window.WebSocket != undefined)
+            return true;
+        return false;
+    } else {
+        return (global.WebSocket !== undefined);
+    }
 };
 
 
@@ -1137,7 +1145,9 @@ PayTec.POSTerminal = function(pairingInfo, options) {
             smq.subscribe(pairing.Channel, undefined, { datatype: "json", onmsg: onMessage } );
             changeState(State.CONNECTING);
         }
-        else if (navigator.userAgent.includes ('wv') || (peerURL !== undefined)) {
+        else if ((global.navigator !== undefined)
+            && (global.navigator.userAgent !== undefined)
+            && (global.navigator.userAgent.includes ('wv') || (peerURL !== undefined))) {
             let webSocketURL = (peerURL !== undefined ? peerURL : "ws://localhost:18307");
 
             console.log("Trying direct web socket connection at " + webSocketURL);
@@ -2505,7 +2515,12 @@ PayTec.POSTerminal = function(pairingInfo, options) {
 
     function createSMQ() {
         try {
-            smq = new SMQ.Client(window.location.protocol == "https:" ? "wss://ecritf.paytec.ch/smq.lsp" : "ws://ecritf.paytec.ch/smq.lsp");
+            if ((global.window !== undefined)
+                && (global.window.location !== undefined)) {
+                smq = new SMQ.Client(global.window.location.protocol == "https:" ? "wss://ecritf.paytec.ch/smq.lsp" : "ws://ecritf.paytec.ch/smq.lsp");
+            } else {
+                smq = new SMQ.Client("wss://ecritf.paytec.ch/smq.lsp");
+            }
 
             smq.onclose = function(message, canreconnect) {
                 peerPTID = 0;
@@ -2523,6 +2538,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
             };
         }
         catch (e) {
+            console.log(e.message);
             onError("Cannot create SMQ client object");
             smq = undefined;
         }
@@ -2553,7 +2569,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
 
     function generateUUID() {
         var dt = new Date().getTime();
-        if(window.performance && typeof window.performance.now === "function"){
+        if(global.window && global.window.performance && typeof global.window.performance.now === "function"){
             dt += performance.now(); //use high-precision timer if available
         }
         var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -2755,7 +2771,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     }
 
     function timeStamp() {
-        now = new Date();
+        var now = new Date();
 
         return pad(now.getFullYear(), 2) + "-" + pad(now.getMonth() + 1, 2) + "-" + pad(now.getDate(), 2)
             + " " + pad(now.getHours(), 2) + ":" + pad(now.getMinutes(), 2) + ":" + pad(now.getSeconds(), 2)
@@ -2768,3 +2784,6 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         return (padArray + num).slice(-padArray.length);
     }
 };
+
+export { PayTec };
+export default PayTec.POSTerminal;

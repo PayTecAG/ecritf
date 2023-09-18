@@ -1,0 +1,28 @@
+{
+  "name": "@paytecag/ecritf",
+  "version": "1.0.0",
+  "description": "A library for interfacing PayTec AG's POS terminals via cloud and locally",
+  "main": "ecritf.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "grep -v '^export ' ecritf.js | sed -e 's/global.//g' > web_api/api/v1.0/ecritf.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PayTecAG/ecritf.git"
+  },
+  "keywords": [
+    "payment",
+    "terminal",
+    "POS",
+    "EFT",
+    "ECR",
+    "cloud"
+  ],
+  "author": "PayTec AG <support@paytec.ch>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PayTecAG/ecritf/issues"
+  },
+  "homepage": "https://ecritf.paytec.ch/doc"
+}
