@@ -20,7 +20,7 @@
     "cloud"
   ],
   "author": "PayTec AG <support@paytec.ch>",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/PayTecAG/ecritf/issues"
   },
