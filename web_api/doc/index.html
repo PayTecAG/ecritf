@@ -652,7 +652,7 @@
 The terminal uses HTTPS for communication, so make sure outbound TCP port 443
 is not blocked! Inbound communication is not used.
 </aside>
-<h2 id='embed-the-api'>Embed the API</h2>
+<h2 id='embed-the-api'>Embed the API</h2><h3 id='from-a-web-page'>From a web page</h3>
 <p>At the end of your HTML code, embed the API as a script:</p>
 
 <p><code>&lt;script src=&quot;//ecritf.paytec.ch/api/v1.0/ecritf.js&quot;&gt;&lt;/script&gt;</code></p>
@@ -660,6 +660,18 @@ is not blocked! Inbound communication is not used.
 <p>Instantiate a <a href="#posterminal">POSTerminal</a> object using its <a href="#constructor">constructor</a>:</p>
 
 <p><code>trm = new PayTec.POSTerminal(undefined, { OnConnected: onConnected, ... });</code></p>
+<h3 id='from-npm-based-frameworks'>From NPM-based frameworks</h3>
+<p>Add @paytecag/ecritf to your package dependencies:</p>
+
+<p><code>npm i -save @paytecag/ecritf</code></p>
+
+<p>Import and instantiate a <a href="#posterminal">POSTerminal</a> object:</p>
+
+<p><code>import POSTerminal from &#39;@paytecag/ecritf&#39;;</code>
+<code>trm = new POSTerminal(undefined, { OnConnected: onConnected, ... });</code></p>
+
+<p>There is a very basic <a href="https://github.com/PayTecAG/ecritf/tree/main/examples/react-native/SimplePOS">example</a> available for react-native.
+For a more comprehensive sight on how to use the SDK, please consider the web <a href="https://ecritf.paytec.ch">example</a>.</p>
 <h2 id='pairing'>Pairing</h2>
 <aside class="notice">
 When running your web application on a PayTec Android terminal, the API will automatically

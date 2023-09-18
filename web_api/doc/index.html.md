@@ -40,6 +40,8 @@ is not blocked! Inbound communication is not used.
 
 ## Embed the API
 
+### From a web page
+
 At the end of your HTML code, embed the API as a script:
 
 `<script src="//ecritf.paytec.ch/api/v1.0/ecritf.js"></script>`
@@ -47,6 +49,20 @@ At the end of your HTML code, embed the API as a script:
 Instantiate a [POSTerminal](#posterminal) object using its [constructor](#constructor):
 
 `trm = new PayTec.POSTerminal(undefined, { OnConnected: onConnected, ... });`
+
+### From NPM-based frameworks
+
+Add @paytecag/ecritf to your package dependencies:
+
+`npm i -save @paytecag/ecritf`
+
+Import and instantiate a [POSTerminal](#posterminal) object:
+
+`import POSTerminal from '@paytecag/ecritf';`
+`trm = new POSTerminal(undefined, { OnConnected: onConnected, ... });`
+
+There is a very basic [example](https://github.com/PayTecAG/ecritf/tree/main/examples/react-native/SimplePOS) available for react-native.
+For a more comprehensive sight on how to use the SDK, please consider the web [example](https://ecritf.paytec.ch).
 
 
 ## Pairing
