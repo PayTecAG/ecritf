@@ -1,6 +1,6 @@
 {
   "name": "@paytecag/ecritf",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A library for interfacing PayTec AG's POS terminals via cloud and locally",
   "main": "ecritf.js",
   "scripts": {
