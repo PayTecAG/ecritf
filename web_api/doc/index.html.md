@@ -27,7 +27,7 @@ A comprehensive example application can be found [here](//ecritf.paytec.ch).
 
 ## Prerequisites
 
-To access your POS terminal via web, the following is required:
+To access your POS terminal via web, the following is needed:
 
 - PayTec POS terminal with PayTec EP2 software equal or higher than 16.00.00
 - Configured cash register integration type: 'KIT'
@@ -36,6 +36,25 @@ To access your POS terminal via web, the following is required:
 The terminal uses HTTPS for communication, so make sure outbound TCP port 443
 is not blocked! Inbound communication is not used.
 </aside>
+
+## Terminal simulator
+
+<aside class="success">
+** NEW! **
+</aside>
+
+To start development, you can use the PayTec [Terminal Simulator](https://ecritf.paytec.ch/trmsim).
+
+The terminal simulator is a web based tool that simulates the terminal part of our cloud based cash register interface.
+This lets you start your integration without the need of a physical terminal.
+
+** Note **: The PayTec Virtual Terminal Simulator is a valuable tool for testing and development purposes. However, it is important to be aware of the following differences when compared to a physical POS terminal:
+
+- Missing features: The simulator may not include all features present in a physical terminal, including but not limited to automatically triggered actions, tip entry, reference based transactions, petrol use cases
+- Different timing behavior: The timing behavior and status notifications during operations in the simulator may vary from that of a physical terminal.
+- Receipt differences: Receipt content may slightly differ between the simulator and an actual terminal.
+
+Keep these differences in mind while utilizing the terminal simulator for your testing and development. For finishing and testing the integration, a physical terminal will be needed.
 
 
 ## Embed the API
