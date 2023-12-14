@@ -662,7 +662,7 @@
                     }
                 }
                 else if ((((trm.StatusFlags.BUSY | trm.StatusFlags.LOCKED) & newStatus) != ((trm.StatusFlags.BUSY | trm.StatusFlags.LOCKED) & trmStatus)) && $("#abortTransactionButton").is(":hidden")) {
-                    if (((trm.StatusFlags.BUSY | trm.StatusFlags.LOCKED) & newStatus) && !(trm.StatusFlags.CARD_DATA_AVAILABLE & newStatus)) {
+                    if ((trm.StatusFlags.BUSY & newStatus) && !(trm.StatusFlags.CARD_DATA_AVAILABLE & newStatus)) {
                         showDialog(i18n("Please wait"), i18n("Please wait"), Infinity);
                     }
                     else {
