@@ -434,6 +434,12 @@
                     <a href="#getstatus" class="toc-h2 toc-link" data-title="getStatus">getStatus</a>
                   </li>
                   <li>
+                    <a href="#getactseqcnt" class="toc-h2 toc-link" data-title="getActSeqCnt">getActSeqCnt</a>
+                  </li>
+                  <li>
+                    <a href="#getpeseqcnt" class="toc-h2 toc-link" data-title="getPeSeqCnt">getPeSeqCnt</a>
+                  </li>
+                  <li>
                     <a href="#canperformtransactions" class="toc-h2 toc-link" data-title="canPerformTransactions">canPerformTransactions</a>
                   </li>
                   <li>
@@ -1363,6 +1369,15 @@ is finally reverted.</p>
 <p><code>status = trm.getStatus()</code></p>
 
 <p>Gets the terminal status as a combination of <a href="#statusflags">flags</a>.</p>
+<h2 id='getactseqcnt'>getActSeqCnt</h2>
+<p><code>actSeqCnt = trm.getActSeqCnt()</code></p>
+
+<p>Returns the current Activation Sequence Counter which will be increased whenever a new shift is opened via <a href="#activate">activate</a>.</p>
+<h2 id='getpeseqcnt'>getPeSeqCnt</h2>
+<p><code>peSeqCnt = trm.getPeSeqCnt()</code></p>
+
+<p>Returns the current Period Sequence Counter which will be increased whenever a new booking period is opened by calling <a href="#activate">activate</a>
+after <a href="#balance">balance</a>.</p>
 <h2 id='canperformtransactions'>canPerformTransactions</h2>
 <p><code>var ready = trm.canPerformTransactions()</code></p>
 

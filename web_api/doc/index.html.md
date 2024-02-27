@@ -615,6 +615,21 @@ returns the terminal software version as a number.
 Gets the terminal status as a combination of [flags](#statusflags).
 
 
+## getActSeqCnt
+
+`actSeqCnt = trm.getActSeqCnt()`
+
+Returns the current Activation Sequence Counter which will be increased whenever a new shift is opened via [activate](#activate).
+
+
+## getPeSeqCnt
+
+`peSeqCnt = trm.getPeSeqCnt()`
+
+Returns the current Period Sequence Counter which will be increased whenever a new booking period is opened by calling [activate](#activate)
+after [balance](#balance).
+
+
 ## canPerformTransactions
 
 `var ready = trm.canPerformTransactions()`

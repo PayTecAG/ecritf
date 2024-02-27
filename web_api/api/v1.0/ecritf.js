@@ -806,6 +806,8 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     this.getDeviceModelName = getDeviceModelName;
     this.getSoftwareVersion = getSoftwareVersion;
     this.getStatus = getStatus;
+    this.getActSeqCnt = getActSeqCnt;
+    this.getPeSeqCnt = getPeSeqCnt;
     this.canPerformTransactions = canPerformTransactions;
     this.getAcquirers = getAcquirers;
     this.getAcquirerInfo = getAcquirerInfo;
@@ -1078,6 +1080,8 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     var brands = [];
     var currencies = [];
     var trxFunctions = [];
+    var actSeqCnt = undefined;
+    var peSeqCnt = undefined;
     var confirmingTrxSeqCnt = undefined;
     var currentAcqID = -1;
     var neverActivated = true;
@@ -1561,6 +1565,14 @@ PayTec.POSTerminal = function(pairingInfo, options) {
 
     function getStatus() {
         return trmStatus;
+    }
+
+    function getActSeqCnt() {
+        return actSeqCnt;
+    }
+
+    function getPeSeqCnt() {
+        return peSeqCnt;
     }
 
     function canPerformTransactions() {
@@ -2169,10 +2181,35 @@ PayTec.POSTerminal = function(pairingInfo, options) {
                 console.log("Callback failed: " + e + "\n" + e.stack);
             }
         }
-
-        if (message.EFTHello) {
+        else if (message.EFTHello) {
             // triggers ConnectRequest, also in case of SMQ reconnection
             onEFTHello(message.EFTHello);
+        }
+        else if (message.ConnectResponse) {
+            if (undefined !== message.ConnectResponse.TrmLng)
+                trmLng = message.ConnectResponse.TrmLng;
+
+            if (undefined !== message.ConnectResponse.IFDSerialNum)
+                serialNumber = message.ConnectResponse.IFDSerialNum;
+
+            if (undefined !== message.ConnectResponse.TrmID)
+                terminalID = message.ConnectResponse.TrmID;
+
+            if (undefined !== message.ConnectResponse.SoftwareVersion)
+                softwareVersion = message.ConnectResponse.SoftwareVersion;
+
+            if (undefined !== message.ConnectResponse.ActSeqCnt)
+                actSeqCnt = message.ConnectResponse.ActSeqCnt;
+
+            if (undefined !== message.ConnectResponse.PeSeqCnt)
+                peSeqCnt = message.ConnectResponse.PeSeqCnt;
+        }
+        else if (message.ActivationResponse) {
+            if (undefined !== message.ActivationResponse.ActSeqCnt)
+                actSeqCnt = message.ActivationResponse.ActSeqCnt;
+
+            if (undefined !== message.ActivationResponse.PeSeqCnt)
+                peSeqCnt = message.ActivationResponse.PeSeqCnt;
         }
 
         switch (state) {
@@ -2190,16 +2227,6 @@ PayTec.POSTerminal = function(pairingInfo, options) {
             break;
         case State.CONNECTING:
             if (message.ConnectResponse) {
-                if (undefined !== message.ConnectResponse.TrmLng)
-                    trmLng = message.ConnectResponse.TrmLng;
-
-                if (undefined !== message.ConnectResponse.IFDSerialNum)
-                    serialNumber = message.ConnectResponse.IFDSerialNum;
-
-                if (undefined !== message.ConnectResponse.TrmID)
-                    terminalID = message.ConnectResponse.TrmID;
-
-                softwareVersion = message.ConnectResponse.SoftwareVersion;
                 changeState(State.CONNECTED);
                 onConnected();
             }
