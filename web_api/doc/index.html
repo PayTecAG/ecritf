@@ -1056,8 +1056,14 @@ For details concerning parameters which depend on certain transaction types,
 <tr>
 <td>TrxReqFlags</td>
 <td>Numeric</td>
+<td>Optional</td>
 <td><a href="#transactionrequestflags">Flags</a> that impact the behaviour when starting a transaction</td>
-<td></td>
+</tr>
+<tr>
+<td>PartialApprovalCap</td>
+<td>Numeric</td>
+<td>For partial approvals</td>
+<td>When set to 1 and initialized by the acquirer, the terminal accepts partial approval of a transaction</td>
 </tr>
 </tbody></table>
 <h2 id='aborttransaction'>abortTransaction</h2>

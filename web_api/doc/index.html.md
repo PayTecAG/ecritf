@@ -324,7 +324,8 @@ TrxCurrC | Numeric | For amount based transaction types | Transaction Currency C
 TrxFunction | Numeric | **Mandatory** | [Transaction function](#transactionfunctions) to be used
 TrxRefNum | String | For reference based transactions like e.g. Purchase Reservation | Original Transaction Reference Number
 TrxReasonC | String | For Account Verification transactions | Transaction Reason Code
-TrxReqFlags | Numeric | [Flags](#transactionrequestflags) that impact the behaviour when starting a transaction
+TrxReqFlags | Numeric | Optional | [Flags](#transactionrequestflags) that impact the behaviour when starting a transaction
+PartialApprovalCap | Numeric | For partial approvals | When set to 1 and initialized by the acquirer, the terminal accepts partial approval of a transaction
 
 
 ## abortTransaction
