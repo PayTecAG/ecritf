@@ -1084,7 +1084,8 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     var peSeqCnt = undefined;
     var confirmingTrxSeqCnt = undefined;
     var currentAcqID = -1;
-    var neverActivated = true;
+    var needsActivation = true;
+    var scheduleActivationTimer = 0;
     var receiptText = "";
     var localSocket = undefined;
     var localSocketFragment = "";
@@ -2485,12 +2486,38 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         setAcqInfo = rsp.SetAcqInfo;
 
         // if terminal is active, send ActivationRequest to get the brand info etc.
-        if ((self.StatusFlags.SHIFT_OPEN & trmStatus) && !(self.StatusFlags.BUSY & trmStatus) && neverActivated) {
+        if ((self.StatusFlags.SHIFT_OPEN & trmStatus) && !(self.StatusFlags.BUSY & trmStatus) && needsActivation) {
+            if (scheduleActivationTimer) {
+                clearTimeout(scheduleActivationTimer);
+                scheduleActivationTimer = 0;
+            }
+
             activate();
         }
         else {
             try {
                 onStatusChanged(rsp);
+ 
+                const nextScheduledTask = rsp.NextScheduledTask;
+
+                if (nextScheduledTask
+                    && (nextScheduledTask.TaskName.startsWith("CONFIG") || (nextScheduledTask.TaskName.startsWith("INIT")))) {
+                    const nextRunTime = new Date(nextScheduledTask.NextRun);
+                    const currentTime = new Date();
+
+                    const timeout = nextRunTime - currentTime;
+
+                    if (timeout < 3600000) {
+                        if (scheduleActivationTimer) {
+                            clearTimeout(scheduleActivationTimer);
+                        }
+
+                        scheduleActivationTimer = setTimeout(() => {
+                            console.log("Scheduling activation after " + nextScheduledTask.TaskName + ".");
+                            needsActivation = true;
+                        }, timeout + 1000);
+                    }
+                }
             }
             catch (e) {
                 console.log("Callback failed: " + e + "\n" + e.stack);
@@ -2511,7 +2538,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
             }
         }
 
-        neverActivated = false;
+        needsActivation = false;
 
         try {
             onStatusChanged(lastStatusResponse);
