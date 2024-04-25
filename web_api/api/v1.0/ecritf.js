@@ -1084,6 +1084,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     var peSeqCnt = undefined;
     var confirmingTrxSeqCnt = undefined;
     var currentAcqID = -1;
+    var neverActivated = true;
     var needsActivation = true;
     var scheduleActivationTimer = 0;
     var receiptText = "";
@@ -2114,6 +2115,9 @@ PayTec.POSTerminal = function(pairingInfo, options) {
             setTimer(initializationTimeout);
             break;
         case State.ACTIVATE:
+            needsActivation = false;
+            setTimer(defaultTimeout);
+            break;
         case State.DEACTIVATE:
         case State.TRX_CONFIRMATION:
         case State.BALANCE:
@@ -2486,7 +2490,8 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         setAcqInfo = rsp.SetAcqInfo;
 
         // if terminal is active, send ActivationRequest to get the brand info etc.
-        if ((self.StatusFlags.SHIFT_OPEN & trmStatus) && !(self.StatusFlags.BUSY & trmStatus) && needsActivation) {
+        if ((self.StatusFlags.SHIFT_OPEN & trmStatus) && !(self.StatusFlags.BUSY & trmStatus)
+            && (neverActivated || needsActivation)) {
             if (scheduleActivationTimer) {
                 clearTimeout(scheduleActivationTimer);
                 scheduleActivationTimer = 0;
@@ -2538,7 +2543,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
             }
         }
 
-        needsActivation = false;
+        neverActivated = false;
 
         try {
             onStatusChanged(lastStatusResponse);
