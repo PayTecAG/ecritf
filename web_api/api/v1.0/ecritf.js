@@ -2490,8 +2490,9 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         setAcqInfo = rsp.SetAcqInfo;
 
         // if terminal is active, send ActivationRequest to get the brand info etc.
-        if ((self.StatusFlags.SHIFT_OPEN & trmStatus) && !(self.StatusFlags.BUSY & trmStatus)
-            && (neverActivated || needsActivation)) {
+        if ((0 != (trmStatus & self.StatusFlags.SHIFT_OPEN))
+                && (0 == (trmStatus & (self.StatusFlags.BUSY | self.StatusFlags.LOCKED)))
+                && (neverActivated || needsActivation)) {
             if (scheduleActivationTimer) {
                 clearTimeout(scheduleActivationTimer);
                 scheduleActivationTimer = 0;
@@ -2512,7 +2513,8 @@ PayTec.POSTerminal = function(pairingInfo, options) {
 
                     const timeout = nextRunTime - currentTime;
 
-                    if (timeout < 3600000) {
+                    // timeout could be negative if the terminal's time zone is different from ours
+                    if ((timeout > 0) && (timeout < 3600000)) {
                         if (scheduleActivationTimer) {
                             clearTimeout(scheduleActivationTimer);
                         }
