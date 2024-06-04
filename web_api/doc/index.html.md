@@ -1003,7 +1003,7 @@ If [AddTrxReceiptsToConfirmation](#addtrxreceiptstoconfirmation) is true, the ca
 
 ```
 // If AddTrxReceiptsToConfirmation is true, the response looks like:
-`{`  
+{
     "Receipts": [
       {
         "ReceiptType": 1,

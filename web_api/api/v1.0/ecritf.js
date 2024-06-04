@@ -2367,7 +2367,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
                     changeState(State.TRX_CONFIRMATION_WAIT_RECEIPTS);
                 } else {
                     changeState(State.CONNECTED);
-                    onTransactionConfirmationSucceeded({ TransactionConfirmationResponse: {} });
+                    onTransactionConfirmationSucceeded({});
                 }
             }
             break;
@@ -2376,12 +2376,12 @@ PayTec.POSTerminal = function(pairingInfo, options) {
                 changeState(State.CONNECTED);
 
                 // transaction is already confirmed at this stage
-                onTransactionConfirmationSucceeded({ TransactionConfirmationResponse: { Receipts: transactionReceipts } });
+                onTransactionConfirmationSucceeded({Receipts: transactionReceipts});
             }
             else if (message.ReceiptResponse) {
                 if (message.ReceiptResponse.ReceiptType == self.ReceiptTypes.TRX_COPY) {
                     changeState(State.CONNECTED);
-                    onTransactionConfirmationSucceeded({ TransactionConfirmationResponse: { Receipts: transactionReceipts } });
+                    onTransactionConfirmationSucceeded({Receipts: transactionReceipts});
                 }
             }
             break;
@@ -2460,7 +2460,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
             break;
         case State.TRX_CONFIRMATION_WAIT_RECEIPTS:
             // transaction already confirmed at this stage
-            onTransactionConfirmationSucceeded({ TransactionConfirmationResponse: { Receipts: transactionReceipts } });
+            onTransactionConfirmationSucceeded({Receipts: transactionReceipts});
             changeState(State.CONNECTED);
             break;
         case State.BALANCE:
