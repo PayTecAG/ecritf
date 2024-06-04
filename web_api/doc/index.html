@@ -479,6 +479,9 @@
                     <a href="#autoconfirm" class="toc-h2 toc-link" data-title="AutoConfirm">AutoConfirm</a>
                   </li>
                   <li>
+                    <a href="#addtrxreceiptstoconfirmation" class="toc-h2 toc-link" data-title="AddTrxReceiptsToConfirmation">AddTrxReceiptsToConfirmation</a>
+                  </li>
+                  <li>
                     <a href="#heartbeatinterval" class="toc-h2 toc-link" data-title="HeartbeatInterval">HeartbeatInterval</a>
                   </li>
                   <li>
@@ -806,6 +809,9 @@ The result of this operation is reported through the <a href="#ontransactionappr
 </tr>
 <tr>
 <td><a href="#autoconfirm">AutoConfirm</a></td>
+</tr>
+<tr>
+<td><a href="#addtrxreceiptstoconfirmation">AddTrxReceiptsToConfirmation</a></td>
 </tr>
 <tr>
 <td><a href="#heartbeatinterval">HeartbeatInterval</a></td>
@@ -1480,6 +1486,16 @@ If <code>language</code> is <code>undefined</code>, the current <a href="#trmlng
 <aside class="notice">
 You should configure this to <code>false</code>  if the final amount is not yet known at transaction start.
 </aside>
+<h2 id='addtrxreceiptstoconfirmation'>AddTrxReceiptsToConfirmation</h2>
+<p><code>trm.getAddTrxReceiptsToConfirmation()</code><br>
+<code>trm.setAddTrxReceiptsToConfirmation(value)</code></p>
+
+<p>Configures whether the API shall wait on the transaction receipts before calling <a href="#ontransactionconfirmationsucceeded">onTransactionConfirmationSucceeded()</a>.</p>
+
+<p>Default value: false.</p>
+
+<p>This may facilitate integrating the API by making it unnecessary to wait on <a href="#onreceipt">onReceipt()</a>. If the connection times out after transaction confirmation due to network instability,
+<a href="#ontransactionconfirmationsucceeded">onTransactionConfirmationSucceeded()</a> may be called without the two receipts. If this happens, the missing receipt(s) can be <a href="#requestreceipt">requested</a> afterwards.</p>
 <h2 id='heartbeatinterval'>HeartbeatInterval</h2>
 <p><code>trm.getHeartbeatInterval()</code><br>
 <code>trm.setHeartbeatInterval(value)</code></p>
@@ -1607,11 +1623,32 @@ You should configure this to <code>false</code>  if the final amount is not yet 
 <p>Called when no transaction response has been received within <a href="#transactiontimeout">TransactionTimeout</a> milliseconds
 after <a href="#starttransaction">startTransaction</a>.</p>
 <h2 id='ontransactionconfirmationsucceeded'>OnTransactionConfirmationSucceeded</h2>
-<p><code>function onTransactionConfirmationSucceeded() {}</code><br>
+<p><code>function onTransactionConfirmationSucceeded(response) {}</code><br>
 <code>trm.setOnTransactionConfirmationSucceeded(onTransactionConfirmationSucceeded)</code></p>
 
 <p>Called when the <a href="#confirmtransaction">confirmation</a> of a payment transaction has been acknowledged by the terminal.</p>
-<h2 id='ontransactionconfirmationfailed'>OnTransactionConfirmationFailed</h2>
+
+<p>If <a href="#addtrxreceiptstoconfirmation">AddTrxReceiptsToConfirmation</a> is true, the callback is postponed until the receipts have been received.</p>
+<div class="highlight"><pre class="highlight plaintext"><code>// If AddTrxReceiptsToConfirmation is true, the response looks like:
+`{`  
+    "Receipts": [
+      {
+        "ReceiptType": 1,
+        "ReceiptFlags": 2,
+        "ReceiptText": "&lt;Merchant receipt text&gt;"
+      },
+      {
+        "ReceiptType": 2,
+        "ReceiptFlags": 2,
+        "ReceiptText": "&amp;lt;Cardholder receipt text&amp;gt;"
+      }
+    ]
+  }
+}
+
+If AddTrxReceiptsToConfirmation is false, or if getting the transaction receipts fails, the response is an empty object:
+{}
+</code></pre></div><h2 id='ontransactionconfirmationfailed'>OnTransactionConfirmationFailed</h2>
 <p><code>function onTransactionConfirmationFailed() {}</code><br>
 <code>trm.setOnTransactionConfirmationFailed(onTransactionConfirmationFailed)</code></p>
 

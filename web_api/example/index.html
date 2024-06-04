@@ -476,7 +476,7 @@
                     OnActivationSucceeded: resetTransactionUI,
                     OnInitializationSucceeded: resetTransactionUI,
                     OnConfigurationSucceeded: resetTransactionUI,
-                    OnTransactionConfirmationSucceeded: resetTransactionUI,
+                    OnTransactionConfirmationSucceeded: onTransactionConfirmationSucceeded,
                     OnTransactionConfirmationFailed: resetTransactionUI,
                     OnTransactionConfirmationTimedOut: resetTransactionUI,
                     OnReceipt: onReceipt,
@@ -835,6 +835,12 @@
             function onTransactionTimedOut() {
                 resetTransactionUI();
                 showDialog(i18n("Processing failed"), "Timeout", 30000);
+            }
+
+            function onTransactionConfirmationSucceeded(response) {
+                console.log("Transaction confirmation suceeded.");
+                console.log(JSON.stringify(response));
+                resetTransactionUI();
             }
 
             function onReceipt(receiptType, receiptText) {

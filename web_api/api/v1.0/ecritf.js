@@ -837,6 +837,9 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     this.getAutoConfirm = getAutoConfirm;
     this.setAutoConfirm = setAutoConfirm;
 
+    this.getAddTrxReceiptsToConfirmation = getAddTrxReceiptsToConfirmation;
+    this.setAddTrxReceiptsToConfirmation = setAddTrxReceiptsToConfirmation;
+
     this.getHeartbeatInterval = getHeartbeatInterval;
     this.setHeartbeatInterval = setHeartbeatInterval;
 
@@ -1005,10 +1008,11 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         TRANSACTION: 6,
         AUTHORIZATION_PURCHASE: 7,
         TRX_CONFIRMATION: 8,
-        BALANCE: 9,
-        CONFIG: 10,
-        INIT: 11,
-        DEVICE_COMMAND: 12
+        TRX_CONFIRMATION_WAIT_RECEIPTS: 9,
+        BALANCE: 10,
+        CONFIG: 11,
+        INIT: 12,
+        DEVICE_COMMAND: 13
     };
 
     var self = this;
@@ -1024,6 +1028,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     var autoConnect = (undefined !== options && undefined !== options.AutoConnect) ? (options.AutoConnect ? true : false) : true;
     var autoReconnect = (undefined !== options && undefined !== options.AutoReconnect) ? (options.AutoReconnect ? true : false) : true;
     var autoConfirm = (undefined !== options && undefined !== options.AutoConfirm) ? (options.AutoConfirm ? true : false) : true;
+    var addTrxReceiptsToConfirmation = (undefined !== options && undefined !== options.AddTrxReceiptsToConfirmation) ? (options.AddTrxReceiptsToConfirmation ? true : false) : false;
     var heartbeatInterval = (undefined !== options && undefined !== options.HeartbeatInterval) ? options.HeartbeatInterval : 10000;
     var heartbeatTimeout = (undefined !== options && undefined !== options.HeartbeatTimeout) ? options.HeartbeatTimeout : 10000;
     var connectionTimeout = (undefined !== options && undefined !== options.ConnectionTimeout) ? options.ConnectionTimeout : 20000;
@@ -1083,6 +1088,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     var actSeqCnt = undefined;
     var peSeqCnt = undefined;
     var confirmingTrxSeqCnt = undefined;
+    var transactionReceipts = [];
     var currentAcqID = -1;
     var neverActivated = true;
     var needsActivation = true;
@@ -1720,6 +1726,15 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         return self;
     }
 
+    function getAddTrxReceiptsToConfirmation() {
+        return addTrxReceiptsToConfirmation;
+    }
+
+    function setAddTrxReceiptsToConfirmation(value) {
+        addTrxReceiptsToConfirmation = (undefined === value ? false : (value ? true : false));
+        return self;
+    }
+
     function getHeartbeatInterval() {
         return heartbeatInterval;
     }
@@ -2087,6 +2102,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         case State.ACTIVATE:
         case State.DEACTIVATE:
         case State.TRX_CONFIRMATION:
+        case State.TRX_CONFIRMATION_WAIT_RECEIPTS:
             break;
         case State.BALANCE:
         case State.CONFIG:
@@ -2120,6 +2136,12 @@ PayTec.POSTerminal = function(pairingInfo, options) {
             break;
         case State.DEACTIVATE:
         case State.TRX_CONFIRMATION:
+            setTimer(defaultTimeout);
+            break;
+        case State.TRX_CONFIRMATION_WAIT_RECEIPTS:
+            transactionReceipts = [];
+            setTimer(defaultTimeout);
+            break;
         case State.BALANCE:
         case State.CONFIG:
         case State.DEVICE_COMMAND:
@@ -2340,8 +2362,27 @@ PayTec.POSTerminal = function(pairingInfo, options) {
             }
             else if (message.TransactionConfirmationResponse) {
                 requestReceiptIfNecessary({ ReceiptType: self.ReceiptTypes.TRX, ReceiptID: confirmingTrxSeqCnt });
+                
+                if (addTrxReceiptsToConfirmation) {
+                    changeState(State.TRX_CONFIRMATION_WAIT_RECEIPTS);
+                } else {
+                    changeState(State.CONNECTED);
+                    onTransactionConfirmationSucceeded({ TransactionConfirmationResponse: {} });
+                }
+            }
+            break;
+        case State.TRX_CONFIRMATION_WAIT_RECEIPTS:
+            if (message.ErrorNotification) {
                 changeState(State.CONNECTED);
-                onTransactionConfirmationSucceeded();
+
+                // transaction is already confirmed at this stage
+                onTransactionConfirmationSucceeded({ TransactionConfirmationResponse: { Receipts: transactionReceipts } });
+            }
+            else if (message.ReceiptResponse) {
+                if (message.ReceiptResponse.ReceiptType == self.ReceiptTypes.TRX_COPY) {
+                    changeState(State.CONNECTED);
+                    onTransactionConfirmationSucceeded({ TransactionConfirmationResponse: { Receipts: transactionReceipts } });
+                }
             }
             break;
         case State.BALANCE:
@@ -2415,6 +2456,11 @@ PayTec.POSTerminal = function(pairingInfo, options) {
             break;
         case State.TRX_CONFIRMATION:
             onTransactionConfirmationTimedOut();
+            changeState(State.CONNECTED);
+            break;
+        case State.TRX_CONFIRMATION_WAIT_RECEIPTS:
+            // transaction already confirmed at this stage
+            onTransactionConfirmationSucceeded({ TransactionConfirmationResponse: { Receipts: transactionReceipts } });
             changeState(State.CONNECTED);
             break;
         case State.BALANCE:
@@ -2567,6 +2613,15 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         }
         else {
             onReceipt(rsp.ReceiptType, receiptText);
+            
+            switch (rsp.ReceiptType) {
+            case self.ReceiptTypes.TRX:
+            case self.ReceiptTypes.TRX_COPY:
+                if (addTrxReceiptsToConfirmation) {
+                    transactionReceipts.push(rsp);
+                }
+                break;
+            }
 
             if (rsp.ReceiptType == self.ReceiptTypes.TRX) {
                 requestReceiptIfNecessary({ ReceiptType: self.ReceiptTypes.TRX_COPY, ReceiptID: confirmingTrxSeqCnt });

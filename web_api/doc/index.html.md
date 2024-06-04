@@ -196,6 +196,7 @@ trm = new PayTec.POSTerminal(
 |[AutoConnect](#autoconnect)|
 |[AutoReconnect](#autoreconnect)|
 |[AutoConfirm](#autoconfirm)|
+|[AddTrxReceiptsToConfirmation](#addtrxreceiptstoconfirmation)|
 |[HeartbeatInterval](#heartbeatinterval)|
 |[HeartbeatTimeout](#heartbeattimeout)|
 |[ConnectionTimeout](#connectiontimeout)|
@@ -789,6 +790,19 @@ You should configure this to <code>false</code>  if the final amount is not yet 
 </aside>
 
 
+## AddTrxReceiptsToConfirmation
+
+`trm.getAddTrxReceiptsToConfirmation()`  
+`trm.setAddTrxReceiptsToConfirmation(value)`
+
+Configures whether the API shall wait on the transaction receipts before calling [onTransactionConfirmationSucceeded()](#ontransactionconfirmationsucceeded).
+
+Default value: false.
+
+This may facilitate integrating the API by making it unnecessary to wait on [onReceipt()](#onreceipt). If the connection times out after transaction confirmation due to network instability,
+[onTransactionConfirmationSucceeded()](#ontransactionconfirmationsucceeded) may be called without the two receipts. If this happens, the missing receipt(s) can be [requested](#requestreceipt) afterwards.
+
+
 ## HeartbeatInterval
 
 `trm.getHeartbeatInterval()`  
@@ -980,11 +994,34 @@ after [startTransaction](#starttransaction).
 
 ## OnTransactionConfirmationSucceeded
 
-`function onTransactionConfirmationSucceeded() {}`  
+`function onTransactionConfirmationSucceeded(response) {}`  
 `trm.setOnTransactionConfirmationSucceeded(onTransactionConfirmationSucceeded)`
 
 Called when the [confirmation](#confirmtransaction) of a payment transaction has been acknowledged by the terminal.
 
+If [AddTrxReceiptsToConfirmation](#addtrxreceiptstoconfirmation) is true, the callback is postponed until the receipts have been received.
+
+```
+// If AddTrxReceiptsToConfirmation is true, the response looks like:
+`{`  
+    "Receipts": [
+      {
+        "ReceiptType": 1,
+        "ReceiptFlags": 2,
+        "ReceiptText": "<Merchant receipt text>"
+      },
+      {
+        "ReceiptType": 2,
+        "ReceiptFlags": 2,
+        "ReceiptText": "&lt;Cardholder receipt text&gt;"
+      }
+    ]
+  }
+}
+
+If AddTrxReceiptsToConfirmation is false, or if getting the transaction receipts fails, the response is an empty object:
+{}
+```
 
 ## OnTransactionConfirmationFailed
 
