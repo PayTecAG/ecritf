@@ -712,7 +712,7 @@ the terminal. You can therefore skip this chapter!
 a trusted connection providing a temporary pairing code. This code is generated
 on the POS terminal via the attendant menu...</p>
 
-<p><img src="images/images/start_pairing.png" alt="Screenshot start pairing" /> <strong>click &#39;Go&#39; =&gt;</strong> <img src="images/images/pairing_code.png" alt="Screenshot pairing code" /></p>
+<p><img src="images/start_pairing.png" alt="Screenshot start pairing" /> <strong>click &#39;Go&#39; =&gt;</strong> <img src="images/pairing_code.png" alt="Screenshot pairing code" /></p>
 
 <p>... and used by the web application via the <a href="#pair">pair</a> method:</p>
 
@@ -720,7 +720,7 @@ on the POS terminal via the attendant menu...</p>
 
 <p>=&gt; the following message will be shown for a few seconds on the terminal:</p>
 
-<p><img src="images/images/pairing_successful.png" alt="Screenshot pairing successful" /></p>
+<p><img src="images/pairing_successful.png" alt="Screenshot pairing successful" /></p>
 <div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="c1">// store the current pairing info in local browser storage</span>
 <span class="kd">function</span> <span class="nx">onConnected</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="nx">Storage</span><span class="p">)</span> <span class="o">!==</span> <span class="dl">"</span><span class="s2">undefined</span><span class="dl">"</span><span class="p">)</span> <span class="p">{</span>

@@ -97,7 +97,7 @@ Before a web application can communicate with a remote POS terminal, it establis
 a trusted connection providing a temporary pairing code. This code is generated
 on the POS terminal via the attendant menu...
 
-![Screenshot start pairing](images/start_pairing.png) **click 'Go' =>** ![Screenshot pairing code](images/pairing_code.png)
+![Screenshot start pairing](start_pairing.png) **click 'Go' =>** ![Screenshot pairing code](pairing_code.png)
 
 
 ... and used by the web application via the [pair](#pair) method:
@@ -106,7 +106,7 @@ on the POS terminal via the attendant menu...
 
 => the following message will be shown for a few seconds on the terminal:
 
-![Screenshot pairing successful](images/pairing_successful.png)
+![Screenshot pairing successful](pairing_successful.png)
 
 
 ```javascript
