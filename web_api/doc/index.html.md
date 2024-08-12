@@ -1223,7 +1223,7 @@ Flags that impact the behaviour when [starting a transaction](#starttransaction)
 | Flag | Value | Description |
 |------|-------|-------------|
 | TRX_SILENT | 0x00000001 | Start transaction without showing 'Insert card' or the like and don't display idle screen after transaction
-| TRX_REPORT_UNKNOWN_NFC_UID | 0x00000004 | Report UID of unknown NFC tags in [onStatusChanged()](#onstatuschanged), e.g. Mifare cards with a data structure unknown to the terminal. If this flag is not set, the transaction will be aborted in this case. What kind of tags are supported at all depends on the terminal device type. Available if PayTec EP2 software equal or higher than 23.00.04
+| TRX_REPORT_UNKNOWN_NFC_UID | 0x00000004 | Report UID of unknown NFC tags in [onStatusChanged()](#onstatuschanged), e.g. Mifare cards with a data structure unknown to the terminal. If this flag is not set, the transaction will be aborted in this case. What kind of tags are supported at all depends on the terminal device type. Available if PayTec EP2 software equal or higher than 23.00.04, and Mifare processing is enabled on TMS.
 
 ## TransactionAbortFlags
 
