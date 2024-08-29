@@ -2559,8 +2559,10 @@ PayTec.POSTerminal = function(pairingInfo, options) {
 
                     const timeout = nextRunTime - currentTime;
 
-                    // timeout could be negative if the terminal's time zone is different from ours
-                    if ((timeout > 0) && (timeout < 3600000)) {
+                    console.log("nextRunTime: " + nextRunTime + "; currentTime: " + currentTime + ", timeout: " + timeout);
+
+                    // timeout could be slightly negative due to scheduling granularity or strongly negative if the terminal's time zone is different from ours
+                    if ((-20000 < timeout) && (timeout < 3600000)) {
                         if (scheduleActivationTimer) {
                             clearTimeout(scheduleActivationTimer);
                         }
@@ -2568,7 +2570,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
                         scheduleActivationTimer = setTimeout(() => {
                             console.log("Scheduling activation after " + nextScheduledTask.TaskName + ".");
                             needsActivation = true;
-                        }, timeout + 1000);
+                        }, (timeout > 0 ? timeout : 5000) + 1000); 
                     }
                 }
             }
