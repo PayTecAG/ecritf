@@ -2562,15 +2562,22 @@ PayTec.POSTerminal = function(pairingInfo, options) {
                     console.log("nextRunTime: " + nextRunTime + "; currentTime: " + currentTime + ", timeout: " + timeout);
 
                     // timeout could be slightly negative due to scheduling granularity or strongly negative if the terminal's time zone is different from ours
-                    if ((-20000 < timeout) && (timeout < 3600000)) {
+                    if ((-15000 < timeout) && (timeout < 3600000)) {
                         if (scheduleActivationTimer) {
                             clearTimeout(scheduleActivationTimer);
                         }
 
                         scheduleActivationTimer = setTimeout(() => {
                             console.log("Scheduling activation after " + nextScheduledTask.TaskName + ".");
+
                             needsActivation = true;
-                        }, (timeout > 0 ? timeout : 5000) + 1000); 
+
+                            // otherwise activation is not done until next StatusResponse arrives
+                            if ((0 != (trmStatus & self.StatusFlags.SHIFT_OPEN))
+                                && (0 == (trmStatus & (self.StatusFlags.BUSY | self.StatusFlags.LOCKED)))) {
+                                activate();
+                            }
+                        }, (timeout > 0 ? timeout : 0) + 10000); 
                     }
                 }
             }
