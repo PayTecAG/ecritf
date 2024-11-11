@@ -957,7 +957,7 @@
                     };
                     
                     if (trm.needsAmtAuth(trxFunction) || trm.needsAmtOther(trxFunction)) {
-                        req.TrxCurrC = Number($("#currencySelect").find(":selected")[0].value);
+                        req.TrxCurrC = Number($("#currencySelect").val());
                     }
 
                     if (trm.needsAmtAuth(trxFunction)) {
@@ -974,7 +974,7 @@
 
                     if (trm.supportsTrxRefNum(trxFunction) && ($("#trxRefNum")[0].value !== "")) {
                         req.TrxRefNum = String($("#trxRefNum")[0].value);
-                        req.AcqID = Number($("#acqIDSelect").find(":selected")[0].value);
+                        req.AcqID = Number($("#acqIDSelect").val());
                     }
 
                     trm.setTransactionTimeout(trm.TransactionFunctions.AUTHORIZATION_PURCHASE == trxFunction ? 3600000 : 90000);
