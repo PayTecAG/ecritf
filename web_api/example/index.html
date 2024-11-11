@@ -936,7 +936,7 @@
                     return;
                 }
 
-                var trxFunction = Number($("#trxFunctionSelect").find(":selected")[0].value);
+                var trxFunction = Number($("#trxFunctionSelect").val());
 
                 if (ONLINE_ADVICE == trxFunction) {
                     trm.confirmTransaction({
