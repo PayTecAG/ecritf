@@ -298,7 +298,8 @@ trm.startTransaction({
         TrxFunction: trm.TransactionFunctions.PURCHASE_WITH_CASHBACK,
         TrxCurrC: 756,
         AmtAuth: 1575,
-        AmtOther: 1000
+        AmtOther: 1000,
+        RecOrderRef: { OrderID: "Order1234" }
     });
 ```
 
@@ -327,6 +328,7 @@ TrxRefNum | String | For reference based transactions like e.g. Purchase Reserva
 TrxReasonC | String | For Account Verification transactions | Transaction Reason Code
 TrxReqFlags | Numeric | Optional | [Flags](#transactionrequestflags) that impact the behaviour when starting a transaction
 PartialApprovalCap | Numeric | For partial approvals | When set to 1 and initialized by the acquirer, the terminal accepts partial approval of a transaction
+RecOrderRef | Object | Optional, supported with SW version >= 24.04.06 | Record Order Reference to submit a merchant generated reference of the transaction to the acquirer
 
 
 ## abortTransaction

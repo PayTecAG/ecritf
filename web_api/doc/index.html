@@ -975,7 +975,8 @@ The result of this operation is reported through the <a href="#ontransactionappr
         <span class="na">TrxFunction</span><span class="p">:</span> <span class="nx">trm</span><span class="p">.</span><span class="nx">TransactionFunctions</span><span class="p">.</span><span class="nx">PURCHASE_WITH_CASHBACK</span><span class="p">,</span>
         <span class="na">TrxCurrC</span><span class="p">:</span> <span class="mi">756</span><span class="p">,</span>
         <span class="na">AmtAuth</span><span class="p">:</span> <span class="mi">1575</span><span class="p">,</span>
-        <span class="na">AmtOther</span><span class="p">:</span> <span class="mi">1000</span>
+        <span class="na">AmtOther</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span>
+        <span class="na">RecOrderRef</span><span class="p">:</span> <span class="p">{</span> <span class="na">OrderID</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Order1234</span><span class="dl">"</span> <span class="p">}</span>
     <span class="p">});</span>
 </code></pre></div>
 <p>Starts a new payment transaction.</p>
@@ -1070,6 +1071,12 @@ For details concerning parameters which depend on certain transaction types,
 <td>Numeric</td>
 <td>For partial approvals</td>
 <td>When set to 1 and initialized by the acquirer, the terminal accepts partial approval of a transaction</td>
+</tr>
+<tr>
+<td>RecOrderRef</td>
+<td>Object</td>
+<td>Optional, supported with SW version &gt;= 24.04.06</td>
+<td>Record Order Reference to submit a merchant generated reference of the transaction to the acquirer</td>
 </tr>
 </tbody></table>
 <h2 id='aborttransaction'>abortTransaction</h2>
