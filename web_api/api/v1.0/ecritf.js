@@ -2874,6 +2874,10 @@ PayTec.POSTerminal = function(pairingInfo, options) {
                     return "PayTec Nexgo CT20P";
                 case "D62":
                     return "PayTec Nexgo CT20P (Development)";
+                case "N80":
+                    return "PayTec Nexgo N80";
+                case "D80":
+                    return "PayTec Nexgo D80 (Development)";
             }
         }
 
