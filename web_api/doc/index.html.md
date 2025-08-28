@@ -37,6 +37,11 @@ The terminal uses HTTPS for communication, so make sure outbound TCP port 443
 is not blocked! Inbound communication is not used.
 </aside>
 
+Communication scheme:
+
+![Communication Scheme](communication.png)
+
+
 ## Terminal simulator
 
 <aside class="success">
