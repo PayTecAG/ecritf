@@ -2538,6 +2538,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         // if terminal is active, send ActivationRequest to get the brand info etc.
         if ((0 != (trmStatus & self.StatusFlags.SHIFT_OPEN))
                 && (0 == (trmStatus & (self.StatusFlags.BUSY | self.StatusFlags.LOCKED)))
+                && (State.CONNECTED == state) // API can be busy with an action shortly before reflected in trmStatus
                 && (neverActivated || needsActivation)) {
             if (scheduleActivationTimer) {
                 clearTimeout(scheduleActivationTimer);
@@ -2612,7 +2613,8 @@ PayTec.POSTerminal = function(pairingInfo, options) {
 
                     // otherwise activation is not done until next StatusResponse arrives
                     if ((0 != (trmStatus & self.StatusFlags.SHIFT_OPEN))
-                        && (0 == (trmStatus & (self.StatusFlags.BUSY | self.StatusFlags.LOCKED)))) {
+                        && (0 == (trmStatus & (self.StatusFlags.BUSY | self.StatusFlags.LOCKED)))
+                        && (State.CONNECTED == state)) { // API can be busy with an action shortly before reflected in trmStatus
                         activate();
                     }
                 }, 5000); 
