@@ -1157,9 +1157,10 @@ PayTec.POSTerminal = function(pairingInfo, options) {
             smq.subscribe(pairing.Channel, undefined, { datatype: "json", onmsg: onMessage } );
             changeState(State.CONNECTING);
         }
-        else if ((navigator !== undefined)
-            && (navigator.userAgent !== undefined)
-            && (navigator.userAgent.includes ('wv') || (peerURL !== undefined))) {
+        else if (((navigator !== undefined)
+                    && (navigator.userAgent !== undefined)
+                    && navigator.userAgent.includes('wv'))
+                || (peerURL !== undefined)) {
             let webSocketURL = (peerURL !== undefined ? peerURL : "ws://localhost:18307");
 
             console.log("Trying direct web socket connection at " + webSocketURL);
