@@ -1,3 +1,4 @@
+import 'fast-text-encoding';
 
 var SMQ={};
 
