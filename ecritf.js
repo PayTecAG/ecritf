@@ -1199,7 +1199,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
                 };
 
                 localSocket.onerror = function(evt) {
-                    console.log("WebSocket error: ", event);
+                    console.log("WebSocket error: ", evt);
                     disconnect();
                 };
             }
