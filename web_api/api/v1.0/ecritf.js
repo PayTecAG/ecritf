@@ -1021,6 +1021,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     var serialNumber = undefined;
     var terminalID = undefined;
     var softwareVersion = 0;
+    var hostName = (undefined !== options && undefined !== options.HostName) ? options.HostName : undefined;
     var peerURL = (undefined !== options && undefined !== options.PeerURL) ? options.PeerURL : undefined;
     var posID = (undefined !== options && undefined !== options.POSID) ? options.POSID : undefined;
     var trmLng = (undefined !== options && undefined !== options.TrmLng) ? options.TrmLng : undefined;
@@ -1101,7 +1102,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     var timer = undefined;
     var heartbeatTimer = undefined;
 
-    createSMQ();
+    createSMQ(hostName);
 
     if (autoConnect)
         setTimeout(connect, 1);
@@ -1151,7 +1152,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         }
 
         if (smq === undefined)
-            createSMQ();
+            createSMQ(hostName);
 
         if (hasPairing() && (smq !== undefined)) {
             smq.subscribe(pairing.Channel, undefined, { datatype: "json", onmsg: onMessage } );
@@ -2628,14 +2629,19 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         }
     }
 
-    function createSMQ() {
+    function createSMQ(host) {
         try {
-            if ((window !== undefined)
-                && (window.location !== undefined)) {
-                smq = new SMQ.Client(window.location.protocol == "https:" ? "wss://ecritf.paytec.ch/smq.lsp" : "ws://ecritf.paytec.ch/smq.lsp");
-            } else {
-                smq = new SMQ.Client("wss://ecritf.paytec.ch/smq.lsp");
+            var scheme = (window && window.location && window.location.protocol == "http:") ? "ws:" : "wss:";
+
+            if (host === undefined) {
+                if (window && window.location && /\.paytec\.ch$/i.test(window.location.hostname)) {
+                    host = window.location.hostname;
+                } else {
+                    host = "ecritf.paytec.ch";
+                }
             }
+
+            smq = new SMQ.Client(scheme + "//" + host + "/smq.lsp");
 
             smq.onclose = function(message, canreconnect) {
                 peerPTID = 0;
