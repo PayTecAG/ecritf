@@ -1022,6 +1022,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     var serialNumber = undefined;
     var terminalID = undefined;
     var softwareVersion = 0;
+    var hostName = (undefined !== options && undefined !== options.HostName) ? options.HostName : undefined;
     var peerURL = (undefined !== options && undefined !== options.PeerURL) ? options.PeerURL : undefined;
     var posID = (undefined !== options && undefined !== options.POSID) ? options.POSID : undefined;
     var trmLng = (undefined !== options && undefined !== options.TrmLng) ? options.TrmLng : undefined;
@@ -1102,13 +1103,31 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     var timer = undefined;
     var heartbeatTimer = undefined;
 
-    createSMQ();
+    createSMQ(hostName);
 
     if (autoConnect)
         setTimeout(connect, 1);
 
     function pair(code, friendlyName, params) {
         unpair();
+        
+        if (localSocket !== undefined) {
+            try {
+                localSocket.onclose = function() {
+                    console.log("WebSocket close event");
+                };
+
+                localSocket.onerror = function(evt) {
+                    console.log("WebSocket error: ", evt);
+                };
+
+                localSocket.close();
+                localSocket = undefined;
+            }
+            catch (e) {
+                console.log(e);
+            }
+        }
 
         pairing = {
             Code: code.substring(4),
@@ -1152,7 +1171,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         }
 
         if (smq === undefined)
-            createSMQ();
+            createSMQ(hostName);
 
         if (hasPairing() && (smq !== undefined)) {
             smq.subscribe(pairing.Channel, undefined, { datatype: "json", onmsg: onMessage } );
@@ -2629,14 +2648,19 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         }
     }
 
-    function createSMQ() {
+    function createSMQ(host) {
         try {
-            if ((global.window !== undefined)
-                && (global.window.location !== undefined)) {
-                smq = new SMQ.Client(global.window.location.protocol == "https:" ? "wss://ecritf.paytec.ch/smq.lsp" : "ws://ecritf.paytec.ch/smq.lsp");
-            } else {
-                smq = new SMQ.Client("wss://ecritf.paytec.ch/smq.lsp");
+            var scheme = (global.window && global.window.location && global.window.location.protocol == "http:") ? "ws:" : "wss:";
+
+            if (host === undefined) {
+                if (global.window && global.window.location && /\.paytec\.ch$/i.test(global.window.location.hostname)) {
+                    host = global.window.location.hostname;
+                } else {
+                    host = "ecritf.paytec.ch";
+                }
             }
+
+            smq = new SMQ.Client(scheme + "//" + host + "/smq.lsp");
 
             smq.onclose = function(message, canreconnect) {
                 peerPTID = 0;
