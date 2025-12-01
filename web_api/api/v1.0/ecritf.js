@@ -1109,6 +1109,24 @@ PayTec.POSTerminal = function(pairingInfo, options) {
 
     function pair(code, friendlyName, params) {
         unpair();
+        
+        if (localSocket !== undefined) {
+            try {
+                localSocket.onclose = function() {
+                    console.log("WebSocket close event");
+                };
+
+                localSocket.onerror = function(evt) {
+                    console.log("WebSocket error: ", evt);
+                };
+
+                localSocket.close();
+                localSocket = undefined;
+            }
+            catch (e) {
+                console.log(e);
+            }
+        }
 
         pairing = {
             Code: code.substring(4),
