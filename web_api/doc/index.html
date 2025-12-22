@@ -500,6 +500,9 @@
                     <a href="#defaulttimeout" class="toc-h2 toc-link" data-title="DefaultTimeout">DefaultTimeout</a>
                   </li>
                   <li>
+                    <a href="#hostname" class="toc-h2 toc-link" data-title="HostName">HostName</a>
+                  </li>
+                  <li>
                     <a href="#onconnected" class="toc-h2 toc-link" data-title="OnConnected">OnConnected</a>
                   </li>
                   <li>
@@ -834,6 +837,9 @@ The result of this operation is reported through the <a href="#ontransactionappr
 </tr>
 <tr>
 <td><a href="#defaulttimeout">DefaultTimeout</a></td>
+</tr>
+<tr>
+<td><a href="#hostname">HostName</a></td>
 </tr>
 </tbody></table>
 
@@ -1549,6 +1555,12 @@ You should configure this to <code>false</code>  if the final amount is not yet 
 <p>Configures how many milliseconds to wait for any other use case.</p>
 
 <p>Default value: 30000</p>
+<h2 id='hostname'>HostName</h2>
+<p><code>trm = new PayTec.POSTerminal(undefined, { HostName: &quot;ecritf.paytec.ch&quot;, OnConnected: onConnected, ... });</code></p>
+
+<p>Configures the cloud peer.</p>
+
+<p>Default value: &quot;ecritf.paytec.ch&quot;</p>
 <h2 id='onconnected'>OnConnected</h2>
 <p><code>function onConnected() {}</code><br>
 <code>trm.setOnConnected(onConnected)</code></p>

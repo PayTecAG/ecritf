@@ -208,6 +208,7 @@ trm = new PayTec.POSTerminal(
 |[InitializationTimeout](#initializationtimeout)|
 |[TransactionTimeout](#transactiontimeout)|
 |[DefaultTimeout](#defaulttimeout)|
+|[HostName](#hostname)|
 
 | Configurable callbacks: |
 |--------|
@@ -868,6 +869,15 @@ Default value: 70000
 Configures how many milliseconds to wait for any other use case.
 
 Default value: 30000
+
+
+## HostName
+
+`trm = new PayTec.POSTerminal(undefined, { HostName: "ecritf.paytec.ch", OnConnected: onConnected, ... });`
+
+Configures the cloud peer.
+
+Default value: "ecritf.paytec.ch"
 
 
 ## OnConnected
