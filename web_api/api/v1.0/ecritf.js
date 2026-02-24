@@ -1023,6 +1023,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     var softwareVersion = 0;
     var hostName = (undefined !== options && undefined !== options.HostName) ? options.HostName : undefined;
     var peerURL = (undefined !== options && undefined !== options.PeerURL) ? options.PeerURL : undefined;
+    var peerURLBackup = undefined; // Auto-configured from device EFTHello
     var posID = (undefined !== options && undefined !== options.POSID) ? options.POSID : undefined;
     var trmLng = (undefined !== options && undefined !== options.TrmLng) ? options.TrmLng : undefined;
     var printerWidth = (undefined !== options && undefined !== options.PrinterWidth) ? options.PrinterWidth : 34;
@@ -1098,9 +1099,18 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     var localSocket = undefined;
     var localSocketFragment = "";
     var smq = undefined;
+    var smqBackup = undefined;
     var peerPTID = 0;
+    var peerPTIDBackup = 0;
     var timer = undefined;
     var heartbeatTimer = undefined;
+    var heartbeatTimerBackup = undefined;
+    var smqConnected = false;
+    var smqBackupConnected = false;
+    var msgIdSequence = 0;
+    var processedMsgIds = {};
+    var processedMsgIdsOrder = [];  // FIFO order for eviction
+    var processedMsgIdsMaxSize = 15000;  // ~10 msg/min * 60 min * 24 h = 14400, rounded up
 
     createSMQ(hostName);
 
@@ -1141,7 +1151,12 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         }
 
         smq.publish(JSON.stringify({ Pairing: pairing}), code.substring(0, 4));
-        smq.subscribe(pairing.Channel, undefined, { "datatype": "json", "onmsg": onMessage } );
+        smq.subscribe(pairing.Channel, undefined, { "datatype": "json", "onmsg": onMessagePrimary } );
+
+        if (smqBackup !== undefined) {
+            smqBackup.publish(JSON.stringify({ Pairing: pairing}), code.substring(0, 4));
+            smqBackup.subscribe(pairing.Channel, undefined, { "datatype": "json", "onmsg": onMessageBackup } );
+        }
 
         peerURL = undefined;
         changeState(State.PAIRING);
@@ -1151,6 +1166,15 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         if (hasPairing() && (smq !== undefined)) {
             try {
                 smq.unsubscribe(pairing.Channel);
+            }
+            catch (e) {
+                console.log(e);
+            }
+        }
+
+        if (hasPairing() && (smqBackup !== undefined)) {
+            try {
+                smqBackup.unsubscribe(pairing.Channel);
             }
             catch (e) {
                 console.log(e);
@@ -1173,7 +1197,11 @@ PayTec.POSTerminal = function(pairingInfo, options) {
             createSMQ(hostName);
 
         if (hasPairing() && (smq !== undefined)) {
-            smq.subscribe(pairing.Channel, undefined, { datatype: "json", onmsg: onMessage } );
+            smq.subscribe(pairing.Channel, undefined, { datatype: "json", onmsg: onMessagePrimary } );
+
+            if (smqBackup !== undefined) {
+                smqBackup.subscribe(pairing.Channel, undefined, { datatype: "json", onmsg: onMessageBackup } );
+            }
             changeState(State.CONNECTING);
         }
         else if (((navigator !== undefined)
@@ -1237,6 +1265,15 @@ PayTec.POSTerminal = function(pairingInfo, options) {
                 console.log(e);
             }
         }
+
+        if (hasPairing() && (smqBackup !== undefined)) {
+            try {
+                smqBackup.unsubscribe(pairing.Channel);
+            }
+            catch (e) {
+                console.log(e);
+            }
+        }
         
         if (localSocket !== undefined) {
             try {
@@ -1248,6 +1285,10 @@ PayTec.POSTerminal = function(pairingInfo, options) {
 
             localSocket = undefined;
         }
+
+        clearHeartbeatTimerBackup();
+        peerPTIDBackup = 0;
+        smqBackupConnected = false;
 
         changeState(State.DISCONNECTED);
     }
@@ -1477,13 +1518,28 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         }
     }
 
+    function generateMsgId() {
+        msgIdSequence++;
+        return Date.now() + "-" + msgIdSequence;
+    }
+
     function sendMessage(message) {
         if (localSocket !== undefined) {
             localSocket.send(new TextEncoder().encode(JSON.stringify(message) + "\n"));
             onMessageSent(message);
         }
         else if (smq !== undefined) {
-            smq.publish(JSON.stringify(message), peerPTID);
+            // Add msg_id for duplicate detection when using a backup SMQ
+            if (peerURLBackup !== undefined) {
+                message.msg_id = generateMsgId();
+            }
+            var msgStr = JSON.stringify(message);
+            if (peerPTID) {
+                smq.publish(msgStr, peerPTID);
+            }
+            if (smqBackup !== undefined && peerPTIDBackup) {
+                smqBackup.publish(msgStr, peerPTIDBackup);
+            }
             onMessageSent(message, peerPTID);
         }
     }
@@ -1690,6 +1746,31 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     function setPeerURL(value) {
         peerURL = value;
         return self;
+    }
+
+    function configurePeerURLBackup(value) {
+        // Disconnect existing backup if URL changed
+        if (smqBackup !== undefined && peerURLBackup !== value) {
+            console.log("Disconnecting old backup SMQ (URL changed)");
+            try {
+                if (hasPairing()) {
+                    smqBackup.unsubscribe(pairing.Channel);
+                }
+                smqBackup.disconnect();
+            } catch (e) {
+                console.log(e);
+            }
+            smqBackup = undefined;
+            peerPTIDBackup = 0;
+            smqBackupConnected = false;
+            clearHeartbeatTimerBackup();
+        }
+
+        peerURLBackup = value;
+
+        if (value !== undefined && smqBackup === undefined) {
+            createSMQBackup(value);
+        }
     }
 
     function getPOSID() {
@@ -2171,6 +2252,13 @@ PayTec.POSTerminal = function(pairingInfo, options) {
             if (peerPTID)
                 peerPTID = 0;
 
+            if (peerPTIDBackup)
+                peerPTIDBackup = 0;
+
+            smqConnected = false;
+            smqBackupConnected = false;
+            clearHeartbeatTimerBackup();
+
             if (state != oldState) {
                 try {
                     onDisconnected();
@@ -2192,16 +2280,79 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         }
     }
 
-    function onMessage(message, ptid, tid, subtid) {
-        if (peerPTID && (ptid != peerPTID)) {
-            console.log("Ignoring message '" + JSON.stringify(message) + "' from unknown ptid " + ptid + "\n");
-            return;
+    // Wrapper functions to identify which SMQ connection the message came from
+    function onMessagePrimary(message, ptid, tid, subtid) {
+        onMessage(message, ptid, tid, subtid, false);
         }
 
+    function onMessageBackup(message, ptid, tid, subtid) {
+        onMessage(message, ptid, tid, subtid, true);
+    }
+
+    function onMessage(message, ptid, tid, subtid, isFromBackupConnection) {
+        // For local socket, isFromBackupConnection is undefined
+        if (isFromBackupConnection === undefined) {
+            isFromBackupConnection = false;
+        }
+
+        // Check if message is from a known peer for this connection
+        if (isFromBackupConnection) {
+            if (peerPTIDBackup && (ptid != peerPTIDBackup)) {
+                // New ptid on backup - could be terminal reconnecting, update it
+                console.log("Backup connection: updating peerPTIDBackup from " + peerPTIDBackup + " to " + ptid + "\n");
+                peerPTIDBackup = ptid;
+            } else if (!peerPTIDBackup) {
+                peerPTIDBackup = ptid;
+                console.log("Backup connection: established peerPTIDBackup = " + ptid + "\n");
+            }
+            smqBackupConnected = true;
+        } else {
+            // Message is from primary SMQ connection (or local socket)
+            if (peerPTID && (ptid != peerPTID) && (ptid !== null)) {
+                // New ptid on primary - could be terminal reconnecting, update it
+                console.log("Primary connection: updating peerPTID from " + peerPTID + " to " + ptid + "\n");
+                peerPTID = ptid;
+            } else if (!peerPTID && ptid) {
+                peerPTID = ptid;
+                console.log("Primary connection: established peerPTID = " + ptid + "\n");
+            }
+            if (ptid) {
+                smqConnected = true;
+            }
+        }
+
+        if (message.msg_id !== undefined) {
+            if (processedMsgIds[message.msg_id]) {
+                console.log("Ignoring duplicate message with msg_id " + message.msg_id + " from ptid " + ptid + (isFromBackupConnection ? " (backup)" : " (primary)") + "\n");
+                // Still reset heartbeat timer for the connection that received the duplicate
+                if (isFromBackupConnection) {
+                    clearHeartbeatTimerBackup();
+                    heartbeatTimerBackup = setTimeout(heartbeatBackup, heartbeatInterval);
+                } else {
         clearHeartbeatTimer();
         heartbeatTimer = setTimeout(heartbeat, heartbeatInterval);
+                }
+                return;
+            }
 
-        peerPTID = ptid;
+            // Add to cache with size-based eviction
+            processedMsgIds[message.msg_id] = true;
+            processedMsgIdsOrder.push(message.msg_id);
+
+            // Evict oldest entries if cache exceeds max size
+            while (processedMsgIdsOrder.length > processedMsgIdsMaxSize) {
+                var oldestMsgId = processedMsgIdsOrder.shift();
+                delete processedMsgIds[oldestMsgId];
+            }
+        }
+
+        if (isFromBackupConnection) {
+            clearHeartbeatTimerBackup();
+            heartbeatTimerBackup = setTimeout(heartbeatBackup, heartbeatInterval);
+        } else {
+            clearHeartbeatTimer();
+            heartbeatTimer = setTimeout(heartbeat, heartbeatInterval);
+        }
 
         try {
             if (onMessageReceived(message, ptid, tid, subtid))
@@ -2662,18 +2813,30 @@ PayTec.POSTerminal = function(pairingInfo, options) {
             smq = new SMQ.Client(scheme + "//" + host + "/smq.lsp");
 
             smq.onclose = function(message, canreconnect) {
+                smqConnected = false;
                 peerPTID = 0;
 
+                // Only trigger disconnect if backup is also not connected
+                if (peerURLBackup === undefined || !smqBackupConnected) {
+                    // No backup or backup also disconnected
                 if (canreconnect)
                     return 3000;
+                } else {
+                    // Backup still connected, just reconnect this one silently
+                    console.log("Primary SMQ disconnected, backup still active");
+                    if (canreconnect)
+                        return 3000;
+                }
             };
 
             smq.onconnect = function() {
-                console.log("Connected - no devices connected");
+                smqConnected = true;
+                console.log("Primary SMQ connected - no devices connected");
             };
 
             smq.onreconnect = function() {
-                console.log("Reconnected - no devices connected");
+                smqConnected = true;
+                console.log("Primary SMQ reconnected - no devices connected");
             };
         }
         catch (e) {
@@ -2683,11 +2846,87 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         }
     }
 
+    function createSMQBackup(backupUrl) {
+        try {
+            smqBackup = new SMQ.Client(backupUrl);
+
+            smqBackup.onclose = function(message, canreconnect) {
+                smqBackupConnected = false;
+                peerPTIDBackup = 0;
+
+                // Only trigger disconnect if primary is also not connected
+                if (!smqConnected) {
+                    console.log("Backup SMQ disconnected, primary also disconnected");
+                    if (canreconnect)
+                        return 3000;
+                } else {
+                    // Primary still connected, just reconnect backup silently
+                    console.log("Backup SMQ disconnected, primary still active");
+                    if (canreconnect)
+                        return 3000;
+                }
+            };
+
+            smqBackup.onconnect = function() {
+                smqBackupConnected = true;
+                console.log("Backup SMQ connected - no devices connected");
+            };
+
+            smqBackup.onreconnect = function() {
+                smqBackupConnected = true;
+                console.log("Backup SMQ reconnected - no devices connected");
+            };
+        }
+        catch (e) {
+            console.log("Cannot create backup SMQ client: " + e.message);
+            smqBackup = undefined;
+        }
+    }
+
     function onEFTHello(rsp) {
-        smq.observe(peerPTID, disconnect);
+        // Set up observation on the primary connection
+        if (smq !== undefined && peerPTID) {
+            smq.observe(peerPTID, function() {
+                console.log("Primary SMQ peer disconnected");
+                smqConnected = false;
+                peerPTID = 0;
+                // Only fully disconnect if backup is also not connected
+                if (peerURLBackup === undefined || !smqBackupConnected) {
+                    disconnect();
+                }
+            });
+        }
+
+        // Set up observation on the backup connection if available
+        if (smqBackup !== undefined && peerPTIDBackup) {
+            smqBackup.observe(peerPTIDBackup, function() {
+                console.log("Backup SMQ peer disconnected");
+                smqBackupConnected = false;
+                peerPTIDBackup = 0;
+                // Only fully disconnect if primary is also not connected
+                if (!smqConnected) {
+                    disconnect();
+                }
+            });
+        }
 
         serialNumber = rsp.IFDSerialNum;
         terminalID = rsp.TrmID;
+
+        // Configure PeerURLBackup from device (handles new URL, URL change, or removal)
+        if (rsp.PeerURLBackup !== peerURLBackup) {
+            if (rsp.PeerURLBackup !== undefined) {
+                console.log("Configuring PeerURLBackup from device: " + rsp.PeerURLBackup);
+            } else {
+                console.log("Device has no PeerURLBackup, disconnecting backup SMQ");
+            }
+            configurePeerURLBackup(rsp.PeerURLBackup);
+
+            // Subscribe the newly created backup connection to the channel
+            if (smqBackup !== undefined && hasPairing()) {
+                smqBackup.subscribe(pairing.Channel, undefined, { datatype: "json", onmsg: onMessageBackup });
+            }
+        }
 
         sendConnectRequest();
         sendMessage({ StatusRequest: {}});
@@ -2700,10 +2939,66 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         }
     }
 
+    function clearHeartbeatTimerBackup() {
+        if (undefined !== heartbeatTimerBackup) {
+            clearTimeout(heartbeatTimerBackup);
+            heartbeatTimerBackup = undefined;
+        }
+    }
+
     function heartbeat() {
         clearHeartbeatTimer();
+        // Only send heartbeat if we're in a connected state
+        if (state != State.DISCONNECTED && peerPTID) {
         sendMessage({HeartbeatRequest: {}});
-        heartbeatTimer = setTimeout(disconnect, heartbeatTimeout);
+    }
+        // Only disconnect if backup is also not responding or not configured
+        if (peerURLBackup === undefined || heartbeatTimerBackup === undefined) {
+            heartbeatTimer = setTimeout(function() {
+                console.log("Primary heartbeat timeout");
+                if (peerURLBackup === undefined || !smqBackupConnected) {
+                    disconnect();
+                } else {
+                    console.log("Primary heartbeat failed but backup is still active");
+                    smqConnected = false;
+                    peerPTID = 0;
+                }
+            }, heartbeatTimeout);
+        } else {
+            heartbeatTimer = setTimeout(function() {
+                console.log("Primary heartbeat timeout, backup still active");
+                smqConnected = false;
+                peerPTID = 0;
+            }, heartbeatTimeout);
+        }
+    }
+
+    function heartbeatBackup() {
+        clearHeartbeatTimerBackup();
+        // Backup heartbeat - if primary is active we don't send a separate heartbeat
+        // The sendMessage already sends to both
+        if (smqConnected && peerPTID) {
+            // Primary is active, backup heartbeat is just for monitoring
+            heartbeatTimerBackup = setTimeout(function() {
+                console.log("Backup heartbeat timeout, primary still active");
+                smqBackupConnected = false;
+                peerPTIDBackup = 0;
+            }, heartbeatTimeout);
+        } else {
+            // Primary is down, backup needs to send heartbeat and trigger disconnect if it also fails
+            if (state != State.DISCONNECTED && peerPTIDBackup) {
+                sendMessage({HeartbeatRequest: {}});
+            }
+            heartbeatTimerBackup = setTimeout(function() {
+                console.log("Backup heartbeat timeout");
+                if (!smqConnected) {
+                    disconnect();
+                } else {
+                    smqBackupConnected = false;
+                    peerPTIDBackup = 0;
+                }
+            }, heartbeatTimeout);
+        }
     }
 
     function generateUUID() {
