@@ -59,6 +59,32 @@ Executables will be in the `dist/` folder.
 - `Ctrl+Enter` - Start purchase transaction
 - `Ctrl+Escape` - Abort current transaction
 
+## Message Flow
+
+```
+ECR                                   Terminal
+ |                                       |
+ |--- ConnectRequest ------------------->|
+ |<-- ConnectResponse -------------------|
+ |                                       |
+ |--- ActivationRequest ---------------->|
+ |<-- ActivationResponse ----------------|
+ |                                       |
+ |--- TransactionRequest --------------->|
+ |<-- StatusResponse --------------------| (multiple)
+ |<-- TransactionResponse ---------------|
+ |                                       |
+ |--- TransactionConfirmationRequest --->|
+ |<-- TransactionConfirmationResponse ---|
+ |<-- ReceiptResponse -------------------|
+ |                                       |
+ |<-- HeartbeatRequest ------------------| (every ~10s)
+ |--- HeartbeatResponse ---------------->|
+ |                                       |
+ |<-- StatusResponse --------------------| (may arrive any time)
+ 
+```
+
 ## Schema
 
 All messages are validated against `../../../ecritf-schema.json` (JSON Schema Draft 2020-12).
