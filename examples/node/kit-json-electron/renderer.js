@@ -690,7 +690,6 @@ async function handleResponse(data) {
         delete deferredMessage.TransactionResponse.AttendantText;
       }
     }
-    addMessage('response', 'rx', deferredMessage, pendingApprovedTrxResponse.valid);
     showTransactionResult(deferredMessage.TransactionResponse);
     pendingApprovedTrxResponse = null;
   }
