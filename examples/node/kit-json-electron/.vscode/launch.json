@@ -1,0 +1,28 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Electron: Main",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+      "program": "${workspaceFolder}/main.js",
+      "windows": {
+        "runtimeExecutable": "${workspaceFolder}\\node_modules\\.bin\\electron.cmd"
+      },
+      "args": ["."],
+      "cwd": "${workspaceFolder}",
+      "outputCapture": "std",
+      "env": {
+        "ELECTRON_DISABLE_SECURITY_WARNINGS": "true"
+      }
+    },
+    {
+      "type": "chrome",
+      "request": "attach",
+      "name": "Electron: Renderer (Attach)",
+      "port": 9222,
+      "webRoot": "${workspaceFolder}"
+    }
+  ]
+}
