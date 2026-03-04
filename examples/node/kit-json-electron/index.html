@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KIT JSON Tester - PayTec Terminal Interface</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1a1a2e;
+      color: #eee;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    header {
+      background: #16213e;
+      display: flex;
+      flex-direction: column;
+      border-bottom: 1px solid #0f3460;
+    }
+    
+    .header-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 7px 15px;
+    }
+    
+    .header-row + .header-row {
+      border-top: 1px solid rgba(15,52,96,0.5);
+    }
+    
+    .header-row h1 {
+      font-size: 16px;
+      font-weight: 500;
+      color: #e94560;
+      white-space: nowrap;
+    }
+    
+    .connection {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+    }
+    
+    .header-input {
+      background: #0f3460;
+      border: 1px solid #1a1a2e;
+      color: #fff;
+      padding: 5px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    
+    .header-input:focus {
+      outline: none;
+      border-color: #e94560;
+    }
+
+    .floating-field {
+      position: relative;
+      display: block;
+    }
+
+    .floating-field::before {
+      content: attr(data-label);
+      position: absolute;
+      left: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #9ba4b5;
+      font-size: 11px;
+      line-height: 1;
+      pointer-events: none;
+      transition: all 0.15s ease;
+      max-width: calc(100% - 16px);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .floating-field > input::placeholder {
+      color: transparent;
+    }
+
+    .floating-field.header-field > input {
+      width: 100%;
+      padding-top: 11px;
+      padding-bottom: 1px;
+    }
+
+    .floating-field.control-field > input {
+      width: 100% !important;
+      padding-top: 15px !important;
+      padding-bottom: 3px !important;
+    }
+
+    .floating-field:focus-within::before,
+    .floating-field:has(> input:not(:placeholder-shown))::before {
+      top: 2px;
+      transform: none;
+      font-size: 9px;
+      color: #a8b2c1;
+      background: #0f3460;
+      padding: 0 2px;
+    }
+
+    .floating-field:focus-within::before {
+      color: #e94560;
+    }
+    
+    button {
+      background: #e94560;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    
+    button .icon {
+      font-size: 18px;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    
+    button:hover { background: #ff6b6b; }
+    button:disabled { background: #444; cursor: not-allowed; }
+    button.secondary { background: #0f3460; }
+    button.secondary:hover { background: #16213e; }
+    button.success { background: #27ae60; }
+    button.success:hover { background: #2ecc71; }
+    
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #e74c3c;
+    }
+    
+    .status-dot.connected { background: #2ecc71; }
+    
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 4px 14px;
+      padding: 5px 15px;
+      background: rgba(15,52,96,0.3);
+    }
+    
+    .toolbar-section {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .toolbar-divider {
+      width: 1px;
+      height: 22px;
+      background: #0f3460;
+    }
+    
+    .toolbar-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #9ba4b5;
+      white-space: nowrap;
+    }
+    
+    .toolbar-value {
+      font-size: 12px;
+      color: #fff;
+      white-space: nowrap;
+    }
+    
+    .toolbar select,
+    .toolbar input[type="number"],
+    .toolbar input[type="text"] {
+      background: #0f3460;
+      border: 1px solid #1a1a2e;
+      color: #fff;
+      padding: 4px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    
+    .toolbar select:focus,
+    .toolbar input:focus {
+      outline: none;
+      border-color: #e94560;
+    }
+    
+    main {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+    
+    .panel {
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid #0f3460;
+    }
+    
+    .panel-header {
+      background: #16213e;
+      padding: 10px 15px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #a8b2c1;
+      border-bottom: 1px solid #0f3460;
+    }
+    
+    .messages {
+      flex: 1;
+      min-width: 300px;
+    }
+    
+    .messages-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 12px;
+      background: #0d0d1a;
+    }
+    
+    .message {
+      margin-bottom: 10px;
+      padding: 8px 10px;
+      border-radius: 4px;
+      background: #16213e;
+    }
+    
+    .message.tx { border-left: 3px solid #27ae60; }
+    .message.rx { border-left: 3px solid #3498db; }
+    .message.error { border-left: 3px solid #e74c3c; }
+    .message.info { border-left: 3px solid #f39c12; }
+    
+    .message-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: #a8b2c1;
+      margin-bottom: 5px;
+    }
+    
+    .message-type {
+      font-weight: bold;
+      color: #e94560;
+    }
+    
+    .message pre {
+      white-space: pre-wrap;
+      word-break: break-all;
+      color: #ccc;
+    }
+
+    .copy-btn {
+      background: none;
+      border: 1px solid #555;
+      color: #aaa;
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 3px;
+      cursor: pointer;
+      margin-left: 6px;
+    }
+    .copy-btn:hover { background: #2a3a5e; color: #fff; }
+    
+    .receipt-panel {
+      min-width: 200px;
+      border-right: none;
+      flex: 0 0 auto;
+    }
+
+    .trx-result-card {
+      border-radius: 8px;
+      padding: 15px;
+      background: #16213e;
+      border: 1px solid #1a1a2e;
+    }
+
+    .trx-result-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .trx-result-badge.approved { background: #00b894; color: #fff; }
+    .trx-result-badge.declined { background: #d63031; color: #fff; }
+    .trx-result-badge.referred { background: #fdcb6e; color: #000; }
+    .trx-result-badge.aborted  { background: #636e72; color: #fff; }
+
+    .trx-detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+      font-size: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .trx-detail-row:last-child { border-bottom: none; }
+    .trx-detail-label { color: #a8b2c1; }
+    .trx-detail-value { color: #eee; font-weight: 500; text-align: right; max-width: 60%; }
+
+    .trx-text-block {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .trx-text-block.attendant {
+      background: #0a3d62;
+      border-left: 3px solid #3c6382;
+      color: #dfe6e9;
+    }
+    .trx-text-block.cardholder {
+      background: #0c2461;
+      border-left: 3px solid #4a69bd;
+      color: #dfe6e9;
+    }
+    .trx-text-label {
+      font-size: 10px;
+      color: #a8b2c1;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+    
+    .controls {
+      width: 290px;
+      min-width: 290px;
+    }
+    
+    .controls-content {
+      padding: 10px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    
+    .control-group {
+      margin-bottom: 15px;
+    }
+    
+    .control-group label {
+      display: block;
+      font-size: 11px;
+      color: #a8b2c1;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .control-group select,
+    .control-group input[type="number"],
+    .control-group input[type="text"] {
+      width: 100%;
+      padding: 6px 8px;
+      background: #0f3460;
+      border: 1px solid #1a1a2e;
+      color: #fff;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    
+    .control-group select:focus,
+    .control-group input:focus {
+      outline: none;
+      border-color: #e94560;
+    }
+    
+    .control-group button {
+      width: 100%;
+    }
+    
+    .amount-input {
+      width: 100%;
+      padding: 8px;
+      background: #0f3460;
+      border: 1px solid #1a1a2e;
+      color: #fff;
+      border-radius: 4px;
+      font-size: 14px;
+      text-align: right;
+    }
+    
+    .receipt-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px;
+      background: #fff;
+      color: #000;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      line-height: 1.4;
+    }
+    
+    .receipt-content pre {
+      white-space: pre-wrap;
+    }
+    
+    .heartbeat-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #333;
+      display: inline-block;
+      margin-left: 10px;
+      transition: background 0.3s;
+    }
+    
+    .heartbeat-indicator.pulse {
+      background: #2ecc71;
+    }
+
+    .status-bits {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 3px;
+    }
+    .status-bit {
+      display: inline-block;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      background: #1a1a2e;
+      color: #636e7e;
+      border: 1px solid #4a5568;
+      transition: all 0.3s;
+    }
+    .status-bit.active { color: #fff; }
+    .status-bit.active.green  { background: #00b894; border-color: #00b894; }
+    .status-bit.active.orange { background: #e17055; border-color: #e17055; }
+    .status-bit.active.blue   { background: #0984e3; border-color: #0984e3; }
+    .status-bit.active.red    { background: #d63031; border-color: #d63031; }
+    .status-bit.active.yellow { background: #fdcb6e; border-color: #fdcb6e; color: #000; }
+    
+    footer {
+      background: #16213e;
+      padding: 6px 15px;
+      font-size: 11px;
+      color: #9ba4b5;
+      display: flex;
+      justify-content: space-between;
+      border-top: 1px solid #0f3460;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-row">
+      <h1>&#x1f3ea; KIT JSON Tester</h1>
+      <span style="color:#a8b2c1;font-size:12px">PayTec Terminal Interface</span>
+      <div class="connection">
+        <div class="status-dot" id="statusDot"></div>
+        <span class="floating-field header-field" data-label="Host" style="width:120px">
+          <input type="text" id="hostInput" value="127.0.0.1" class="header-input" placeholder=" " aria-label="Host">
+        </span>
+        <span class="floating-field header-field" data-label="Port" style="width:55px">
+          <input type="text" id="portInput" value="8307" class="header-input" placeholder=" " aria-label="Port">
+        </span>
+        <span class="floating-field header-field" data-label="POSID" style="width:100px">
+          <input type="text" id="posidInput" value="" class="header-input" placeholder=" " aria-label="POSID" title="Point of Sale ID (optional)">
+        </span>
+        <span class="floating-field header-field" data-label="PW" style="width:50px">
+          <input type="number" id="printerWidthInput" value="40" class="header-input" placeholder=" " aria-label="Printer Width" title="Printer Width (characters per line)" min="20" max="80">
+        </span>
+        <button id="connectBtn" onclick="toggleConnection()">Connect</button>
+      </div>
+    </div>
+    <div class="header-row toolbar" id="terminalStatus">
+      <div class="toolbar-section">
+        <span class="toolbar-label">TrmID</span>
+        <span class="toolbar-value" id="trmId">-</span>
+      </div>
+      <div class="toolbar-divider"></div>
+      <div class="toolbar-section">
+        <span class="toolbar-label">Status</span>
+        <span class="toolbar-value" id="trmStatus">Disconnected</span>
+        <span class="heartbeat-indicator" id="heartbeat"></span>
+      </div>
+      <div class="toolbar-divider"></div>
+      <div class="toolbar-section status-bits" id="trmStatusBits">
+      </div>
+      <div class="toolbar-divider"></div>
+      <div class="toolbar-section" id="nextTaskSection" style="display:none">
+        <span class="toolbar-label">Next Task</span>
+        <span class="toolbar-value" id="nextTaskName">-</span>
+        <span class="toolbar-value" id="nextTaskTime" style="color:#fdcb6e;font-size:11px">-</span>
+      </div>
+      <div class="toolbar-divider" id="nextTaskDivider" style="display:none"></div>
+      <div class="toolbar-section">
+        <button onclick="sendStatus()" id="statusBtn" class="secondary" disabled><span class="icon">&#x1f4ca;</span> Status</button>
+      </div>
+    </div>
+  </header>
+  
+  <main>
+    <div class="panel controls">
+      <div class="panel-header">Controls</div>
+      <div class="controls-content">
+        <div class="control-group">
+          <button onclick="toggleActivation()" id="activateBtn" style="width:100%" disabled><span class="icon">&#x25b6;</span> Activate</button>
+        </div>
+        <div class="control-group">
+          <label>Transaction</label>
+          <select id="trxFunctionSelect" onchange="onTrxFunctionChange()">
+            <optgroup label="Standard">
+              <option value="32768">Purchase</option>
+              <option value="2048">Credit (Refund)</option>
+              <option value="32">Reversal</option>
+            </optgroup>
+            <optgroup label="Reservations">
+              <option value="16">Reservation</option>
+              <option value="8">Reservation Adjustment</option>
+              <option value="33554432">Cancel Reservation</option>
+              <option value="16384">Purchase Reservation</option>
+            </optgroup>
+            <optgroup label="Special">
+              <option value="128">Authorization Purchase</option>
+              <option value="1">Purchase with Cashback</option>
+              <option value="64">Purchase Mail Ordered</option>
+              <option value="256">Purchase Phone Ordered</option>
+              <option value="512">Purchase Forced Acceptance</option>
+              <option value="1024">Purchase Phone Authorized</option>
+              <option value="4">Confirm Phone Auth Reservation</option>
+            </optgroup>
+            <optgroup label="Other">
+              <option value="16777216">Load</option>
+              <option value="131072">Balance Inquiry</option>
+              <option value="8388608">Activate Card</option>
+              <option value="67108864">Account Verification</option>
+            </optgroup>
+          </select>
+          <div id="trxInputs" style="display:flex;flex-direction:column;gap:6px;margin-top:6px">
+            <div style="display:flex;gap:6px;align-items:center">
+              <span id="trxAmountGroup" class="floating-field control-field" data-label="Amount" style="flex:1">
+                <input type="number" id="amountInput" class="amount-input" value="5.00" step="1.00" min="0" placeholder=" " aria-label="Amount">
+              </span>
+              <span id="trxCurrGroup">
+                <select id="currencySelect">
+                  <option value="756" selected>CHF</option>
+                  <option value="978">EUR</option>
+                  <option value="840">USD</option>
+                </select>
+              </span>
+            </div>
+            <span id="trxCashbackGroup" class="floating-field control-field" data-label="Cashback" style="display:none">
+              <input type="number" id="cashbackInput" class="amount-input" value="2.00" step="1.00" min="0" placeholder=" " aria-label="Cashback">
+            </span>
+            <span id="trxAuthCodeGroup" class="floating-field control-field" data-label="Auth Code" style="display:none">
+              <input type="text" id="authCodeInput" placeholder=" " aria-label="Auth Code" style="width:100%;padding:6px;background:#0f3460;border:1px solid #1a1a2e;color:#fff;border-radius:4px;font-size:12px">
+            </span>
+            <span id="trxOrderIdGroup" class="floating-field control-field" data-label="Order ID" style="display:none">
+              <input type="text" id="orderIdInput" placeholder=" " aria-label="Order ID" maxlength="48" style="width:100%;padding:6px;background:#0f3460;border:1px solid #1a1a2e;color:#fff;border-radius:4px;font-size:12px">
+            </span>
+            <span id="trxRefGroup" class="floating-field control-field" data-label="Transaction Ref" style="display:none">
+              <input type="text" id="trxRefInput" placeholder=" " aria-label="Transaction Reference" style="width:100%;padding:6px;background:#0f3460;border:1px solid #1a1a2e;color:#fff;border-radius:4px;font-size:12px">
+            </span>
+            <span id="trxAcqGroup" class="floating-field control-field" data-label="Acquirer ID" style="display:none">
+              <input type="number" id="acqIdInput" placeholder=" " aria-label="Acquirer ID" style="width:100%;padding:6px;background:#0f3460;border:1px solid #1a1a2e;color:#fff;border-radius:4px;font-size:12px">
+            </span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
+            <button onclick="trxButtonClick()" id="trxBtn" class="success" disabled style="flex:1"><span class="icon">&#x1f4b3;</span> Transaction</button>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;white-space:nowrap;font-size:11px">
+              <input type="checkbox" id="autoConfirmCheck" checked onchange="updateUI()"> Auto-confirm
+            </label>
+          </div>
+          <div id="manualConfirmAmountRow" class="floating-field control-field" data-label="Final Amount (TrxAmt)" style="display:none;margin-top:6px">
+            <input type="number" id="confirmAmountInput" class="amount-input" step="1.00" min="0" placeholder=" " aria-label="Final Amount (TrxAmt, optional)">
+          </div>
+          <div id="manualConfirmRow" style="display:none;gap:8px;margin-top:6px">
+            <button onclick="confirmTransaction(true, true)" id="confirmBtn" class="success" style="flex:1" disabled><span class="icon">&#x2713;</span> Confirm</button>
+            <button onclick="confirmTransaction(false, true)" id="rollbackBtn" style="flex:1" disabled><span class="icon">&#x2715;</span> Rollback</button>
+          </div>
+        </div>
+        <div class="control-group">
+          <label>Operations</label>
+          <button onclick="sendBalanceRequest()" id="balanceBtn" class="secondary" disabled><span class="icon">&#x1f4cb;</span> Balance</button>
+          <div style="display:flex;gap:8px;margin-top:6px">
+            <select id="reportTypeSelect" style="flex:1;min-width:0">
+              <option value="1">Shift Sum</option>
+              <option value="2">Accounting Period</option>
+              <option value="1001">Open Petrol Auth.</option>
+            </select>
+            <button onclick="sendReport()" id="reportBtn" class="secondary" style="flex:1" disabled><span class="icon">&#x1f4c8;</span> Report</button>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:6px">
+            <select id="receiptTypeSelect" style="flex:1;min-width:0" onchange="onReceiptTypeChange()">
+              <option value="1">Transaction</option>
+              <option value="2">Transaction Copy</option>
+              <option value="11">Activation</option>
+              <option value="13">Deactivation</option>
+              <option value="21">Final Balance</option>
+              <option value="23">Submission</option>
+              <option value="25">Transmission</option>
+              <option value="41">Configuration</option>
+              <option value="43">Initialization</option>
+            </select>
+            <button onclick="sendReceiptRequest()" id="receiptBtn" class="secondary" style="flex:1" disabled><span class="icon">&#x1f9fe;</span> Receipt</button>
+          </div>
+          <div class="floating-field control-field" data-label="TrxSeqCnt (optional)" style="margin-top:6px">
+            <input type="number" id="receiptIdInput" placeholder=" " aria-label="TrxSeqCnt (optional)" min="0" style="width:100%;padding:6px 8px;background:#0f3460;border:1px solid #1a1a2e;color:#fff;border-radius:4px;font-size:12px">
+          </div>
+        </div>
+        <div class="control-group">
+          <label>Management</label>
+          <div style="display:flex;gap:8px">
+            <button onclick="sendConfiguration()" id="configBtn" class="secondary" style="flex:1" disabled><span class="icon">&#x2699;</span> Config</button>
+            <button onclick="sendInitialization()" id="initBtn" class="secondary" style="flex:0 0 auto;width:auto" disabled><span class="icon">&#x1f504;</span> Init</button>
+            <span class="floating-field control-field" data-label="AcqID" style="flex:0 0 72px;width:72px">
+              <input type="number" id="initAcqIdInput" placeholder=" " aria-label="AcqID" min="0" title="Acquirer ID (optional, all if empty)" style="width:100%;padding:6px 8px;background:#0f3460;border:1px solid #1a1a2e;color:#fff;border-radius:4px;font-size:12px">
+            </span>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:6px">
+            <select id="batchCaptureSelect" style="flex:1;min-width:0">
+              <option value="0">Sub- &amp; Transmission</option>
+              <option value="4">Submission only</option>
+              <option value="2">Transmission only</option>
+            </select>
+            <button onclick="sendBatchCapture()" id="batchCaptureBtn" class="secondary" style="flex:1" disabled><span class="icon">&#x21e7;</span> Capture</button>
+          </div>
+        </div>
+        <div class="control-group">
+          <button onclick="openSendJsonDialog()" id="sendJsonBtn" class="secondary" style="width:100%" disabled><span class="icon">{ }</span> Send JSON&#x2026;</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="panel messages">
+      <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center">Messages <button onclick="clearMessages()" class="secondary" style="padding:2px 8px;font-size:10px">Clear</button></div>
+      <div class="messages-content" id="messagesContent"></div>
+    </div>
+    
+    <div class="panel receipt-panel">
+      <div class="panel-header">Receipts</div>
+      <div class="receipt-content" id="receiptContent"></div>
+    </div>
+  </main>
+  
+  <footer>
+    <span>NDJSON over TCP &#x2022; Schema validated</span>
+    <span id="messageCount">0 messages</span>
+  </footer>
+
+  <!-- Send JSON Dialog -->
+  <div id="sendJsonOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1000;align-items:center;justify-content:center">
+    <div style="background:#16213e;border:1px solid #0f3460;border-radius:8px;width:520px;max-width:90vw;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,0.5)">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid #0f3460">
+        <span style="font-size:14px;font-weight:500;color:#e94560">Send JSON</span>
+        <button onclick="closeSendJsonDialog()" class="secondary" style="padding:4px 10px;font-size:16px;line-height:1">&times;</button>
+      </div>
+      <div style="padding:16px;flex:1;overflow:auto">
+        <textarea id="sendJsonTextarea" spellcheck="false" style="width:100%;height:260px;background:#0d0d1a;color:#ccc;border:1px solid #0f3460;border-radius:4px;padding:10px;font-family:Consolas,Monaco,monospace;font-size:12px;line-height:1.4;resize:vertical" placeholder='Paste JSON here, e.g.&#10;{"StatusRequest":{}}'></textarea>
+        <div id="sendJsonError" style="color:#e74c3c;font-size:11px;margin-top:6px;min-height:16px"></div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;padding:12px 16px;border-top:1px solid #0f3460">
+        <button onclick="closeSendJsonDialog()" class="secondary">Cancel</button>
+        <button onclick="submitSendJsonDialog()" id="sendJsonSubmitBtn">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
