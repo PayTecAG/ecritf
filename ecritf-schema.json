@@ -1,0 +1,941 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://paytec.ch/schemas/ecritf-v1.0.0.json",
+  "title": "PayTec EFT/POS Terminal Interface Schema",
+  "description": "JSON Schema for the PayTec ECR Interface messages. This schema defines all request and response messages for communication with PayTec EFT/POS terminals.",
+  "version": "1.0.0",
+  "$defs": {
+    "TrmID": {
+      "type": "string",
+      "description": "Terminal identification, 8 alphanumeric characters.",
+      "pattern": "^[A-Za-z0-9]{8}$",
+      "examples": ["12345678"]
+    },
+    "IFDSerialNum": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9]{8}$",
+      "description": "Interface device serial number.",
+      "examples": ["ZPD00001"]
+    },
+    "LanguageCode": {
+      "type": "string",
+      "description": "Language code according to ISO 639-1 (e.g., 'de' for German, 'en' for English).",
+      "pattern": "^[a-z]{2}$",
+      "examples": ["de", "en", "fr", "it"]
+    },
+    "TrmStatus": {
+      "type": "integer",
+      "description": "Terminal status flags (bitwise combination): SHIFT_OPEN=0x01, CARD_DATA_AVAILABLE=0x02, BUSY=0x04, READER_SLOT_OCCUPIED=0x08, LOCKED=0x10, APPLICATION_SELECTED=0x20, WAITING_FOR_TRANSACTION_REQUEST=0x40, WAITING_FOR_APPLICATION_SELECTION=0x80, ONLINE_PROCESSING=0x100, PRINTER_UNAVAILABLE=0x200, OUT_OF_PAPER=0x400",
+      "minimum": 0,
+      "examples": [513]
+    },
+    "TrxFunction": {
+      "type": "integer",
+      "description": "Transaction function code: PURCHASE_WITH_CASHBACK=0x01 (1), CONFIRM_PHONE_AUTH_RESERVATION=0x04 (4), RESERVATION_ADJUSTMENT=0x08 (8), RESERVATION=0x10 (16), REVERSAL=0x20 (32), PURCHASE_MAIL_ORDERED=0x40 (64), AUTHORIZATION_PURCHASE=0x80 (128), PURCHASE_PHONE_ORDERED=0x100 (256), PURCHASE_FORCED_ACCEPTANCE=0x200 (512), PURCHASE_PHONE_AUTH=0x400 (1024), CREDIT=0x800 (2048), CASH_ADVANCE=0x1000 (4096), TIP=0x2000 (8192), PURCHASE_RESERVATION=0x4000 (16384), PURCHASE=0x8000 (32768), BALANCE_INQUIRY=0x20000 (131072), ACTIVATE_CARD=0x800000 (8388608), LOAD=0x1000000 (16777216), CANCEL_RESERVATION=0x2000000 (33554432), ACCOUNT_VERIFICATION=0x4000000 (67108864)",
+      "enum": [1, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 131072, 8388608, 16777216, 33554432, 67108864],
+      "examples": [32768]
+    },
+    "TrxFunctions": {
+      "type": "integer",
+      "description": "Supported transaction functions (bitwise combination of TrxFunction values)",
+      "minimum": 0,
+      "examples": [182433]
+    },
+    "TrxResult": {
+      "type": "integer",
+      "description": "Transaction result: 0=Approved, 1=Declined, 2=Referred (phone auth needed), 3=Aborted",
+      "enum": [0, 1, 2, 3],
+      "examples": [0]
+    },
+    "TrxResultExtended": {
+      "type": "integer",
+      "description": "Extended transaction result code: 0-899=TRX_RESULT_APPROVED, 900-999=TRX_RESULT_REFERRED, 1000-9999=TRX_RESULT_DECLINED, 10000-49999=TRX_RESULT_ABORTED. Specific codes: 10014=TRX_RESULT_ABORTED_MATCHED_SURROGATE_PAN, 10017=TRX_RESULT_ABORTED_SCHEDULED_TASK_PENDING (returned 1 minute after starting an authorization purchase transaction when no card is presented and a scheduled task is due; ECR should wait at least 20 seconds and for TrmStatus BUSY flag to clear before restarting)",
+      "minimum": 0,
+      "examples": [100]
+    },
+    "TrxReqFlags": {
+      "type": "integer",
+      "description": "Transaction request flags: 0x01=Start silently, 0x04=Report unknown NFC UIDs in status, 0x08=Abort silently on unknown NFC",
+      "minimum": 0,
+      "examples": [5]
+    },
+    "TrxAbortFlags": {
+      "type": "integer",
+      "description": "Transaction abort flags: 0x01=Abort silently without notifying cardholder",
+      "minimum": 0,
+      "examples": [1]
+    },
+    "POSEntryMode": {
+      "type": "integer",
+      "description": "POS entry mode: 0=Unknown, 1=Manual, 3=Barcode, 4=OCR, 5=ICC, 6=ICC PAN Retrieval, 20=Reference, 21=BLE, 90=Magstripe, 91-93=Magstripe fallback, 97=Contactless EMV, 98=Contactless magstripe, 99=Contactless PAN Retrieval, 1001=Merchant presented QR Code",
+      "minimum": 0,
+      "examples": [97]
+    },
+    "DeviceCommandCode": {
+      "type": "integer",
+      "description": "Device command: 1=Eject card, 2=Force eject, 501=Reboot, 502=SW update, 511=Remote maintenance, 521=Ship logs, 1001/1002=Language dialog on/off, 2001=Show idle, 2002=Present card message, 2601=Scan barcode, 2602=Abort barcode scanning",
+      "enum": [1, 2, 501, 502, 511, 521, 1001, 1002, 2001, 2002, 2601, 2602],
+      "examples": [2601]
+    },
+    "ReceiptType": {
+      "type": "integer",
+      "description": "Receipt type: 1=Transaction, 2=Transaction copy, 11=Activation, 13=Deactivation, 21=Final balance, 23=Submission, 25=Transmission, 41=Configuration, 43=Initialization, 111=DCC offer, 112=DCC rates",
+      "enum": [1, 2, 11, 13, 21, 23, 25, 41, 43, 111, 112],
+      "examples": [1]
+    },
+    "ReceiptFlags": {
+      "type": "integer",
+      "description": "Receipt flags: 0x01=More data available, 0x04=Double height, 0x10=Inverse, 0x20=PNG image (data is base64-encoded PNG)",
+      "minimum": 0,
+      "examples": [16]
+    },
+    "ReportType": {
+      "type": "integer",
+      "description": "Report type: 1=Shift sum, 2=Accounting period sum, 1001=Open petrol authorizations",
+      "enum": [1, 2, 1001],
+      "examples": [1]
+    },
+    "ReportFlags": {
+      "type": "integer",
+      "description": "Report flags: 1=More entries available",
+      "minimum": 0
+    },
+    "FinancialCounterType": {
+      "type": "integer",
+      "description": "Financial counter type: 0=Debit, 1=Credit, 2=Debit reversal, 3=Credit reversal, 4=Reservation, 5=Other Non-financial",
+      "enum": [0, 1, 2, 3, 4, 5],
+      "examples": [1]
+    },
+    "PrinterStatus": {
+      "type": "integer",
+      "description": "Printer status flags: 0x00=OK, 0x01=No paper, 0x02=Jammed, 0x04=Overheat, 0x08=Other error, 0x10=Buffer full, 0x20=Timeout, 0x40=Power failure",
+      "minimum": 0,
+      "examples": [0]
+    },
+    "BatchCaptureFlags": {
+      "type": "integer",
+      "description": "Batch capture flags (bitwise combination): 0x01=Manual (include last transaction), 0x02=No submission, 0x04=No transmission",
+      "minimum": 0
+    },
+    "DialogFlags": {
+      "type": "integer",
+      "description": "Dialog flags (bitwise combination): 0x01=Leave on screen, 0x02=Display input resource, 0x04=Hide input, 0x08=Use attendant language, 0x10=Hide OK on empty signature, 0x20=Allow show input, 0x40=Replaces welcome",
+      "minimum": 0
+    },
+    "DialogIcon": {
+      "type": "integer",
+      "description": "Dialog icon: 1=Please wait, 2=Insert card, 3=Remove card, 4=Approved, 5=Declined, 6=Question, 7=Mobile",
+      "enum": [1, 2, 3, 4, 5, 6, 7]
+    },
+    "DialogResource": {
+      "type": "integer",
+      "description": "Dialog resource: 1010=Free text, 1060=Free text with brands, 10001=Please wait, 10005=Signature please, 10008=Select pump, 10009=Enter mileage, 10010=Enter further info, 15013=Free text with custom buttons",
+      "enum": [1010, 1060, 10001, 10005, 10008, 10009, 10010, 15013]
+    },
+    "DialogResult": {
+      "type": "integer",
+      "description": "Dialog result: 1=OK, 2=Stop, 3=Timeout, 4=Cancelled, 5=Back, 6=Left button, 7=Right button",
+      "enum": [1, 2, 3, 4, 5, 6, 7]
+    },
+    "InputType": {
+      "type": "integer",
+      "description": "Input type: 0=Empty (no input), 2=Unsigned numeric, 51=Numeric string, 52=Alphanumeric special, 101=Password, 151=E-signature",
+      "enum": [0, 2, 51, 52, 101, 151]
+    },
+    "UIButtons": {
+      "type": "integer",
+      "description": "UI button flags (bitwise combination): 0x01=OK, 0x02=Cancel, 0x04=Clear, 0x08=Back, 0x10=Left, 0x20=Right",
+      "minimum": 0
+    },
+    "ErrorCode": {
+      "type": "integer",
+      "description": "Error code; can be OS specific"
+    },
+    "Amount": {
+      "type": "integer",
+      "description": "Monetary amount in the currency's minor unit (e.g., cents for EUR/USD)",
+      "minimum": 0,
+      "examples": [1500]
+    },
+    "CurrencyCode": {
+      "type": "integer",
+      "description": "ISO 4217 numeric currency code",
+      "minimum": 0,
+      "maximum": 999,
+      "examples": [756, 978, 840]
+    },
+    "CountryCode": {
+      "type": "integer",
+      "description": "ISO 3166 numeric country code",
+      "minimum": 0,
+      "maximum": 999,
+      "examples": [756, 276, 840]
+    },
+    "Base64Binary": {
+      "type": "string",
+      "description": "Base64 encoded binary data",
+      "contentEncoding": "base64"
+    },
+    "HexString": {
+      "type": "string",
+      "description": "Hexadecimal encoded string",
+      "pattern": "^[0-9A-Fa-f]*$"
+    },
+    "DateYYMMDD": {
+      "type": "string",
+      "description": "Date in YYMMDD format",
+      "pattern": "^[0-9]{6}$",
+      "examples": ["210101"]
+    },
+    "DateYYYYMMDD": {
+      "type": "string",
+      "description": "Date in YYYYMMDD format",
+      "pattern": "^[0-9]{8}$",
+      "examples": ["20210101"]
+    },
+    "TimeHHMMSS": {
+      "type": "string",
+      "description": "Time in HHMMSS format",
+      "pattern": "^[0-9]{6}$",
+      "examples": ["120000"]
+    },
+    "AcqInfo": {
+      "type": "object",
+      "description": "Acquirer information",
+      "properties": {
+        "AcqID": {
+          "type": "integer",
+          "description": "Acquirer identifier"
+        },
+        "LastAcqInitDate": {
+          "type": "string",
+          "description": "Last acquirer initialization date"
+        }
+      },
+      "additionalProperties": true
+    },
+    "NextScheduledTask": {
+      "type": "object",
+      "description": "Information about the next scheduled task",
+      "required": ["TaskName", "NextRun"],
+      "properties": {
+        "TaskName": {
+          "type": "string",
+          "description": "Name of the scheduled task",
+          "enum": ["CONFIG", "CONFIG_FORCED", "INIT", "INIT_FORCED", "SUBMISSION", "TRANSMISSION", "FINAL_BALANCE", "SW_UPDATE", "REBOOT", "AUTO_REVERSAL", "DECOMMISSIONING"]
+        },
+        "LastRun": {
+          "type": "string",
+          "description": "Local date/time when task was last performed: yyyy-MM-dd HH:mm:ss"
+        },
+        "NextRun": {
+          "type": "string",
+          "description": "Local date/time when task will be performed next: yyyy-MM-dd HH:mm:ss"
+        },
+        "AcqID": {
+          "type": "integer",
+          "description": "Acquirer Identifier (present if TaskName is INIT or INIT_FORCED)"
+        }
+      },
+      "additionalProperties": true
+    },
+    "FinancialReportEntry": {
+      "type": "object",
+      "description": "Financial report entry",
+      "required": ["Brand", "AID", "FinancialCounterType", "TrxCurrC", "TrxCount", "TotalAmount"],
+      "properties": {
+        "Brand": { "type": "string" },
+        "AID": { "$ref": "#/$defs/Base64Binary" },
+        "FinancialCounterType": { "$ref": "#/$defs/FinancialCounterType" },
+        "TrxCurrC": { "$ref": "#/$defs/CurrencyCode" },
+        "TrxCount": { "type": "integer" },
+        "TotalAmount": { "$ref": "#/$defs/Amount" },
+        "TipAmount": { "$ref": "#/$defs/Amount" },
+        "DCCForeignCurrC": { "$ref": "#/$defs/CurrencyCode" },
+        "DCCForeignAmount": { "$ref": "#/$defs/Amount" }
+      },
+      "additionalProperties": true
+    },
+    "TrxListReportEntry": {
+      "type": "object",
+      "description": "Transaction list report entry",
+      "required": ["TrxSeqCnt", "TrxDate", "TrxTime"],
+      "properties": {
+        "TrxSeqCnt": { "type": "integer" },
+        "TrxDate": { "$ref": "#/$defs/DateYYMMDD" },
+        "TrxTime": { "$ref": "#/$defs/TimeHHMMSS" },
+        "FinancialCounterType": { "$ref": "#/$defs/FinancialCounterType" },
+        "TrxFunction": { "$ref": "#/$defs/TrxFunction" },
+        "AuthReslt": { "type": "integer" },
+        "TrxCurrC": { "$ref": "#/$defs/CurrencyCode" },
+        "AmtAuth": { "$ref": "#/$defs/Amount" },
+        "AppPANPrtAttendant": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "TrxDataChangeReason": {
+      "type": "object",
+      "description": "Transaction data change reason",
+      "properties": {
+        "TrxDataChangeReasonCode": { "type": "integer" },
+        "MyOneDiscountCode": { "type": "integer", "description": "MyOne discount code" },
+        "BonusCardBrandNumber": { "type": "integer", "description": "Bonus card brand number" }
+      },
+      "additionalProperties": true
+    },
+    "RecOrderRef": {
+      "type": "object",
+      "description": "Merchant order reference record",
+      "properties": {
+        "OrderID": {
+          "type": "string",
+          "description": "Merchant's order identifier (max 18 chars for ep2 7.x, 48 chars for ep2 >= 8.x)"
+        }
+      }
+    },
+    "ConnectRequest": {
+      "type": "object",
+      "description": "Request to connect to the terminal",
+      "properties": {
+        "TrmLng": { "$ref": "#/$defs/LanguageCode" },
+        "PrinterWidth": {
+          "type": "integer",
+          "description": "Maximum number of characters to be printed on one line",
+          "examples": [34, 40]
+        },
+        "SetTrxDataChangeReason": {
+          "type": "array",
+          "description": "Set of transaction data change reasons to activate",
+          "items": { "$ref": "#/$defs/TrxDataChangeReason" }
+        },
+        "UnsolicitedReceipts": {
+          "type": "integer",
+          "description": "If true, every receipt generated by the terminal is forwarded as receipt response to the cash register",
+          "enum": [0, 1]
+        },
+        "SuppressScheduledTasks": {
+          "type": "integer",
+          "description": "If true, no scheduled tasks (initializations, batch captures, etc.) shall be performed; also prevents standby/sleep mode",
+          "enum": [0, 1]
+        },
+        "POSID": {
+          "type": "string",
+          "description": "Point of sale identifier"
+        }
+      },
+      "additionalProperties": true
+    },
+    "ConnectResponse": {
+      "type": "object",
+      "description": "Response to connect request",
+      "required": ["TrmLng", "IFDSerialNum", "SoftwareVersion", "PeSeqCnt", "ActSeqCnt"],
+      "properties": {
+        "TrmID": { "$ref": "#/$defs/TrmID" },
+        "TrmLng": { "$ref": "#/$defs/LanguageCode" },
+        "IFDSerialNum": { "$ref": "#/$defs/IFDSerialNum" },
+        "SoftwareVersion": { "type": "integer" },
+        "PeSeqCnt": { "type": "integer", "description": "Booking period sequence counter" },
+        "ActSeqCnt": { "type": "integer", "description": "Activation/shift sequence counter" }
+      },
+      "additionalProperties": true
+    },
+    "StatusRequest": {
+      "type": "object",
+      "description": "Request terminal status"
+    },
+    "StatusResponse": {
+      "type": "object",
+      "description": "Terminal status response",
+      "required": ["TrmStatus", "TrmLng", "ESigInd"],
+      "properties": {
+        "TrmStatus": { "$ref": "#/$defs/TrmStatus" },
+        "TrmLng": { "$ref": "#/$defs/LanguageCode" },
+        "IIN": { "type": "integer", "description": "Issuer Identification Number (first 6 digits of PAN)" },
+        "ATR": { "$ref": "#/$defs/Base64Binary", "description": "Answer To Reset of the ICC" },
+        "AID": { "$ref": "#/$defs/Base64Binary", "description": "Application Identification Number of currently selected application" },
+        "AIDICC": { "$ref": "#/$defs/Base64Binary", "description": "Application Identification as read from the IC card" },
+        "AppCurrC": { "$ref": "#/$defs/CurrencyCode", "description": "Application Currency Code from EMV card" },
+        "AppCurrExp": { "type": "integer", "description": "Application Currency Exponent" },
+        "Track2Data": { "$ref": "#/$defs/Base64Binary", "description": "Magstripe ISO track 2 data" },
+        "Track3Data": { "$ref": "#/$defs/Base64Binary", "description": "Magstripe ISO track 3 data" },
+        "UID": { "$ref": "#/$defs/Base64Binary", "description": "NFC Unique ID" },
+        "ESigInd": { "type": "integer", "description": "E-Signature indicator (0 or 1)", "enum": [0, 1] },
+        "LastReaderCleaningDate": { "type": "string", "description": "Local date/time of last cleaning: yyyy-MM-dd HH:mm:ss" },
+        "SetAcqInfo": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/AcqInfo" },
+          "description": "Set of configured acquirer information"
+        },
+        "CardholderLng": { "$ref": "#/$defs/LanguageCode" },
+        "NextScheduledTask": { "$ref": "#/$defs/NextScheduledTask" }
+      },
+      "additionalProperties": true
+    },
+    "ActivationRequest": {
+      "type": "object",
+      "description": "Request to activate the terminal (open shift)",
+      "properties": {
+        "AttendantName": { "type": "string" },
+        "AttendantNumber": { "type": "integer" }
+      },
+      "additionalProperties": true
+    },
+    "ActivationResponse": {
+      "type": "object",
+      "description": "Activation response with terminal configuration",
+      "required": ["TrmID", "TrmType", "TrmLng", "PeSeqCnt", "ActSeqCnt", "TrxSeqCnt", "TrxFunctions", "Currencies", "Brands"],
+      "properties": {
+        "TrmID": { "$ref": "#/$defs/TrmID" },
+        "TrmType": {
+          "type": "integer",
+          "enum": [11, 12, 13, 14, 15, 16, 21, 22, 23, 24, 25, 26, 34, 35, 36],
+          "description": "Terminal Type as defined in EMV Book 4, Annex A1"
+        },
+        "TrmLng": { "$ref": "#/$defs/LanguageCode" },
+        "PeSeqCnt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 99999999,
+          "description": "Current booking period sequence counter"
+        },
+        "ActSeqCnt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 99999999,
+          "description": "Current activation sequence counter"
+        },
+        "TrxSeqCnt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 99999999,
+          "description": "Transaction sequence counter of the most recent transaction. If no transactions have been processed so far, the value 0 is used."
+        },
+        "TrmCntryC": { "$ref": "#/$defs/CountryCode" },
+        "MctID": {
+          "type": "string",
+          "minLength": 15,
+          "maxLength": 15,
+          "description": "Merchant identifier"
+        },
+        "MctNameLoc": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 75,
+          "description": "Merchant name and location"
+        },
+        "TrxFunctions": { "$ref": "#/$defs/TrxFunctions" },
+        "Currencies": {
+          "type": "array",
+          "description": "Set of supported currencies",
+          "items": { "$ref": "#/$defs/CurrencyCode" }
+        },
+        "Brands": {
+          "type": "array",
+          "description": "Set of supported card brands",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": true
+    },
+    "DeactivationRequest": {
+      "type": "object",
+      "description": "Request to deactivate the terminal (close shift)"
+    },
+    "DeactivationResponse": {
+      "type": "object",
+      "description": "Deactivation response"
+    },
+    "TransactionRequest": {
+      "type": "object",
+      "description": "Request to perform a payment transaction",
+      "required": ["TrxFunction"],
+      "properties": {
+        "TrxFunction": { "$ref": "#/$defs/TrxFunction" },
+        "TrxCurrC": { "$ref": "#/$defs/CurrencyCode" },
+        "AmtAuth": { "$ref": "#/$defs/Amount" },
+        "AmtOther": {
+          "$ref": "#/$defs/Amount",
+          "description": "Cashback amount"
+        },
+        "AuthC": {
+          "type": "string",
+          "description": "Authorization code for phone-authorized transactions"
+        },
+        "AcqID": {
+          "type": "integer",
+          "description": "Acquirer identifier for reference-based transactions"
+        },
+        "TrxRefNum": {
+          "type": "string",
+          "description": "Original transaction reference for reference-based transactions"
+        },
+        "TrxSeqCntOri": {
+          "type": "integer",
+          "description": "Original transaction sequence counter"
+        },
+        "TrxReasonC": {
+          "type": "string",
+          "description": "Transaction reason code"
+        },
+        "PartialApprovalCap": {
+          "type": "integer",
+          "description": "Partial approval capability (0 or 1)",
+          "enum": [0, 1]
+        },
+        "RecOrderRef": { "$ref": "#/$defs/RecOrderRef" },
+        "DCCOrigDate": {
+          "$ref": "#/$defs/DateYYYYMMDD",
+          "description": "Original date of DCC rate quotation, used for refunds of DCC transactions"
+        },
+        "TextOnUnknownNFC": {
+          "type": "string",
+          "description": "Text to display for unknown NFC cards"
+        },
+        "SetActiveSurrogatePAN": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Base64Binary" },
+          "description": "Surrogate PANs currently involved in a fuelling process (petrol). If any of these cards are presented, the transaction is immediately aborted with result TRX_RESULT_ABORTED_MATCHED_SURROGATE_PAN to let the fuel station print a receipt"
+        },
+        "TrxReqFlags": { "$ref": "#/$defs/TrxReqFlags" }
+      },
+      "additionalProperties": true
+    },
+    "TransactionResponse": {
+      "type": "object",
+      "description": "Transaction result. Warning: Additional fields may be added in future versions.",
+      "required": ["TrxResult", "TrmID", "TrxResultExtended"],
+      "properties": {
+        "TrxResult": { "$ref": "#/$defs/TrxResult" },
+        "TrmID": { "$ref": "#/$defs/TrmID" },
+        "TrxResultExtended": { "$ref": "#/$defs/TrxResultExtended" },
+        "Brand": { "type": "string", "description": "Card brand" },
+        "AccountType": { "type": "integer", "description": "Account type" },
+        "AcqID": { "type": "integer", "description": "Acquirer identifier" },
+        "AID": { "$ref": "#/$defs/Base64Binary", "description": "Application identifier" },
+        "AIDICC": { "$ref": "#/$defs/Base64Binary", "description": "AID as read from card" },
+        "IIN": { "type": "integer", "description": "6-digit issuer identification number" },
+        "AppExpDate": { "$ref": "#/$defs/DateYYMMDD", "description": "Application expiration date" },
+        "AppPAN": { "$ref": "#/$defs/Base64Binary", "description": "Application Primary Account Number" },
+        "AppPANPrtCardholder": { "type": "string", "description": "Masked PAN for cardholder" },
+        "AppPANPrtAttendant": { "type": "string", "description": "Masked PAN for attendant" },
+        "AppPANEnc": { "type": "string", "description": "Encrypted PAN for manual resubmission" },
+        "StatKeyPANRctInd": { "$ref": "#/$defs/Base64Binary", "description": "EP2 Static Key PAN Receipt Index, needed for receipt from ep2 version 6.0.0. With ep2 >= 7.0.0 this field contains <ep2:KeyPANRctInd>" },
+        "KeyPANRctDOLInd": { "$ref": "#/$defs/Base64Binary", "description": "Key PAN Receipt DOL Indicator" },
+        "AmtAuth": { "$ref": "#/$defs/Amount", "description": "Authorized amount" },
+        "AmtOther": { "$ref": "#/$defs/Amount", "description": "Cashback amount" },
+        "TrxAmt": { "$ref": "#/$defs/Amount", "description": "Final transaction amount" },
+        "TipAmt": { "$ref": "#/$defs/Amount", "description": "Tip amount" },
+        "AuthC": { "type": "string", "description": "Authorization code" },
+        "ARC": { "type": "string", "description": "Authorization response code" },
+        "CardholderText": { "type": "string", "description": "Text to be shown to cardholder" },
+        "AttendantText": { "type": "string", "description": "Text to be shown to attendant" },
+        "IssCntryC": { "type": "integer", "description": "Issuer country code" },
+        "POSEntryMode": { "$ref": "#/$defs/POSEntryMode" },
+        "TrxCurrC": { "$ref": "#/$defs/CurrencyCode" },
+        "TrxType": { "type": "integer", "description": "ISO 8583 transaction type" },
+        "TrxSeqCnt": { "type": "integer", "description": "Transaction sequence counter" },
+        "TrxSeqCntOri": { "type": "integer", "description": "Original transaction sequence counter" },
+        "TrxRefNum": { "type": "string", "description": "Transaction reference number" },
+        "TrxDate": { "$ref": "#/$defs/DateYYMMDD", "description": "Transaction date" },
+        "TrxTime": { "$ref": "#/$defs/TimeHHMMSS", "description": "Transaction time" },
+        "AuthReslt": { "type": "integer", "description": "EP2 authorization result" },
+        "VoicePhone": { "type": "string", "description": "Acquirer phone for referrals" },
+        "SurrogatePAN": { "$ref": "#/$defs/Base64Binary", "description": "Surrogate for Primary Account Number" },
+        "AmtAvail": { "$ref": "#/$defs/Amount", "description": "Available amount" },
+        "AmtAvailCurrC": { "$ref": "#/$defs/CurrencyCode", "description": "Currency code for available amount" },
+        "AmtRemaining": { "$ref": "#/$defs/Amount", "description": "Remaining amount for partial approval" },
+        "DisplayName": { "type": "string", "description": "Display name shown to cardholder" },
+        "ESignature": { "$ref": "#/$defs/Base64Binary", "description": "E-signature PNG" },
+        "CVMResults": { "$ref": "#/$defs/Base64Binary", "description": "Cardholder Verification Method results" },
+        "PreAuthExpDate": { "$ref": "#/$defs/DateYYMMDD", "description": "Pre-authorization expiration date" },
+        "ATR": { "$ref": "#/$defs/Base64Binary", "description": "Answer to Reset" },
+        "BonusCardBrandNumber": { "type": "integer", "description": "Bonus card brand number" },
+        "DCCCommissionAmt": { "$ref": "#/$defs/Amount", "description": "DCC commission amount" },
+        "DCCCommissionCurrC": { "$ref": "#/$defs/CurrencyCode", "description": "Currency code for DCC commission amount" },
+        "DCCForeignAmount": { "$ref": "#/$defs/Amount", "description": "Amount in foreign (card) currency for DCC" },
+        "DCCForeignCurrC": { "$ref": "#/$defs/CurrencyCode", "description": "Foreign (card) currency code for DCC" },
+        "DCCMarkupPercentage": { "type": "string", "description": "DCC markup percentage" },
+        "DCCRate": { "type": "integer", "description": "DCC rate" },
+        "DCCRateExp": { "type": "integer", "description": "DCC rate expiration" },
+        "AOSA": { "type": "integer", "description": "Available Offline Spending Amount" },
+        "FormFactorInd": { "$ref": "#/$defs/Base64Binary", "description": "Form factor indicator" }
+      },
+      "additionalProperties": true
+    },
+    "TransactionConfirmationRequest": {
+      "type": "object",
+      "description": "Confirm or rollback an approved transaction",
+      "required":["Confirm"],
+      "properties": {
+        "Confirm": {
+          "type": "integer",
+          "description": "1 to confirm, 0 to rollback",
+          "enum": [0, 1]
+        },
+        "TrxAmt": {
+          "$ref": "#/$defs/Amount",
+          "description": "Amount to confirm (must be <= AmtAuth)"
+        },
+        "TrxSeqCnt": {
+          "type": "integer",
+          "description": "Transaction sequence counter of the transaction to confirm; only needed in petrol environment to confirm Authorization Purchase transactions"
+        }
+      },
+      "additionalProperties": true
+    },
+    "TransactionConfirmationResponse": {
+      "type": "object",
+      "properties": {
+        "MsgType": {
+          "type": "integer",
+          "description": "EMVco message type in case of rollback"
+        },
+        "AuthReslt": {
+          "type": "integer",
+          "description": "EP2 authorization result in case of rollback"
+        },
+        "CardholderText": {
+          "type": "string",
+          "description": "Text to be shown to cardholder in case of rollback"
+        },
+        "AttendantText": {
+          "type": "string",
+          "description": "Text to be shown to attendant in case of rollback"
+        }
+      },
+      "additionalProperties": true
+    },
+    "ConfirmationTimeExtensionRequest": {
+      "type": "object",
+      "description": "Request more time for transaction confirmation",
+      "required": ["Seconds"],
+      "properties": {
+        "Seconds": {
+          "type": "integer", "description": "Additional seconds requested"
+        },
+        "CardholderText": {
+          "type": "string",
+          "description": "Text to be shown to cardholder while waiting for confirmation"
+        }
+      },
+      "additionalProperties": true
+    },
+    "ConfirmationTimeExtensionResponse": {
+      "type": "object"
+    },
+    "AbortTransactionRequest": {
+      "type": "object",
+      "description": "Abort an in-progress transaction",
+      "properties": {
+        "TrxAbortFlags": { "$ref": "#/$defs/TrxAbortFlags" }
+      },
+      "additionalProperties": true
+    },
+    "AbortTransactionResponse": {
+      "type": "object",
+      "description": "Acknowledges transaction abort request"
+    },
+    "BatchCaptureRequest": {
+      "type": "object",
+      "description": "Submit transactions for batch data capture",
+      "properties": {
+        "BatchCaptureFlags": { "$ref": "#/$defs/BatchCaptureFlags" }
+      },
+      "additionalProperties": true
+    },
+    "BatchCaptureResponse": {
+      "type": "object",
+      "description": "Reports successful batch data capture"
+    },
+    "BalanceRequest": {
+      "type": "object",
+      "description": "Perform daily closure"
+    },
+    "BalanceResponse": {
+      "type": "object",
+      "description": "Reports successful daily closure"
+    },
+    "ConfigurationRequest": {
+      "type": "object",
+      "description": "Download configuration from TMS"
+    },
+    "ConfigurationResponse": {
+      "type": "object",
+      "description": "Reports successful configuration download"
+    },
+    "InitializationRequest": {
+      "type": "object",
+      "description": "Initialize terminal with acquirers",
+      "properties": {
+        "AcqID": {
+          "type": "integer",
+          "description": "Acquirer identifier to initialize; if not set, all acquirers will be initialized"
+        }
+      },
+      "additionalProperties": true
+    },
+    "InitializationResponse": {
+      "type": "object",
+      "description": "Reports successful terminal initialization"
+    },
+    "ReceiptRequest": {
+      "type": "object",
+      "description": "Request a receipt",
+      "required": ["ReceiptType"],
+      "properties": {
+        "ReceiptType": { "$ref": "#/$defs/ReceiptType" },
+        "ReceiptIDNumeric": { "type": "integer", "description": "TrxSeqCnt or AcqID" }
+      },
+      "additionalProperties": true
+    },
+    "ReceiptResponse": {
+      "type": "object",
+      "required": ["ReceiptType", "ReceiptFlags", "ReceiptText"],
+      "properties": {
+        "ReceiptType": { "$ref": "#/$defs/ReceiptType" },
+        "ReceiptFlags": { "$ref": "#/$defs/ReceiptFlags" },
+        "ReceiptText": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "ReportRequest": {
+      "type": "object",
+      "description": "Generate a financial report",
+      "properties": {
+        "ReportType": { "$ref": "#/$defs/ReportType" }
+      },
+      "additionalProperties": true
+    },
+    "ReportResponse": {
+      "type": "object",
+      "required": ["ReportType", "ReportFlags"],
+      "properties": {
+        "ReportType": { "$ref": "#/$defs/ReportType" },
+        "ReportFlags": { "$ref": "#/$defs/ReportFlags" },
+        "FinancialReport": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/FinancialReportEntry" }
+        },
+        "TrxListReport": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/TrxListReportEntry" }
+        }
+      },
+      "additionalProperties": true
+    },
+    "TransactionDataChangeRequest": {
+      "type": "object",
+      "description": "Notification of transaction data change",
+      "properties": {
+        "SetTrxDataChangeReason": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/TrxDataChangeReason" }
+        }
+      },
+      "additionalProperties": true
+    },
+    "TransactionDataChangeResponse": {
+      "type": "object",
+      "properties": {
+        "AmtAuth": {
+            "$ref": "#/$defs/Amount",
+            "description": "Updated authorized amount"
+        }
+      },
+      "additionalProperties": true
+    },
+    "LockEFTOperationsRequest": {
+      "type": "object",
+      "description": "Lock EFT operations on terminal"
+    },
+    "LockEFTOperationsResponse": {
+      "type": "object",
+      "description": "Confirms successful locking"
+    },
+    "UnlockEFTOperationsRequest": {
+      "type": "object",
+      "description": "Unlock EFT operations on terminal"
+    },
+    "UnlockEFTOperationsResponse": {
+      "type": "object",
+      "description": "Confirms successful unlocking"
+    },
+    "SetTerminalLanguageRequest": {
+      "type": "object",
+      "description": "Set terminal display language",
+      "required": ["TrmLng"],
+      "properties": {
+        "TrmLng": { "$ref": "#/$defs/LanguageCode" }
+      },
+      "additionalProperties": true
+    },
+    "SetTerminalLanguageResponse": {
+      "type": "object",
+      "description": "Confirms successful terminal language change"
+    },
+    "DialogRequest": {
+      "type": "object",
+      "description": "Display a dialog on the terminal",
+      "required": ["DialogResource"],
+      "properties": {
+        "DialogResource": {
+          "$ref": "#/$defs/DialogResource",
+          "description": "Text identifier to be shown"
+        },
+        "DialogResourceArgs": {
+            "type": "array",
+            "description": "Arguments for dialog resource"
+        },
+        "Timeout": { "type": "integer", "description": "Timeout in milliseconds" },
+        "InputType": { "$ref": "#/$defs/InputType" },
+        "DialogIcon": { "$ref": "#/$defs/DialogIcon" },
+        "DialogFlags": { "$ref": "#/$defs/DialogFlags" },
+        "DefaultInputValue": { "type": "string" },
+        "MinLength": { "type": "integer" },
+        "MaxLength": { "type": "integer" },
+        "ReferencePassword": { "type": "string" },
+        "DefaultIcon": { "$ref": "#/$defs/DialogIcon" },
+        "DefaultResource": {
+          "$ref": "#/$defs/DialogResource",
+          "description": "Text identifier for to show after dialog completion"
+        },
+        "DefaultResourceArgs": {
+          "type": "array",
+          "description": "Arguments for default resource"
+        },
+        "UIButtons": { "$ref": "#/$defs/UIButtons" }
+      },
+      "additionalProperties": true
+    },
+    "DialogResponse": {
+      "type": "object",
+      "required": ["DialogResult"],
+      "properties": {
+        "DialogResult": { "$ref": "#/$defs/DialogResult" },
+        "UTF8String": {
+          "type": "string",
+          "description": "Result of dialog input"
+        },
+        "Boolean": {
+          "type": "integer",
+          "description": "Result of dialog input in case of password verfication (0 or 1)",
+          "enum": [0, 1]
+        }
+      },
+      "additionalProperties": true
+    },
+    "CancelUIRequest": {
+      "type": "object",
+      "description": "Cancel current UI dialog"
+    },
+    "PrintReceiptRequest": {
+      "type": "object",
+      "description": "Print a receipt on terminal printer",
+      "required": ["ReceiptText"],
+      "properties": {
+        "ReceiptText": { "type": "string" },
+        "ReceiptFlags": { "$ref": "#/$defs/ReceiptFlags" }
+      },
+      "additionalProperties": true
+    },
+    "PrintReceiptResponse": {
+      "type": "object",
+      "required": ["PrinterStatus"],
+      "properties": {
+        "PrinterStatus": { "$ref": "#/$defs/PrinterStatus" }
+      },
+      "additionalProperties": true
+    },
+    "DeviceCommandRequest": {
+      "type": "object",
+      "description": "Send a device command",
+      "required": ["DeviceCommandCode"],
+      "properties": {
+        "DeviceCommandCode": { "$ref": "#/$defs/DeviceCommandCode" },
+        "Timeout": { "type": "integer", "description": "Command timeout in milliseconds" },
+        "Title": { "type": "string", "description": "Title to show on terminal while scanning using the device camera" },
+        "Text": { "type": "string", "description": "Hint text to show on terminal while scanning using the device camera" }
+      },
+      "additionalProperties": true
+    },
+    "DeviceCommandResponse": {
+      "type": "object",
+      "required": ["DeviceCommandCode"],
+      "properties": {
+        "DeviceCommandCode": { "$ref": "#/$defs/DeviceCommandCode" },
+        "ScannedData": { "type": "string", "description": "Scanned barcode data" }
+      },
+      "additionalProperties": true
+    },
+    "HeartbeatRequest": {
+      "type": "object",
+      "description": "Keep-alive heartbeat request"
+    },
+    "HeartbeatResponse": {
+      "type": "object",
+      "description": "Keep-alive heartbeat response"
+    },
+    "ErrorNotification": {
+      "type": "object",
+      "description": "Error notification from terminal",
+      "properties": {
+        "ErrorCode": { "$ref": "#/$defs/ErrorCode" },
+        "ErrorSource": { "type": "string" },
+        "ErrorDescription": { "type": "string" }
+      },
+      "additionalProperties": true
+    }
+  },
+  "type": "object",
+  "minProperties": 1,
+  "maxProperties": 1,
+  "properties": {
+    "ConnectRequest": { "$ref": "#/$defs/ConnectRequest" },
+    "ConnectResponse": { "$ref": "#/$defs/ConnectResponse" },
+    "StatusRequest": { "$ref": "#/$defs/StatusRequest" },
+    "StatusResponse": { "$ref": "#/$defs/StatusResponse" },
+    "ActivationRequest": { "$ref": "#/$defs/ActivationRequest" },
+    "ActivationResponse": { "$ref": "#/$defs/ActivationResponse" },
+    "DeactivationRequest": { "$ref": "#/$defs/DeactivationRequest" },
+    "DeactivationResponse": { "$ref": "#/$defs/DeactivationResponse" },
+    "TransactionRequest": { "$ref": "#/$defs/TransactionRequest" },
+    "TransactionResponse": { "$ref": "#/$defs/TransactionResponse" },
+    "TransactionConfirmationRequest": { "$ref": "#/$defs/TransactionConfirmationRequest" },
+    "TransactionConfirmationResponse": { "$ref": "#/$defs/TransactionConfirmationResponse" },
+    "AbortTransactionRequest": { "$ref": "#/$defs/AbortTransactionRequest" },
+    "AbortTransactionResponse": { "$ref": "#/$defs/AbortTransactionResponse" },
+    "BatchCaptureRequest": { "$ref": "#/$defs/BatchCaptureRequest" },
+    "BatchCaptureResponse": { "$ref": "#/$defs/BatchCaptureResponse" },
+    "BalanceRequest": { "$ref": "#/$defs/BalanceRequest" },
+    "BalanceResponse": { "$ref": "#/$defs/BalanceResponse" },
+    "ConfigurationRequest": { "$ref": "#/$defs/ConfigurationRequest" },
+    "ConfigurationResponse": { "$ref": "#/$defs/ConfigurationResponse" },
+    "InitializationRequest": { "$ref": "#/$defs/InitializationRequest" },
+    "InitializationResponse": { "$ref": "#/$defs/InitializationResponse" },
+    "ReceiptRequest": { "$ref": "#/$defs/ReceiptRequest" },
+    "ReceiptResponse": { "$ref": "#/$defs/ReceiptResponse" },
+    "ReportRequest": { "$ref": "#/$defs/ReportRequest" },
+    "ReportResponse": { "$ref": "#/$defs/ReportResponse" },
+    "TransactionDataChangeRequest": { "$ref": "#/$defs/TransactionDataChangeRequest" },
+    "TransactionDataChangeResponse": { "$ref": "#/$defs/TransactionDataChangeResponse" },
+    "ConfirmationTimeExtensionRequest": { "$ref": "#/$defs/ConfirmationTimeExtensionRequest" },
+    "ConfirmationTimeExtensionResponse": { "$ref": "#/$defs/ConfirmationTimeExtensionResponse" },
+    "LockEFTOperationsRequest": { "$ref": "#/$defs/LockEFTOperationsRequest" },
+    "LockEFTOperationsResponse": { "$ref": "#/$defs/LockEFTOperationsResponse" },
+    "UnlockEFTOperationsRequest": { "$ref": "#/$defs/UnlockEFTOperationsRequest" },
+    "UnlockEFTOperationsResponse": { "$ref": "#/$defs/UnlockEFTOperationsResponse" },
+    "SetTerminalLanguageRequest": { "$ref": "#/$defs/SetTerminalLanguageRequest" },
+    "SetTerminalLanguageResponse": { "$ref": "#/$defs/SetTerminalLanguageResponse" },
+    "DialogRequest": { "$ref": "#/$defs/DialogRequest" },
+    "DialogResponse": { "$ref": "#/$defs/DialogResponse" },
+    "CancelUIRequest": { "$ref": "#/$defs/CancelUIRequest" },
+    "PrintReceiptRequest": { "$ref": "#/$defs/PrintReceiptRequest" },
+    "PrintReceiptResponse": { "$ref": "#/$defs/PrintReceiptResponse" },
+    "DeviceCommandRequest": { "$ref": "#/$defs/DeviceCommandRequest" },
+    "DeviceCommandResponse": { "$ref": "#/$defs/DeviceCommandResponse" },
+    "HeartbeatRequest": { "$ref": "#/$defs/HeartbeatRequest" },
+    "HeartbeatResponse": { "$ref": "#/$defs/HeartbeatResponse" },
+    "ErrorNotification": { "$ref": "#/$defs/ErrorNotification" }
+  },
+  "additionalProperties": true
+}
