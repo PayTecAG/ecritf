@@ -884,7 +884,7 @@ document.addEventListener('keydown', (e) => {
           sendTransaction();
         }
         break;
-      case 'Escape':
+      case 'Backspace':
         if (pendingTransaction) {
           abortTransaction();
         }

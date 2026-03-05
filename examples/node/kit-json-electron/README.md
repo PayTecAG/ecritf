@@ -57,7 +57,7 @@ Executables will be in the `dist/` folder.
 ## Keyboard Shortcuts
 
 - `Ctrl+Enter` - Start purchase transaction
-- `Ctrl+Escape` - Abort current transaction
+- `Ctrl+Backspace` - Abort current transaction
 
 ## Message Flow
 
