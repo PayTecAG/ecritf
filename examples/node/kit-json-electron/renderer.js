@@ -718,6 +718,11 @@ async function handleResponse(data) {
     const busy = (status & 0x04) !== 0;
     updateNextTask(message.StatusResponse.NextScheduledTask);
     
+    // Decide on the shift open flag whether the device is activated or not
+    if (activated && !shiftOpen) {
+      activated = false;
+    }
+    
     if (autoActivating) {
       if (busy) {
         // Terminal is busy, retry after a short delay
@@ -813,9 +818,15 @@ async function handleResponse(data) {
     // If more data available, repeat the request; otherwise clear continuation
     if (moreData && lastReceiptRequest) {
       await sendMessage({ ReceiptRequest: lastReceiptRequest });
-    } else {
+    } else if (!moreData) {
       pendingReceiptEntry = null;
     }
+  }
+  
+  if (message.BatchCaptureResponse) {
+    // After batch capture (e.g. Final balance), the shift may have closed.
+    // Request status to re-check the shift open flag.
+    sendStatus();
   }
   
   if (message.ErrorNotification) {

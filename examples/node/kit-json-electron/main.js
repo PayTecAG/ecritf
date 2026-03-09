@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu, dialog } = require('electron');
 const path = require('path');
 const net = require('net');
 const fs = require('fs');
@@ -85,7 +85,41 @@ function createWindow() {
   // mainWindow.webContents.openDevTools();
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  // Build application menu with version in Help
+  const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'), 'utf8'));
+  const menuTemplate = [
+    { role: 'fileMenu' },
+    { role: 'editMenu' },
+    { role: 'viewMenu' },
+    { role: 'windowMenu' },
+    {
+      role: 'help',
+      submenu: [
+        {
+          label: `Version ${pkg.version}`,
+          enabled: false
+        },
+        { type: 'separator' },
+        {
+          label: 'About',
+          click: () => {
+            dialog.showMessageBox(mainWindow, {
+              type: 'info',
+              title: 'About',
+              message: pkg.description || pkg.name,
+              detail: `Version: ${pkg.version}\nAuthor: ${pkg.author || ''}`,
+              buttons: ['OK']
+            });
+          }
+        }
+      ]
+    }
+  ];
+  Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate));
+
+  createWindow();
+});
 
 app.on('window-all-closed', () => {
   app.quit();
@@ -130,7 +164,7 @@ ipcMain.handle('terminal:connect', async (event, host, port) => {
     });
     
     socket.setTimeout(10000, () => {
-      socket.destroy();
+      if (socket) socket.destroy();
       reject(new Error('Connection timeout'));
     });
   });
