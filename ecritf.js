@@ -2284,7 +2284,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     // Wrapper functions to identify which SMQ connection the message came from
     function onMessagePrimary(message, ptid, tid, subtid) {
         onMessage(message, ptid, tid, subtid, false);
-        }
+    }
 
     function onMessageBackup(message, ptid, tid, subtid) {
         onMessage(message, ptid, tid, subtid, true);
@@ -2330,8 +2330,8 @@ PayTec.POSTerminal = function(pairingInfo, options) {
                     clearHeartbeatTimerBackup();
                     heartbeatTimerBackup = setTimeout(heartbeatBackup, heartbeatInterval);
                 } else {
-        clearHeartbeatTimer();
-        heartbeatTimer = setTimeout(heartbeat, heartbeatInterval);
+                    clearHeartbeatTimer();
+                    heartbeatTimer = setTimeout(heartbeat, heartbeatInterval);
                 }
                 return;
             }
@@ -2820,8 +2820,8 @@ PayTec.POSTerminal = function(pairingInfo, options) {
                 // Only trigger disconnect if backup is also not connected
                 if (peerURLBackup === undefined || !smqBackupConnected) {
                     // No backup or backup also disconnected
-                if (canreconnect)
-                    return 3000;
+                    if (canreconnect)
+                        return 3000;
                 } else {
                     // Backup still connected, just reconnect this one silently
                     console.log("Primary SMQ disconnected, backup still active");
@@ -2951,8 +2951,8 @@ PayTec.POSTerminal = function(pairingInfo, options) {
         clearHeartbeatTimer();
         // Only send heartbeat if we're in a connected state
         if (state != State.DISCONNECTED && peerPTID) {
-        sendMessage({HeartbeatRequest: {}});
-    }
+            sendMessage({HeartbeatRequest: {}});
+        }
         // Only disconnect if backup is also not responding or not configured
         if (peerURLBackup === undefined || heartbeatTimerBackup === undefined) {
             heartbeatTimer = setTimeout(function() {
