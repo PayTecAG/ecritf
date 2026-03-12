@@ -2950,7 +2950,7 @@ PayTec.POSTerminal = function(pairingInfo, options) {
     function heartbeat() {
         clearHeartbeatTimer();
         // Only send heartbeat if we're in a connected state
-        if (state != State.DISCONNECTED && peerPTID) {
+        if (state != State.DISCONNECTED && (peerPTID || (localSocket !== undefined && localSocket.readyState === 1))) {
             sendMessage({HeartbeatRequest: {}});
         }
         // Only disconnect if backup is also not responding or not configured
