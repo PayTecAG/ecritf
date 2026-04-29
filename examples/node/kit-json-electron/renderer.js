@@ -200,7 +200,7 @@ function updateUI() {
   document.getElementById('trxFunctionSelect').disabled = !connected || !activated || pendingTransaction;
 
   allButtons.status.disabled = !connected;
-  allButtons.balance.disabled = !connected || !activated;
+  allButtons.balance.disabled = !connected;
   allButtons.report.disabled = !connected;
   allButtons.receipt.disabled = !connected;
   document.getElementById('reportTypeSelect').disabled = !connected;
