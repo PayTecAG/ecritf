@@ -1,7 +1,7 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('terminal', {
-  connect: (host, port) => ipcRenderer.invoke('terminal:connect', host, port),
+  connect: (host, port, protocol) => ipcRenderer.invoke('terminal:connect', host, port, protocol),
   disconnect: () => ipcRenderer.invoke('terminal:disconnect'),
   send: (message) => ipcRenderer.invoke('terminal:send', message),
   

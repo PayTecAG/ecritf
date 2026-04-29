@@ -16,7 +16,8 @@
   },
   "dependencies": {
     "ajv": "^8.12.0",
-    "ajv-formats": "^2.1.1"
+    "ajv-formats": "^2.1.1",
+    "ws": "^8.16.0"
   },
   "build": {
     "appId": "ch.paytec.kit-json-electron",
@@ -25,6 +26,10 @@
       {
         "from": "../../../ecritf-schema.json",
         "to": "ecritf-schema.json"
+      },
+      {
+        "from": "ca-certificates.pem",
+        "to": "ca-certificates.pem"
       }
     ],
     "win": {

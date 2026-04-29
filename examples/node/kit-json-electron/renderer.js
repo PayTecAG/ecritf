@@ -37,6 +37,7 @@ const statusDot = document.getElementById('statusDot');
 const connectBtn = document.getElementById('connectBtn');
 const hostInput = document.getElementById('hostInput');
 const portInput = document.getElementById('portInput');
+const protocolSelect = document.getElementById('protocolSelect');
 const posidInput = document.getElementById('posidInput');
 const printerWidthInput = document.getElementById('printerWidthInput');
 const messagesContent = document.getElementById('messagesContent');
@@ -47,10 +48,23 @@ const savedHost = localStorage.getItem('kit-json-tester-host');
 const savedPort = localStorage.getItem('kit-json-tester-port');
 const savedPosid = localStorage.getItem('kit-json-tester-posid');
 const savedPrinterWidth = localStorage.getItem('kit-json-tester-printerwidth');
+const savedProtocol = localStorage.getItem('kit-json-tester-protocol');
 if (savedHost) hostInput.value = savedHost;
 if (savedPort) portInput.value = savedPort;
 if (savedPosid) posidInput.value = savedPosid;
 if (savedPrinterWidth) printerWidthInput.value = savedPrinterWidth;
+if (savedProtocol) protocolSelect.value = savedProtocol;
+
+// Update default port when protocol changes
+protocolSelect.addEventListener('change', () => {
+  const proto = protocolSelect.value;
+  const currentPort = portInput.value;
+  if (proto === 'wss' && currentPort === '8307') {
+    portInput.value = '18443';
+  } else if (proto === 'tcp' && currentPort === '18443') {
+    portInput.value = '8307';
+  }
+});
 
 // Adjust receipt panel width based on printer width setting
 function updateReceiptWidth() {
@@ -156,6 +170,7 @@ function updateUI() {
   connectBtn.textContent = connected ? 'Disconnect' : 'Connect';
   hostInput.disabled = connected;
   portInput.disabled = connected;
+  protocolSelect.disabled = connected;
   posidInput.disabled = connected;
   printerWidthInput.disabled = connected;
   
@@ -459,16 +474,19 @@ async function toggleConnection() {
     try {
       const host = hostInput.value || '127.0.0.1';
       const port = portInput.value || '8307';
-      await window.terminal.connect(host, port);
+      const protocol = protocolSelect.value || 'tcp';
+      await window.terminal.connect(host, port, protocol);
       connected = true;
       
       // Save settings for next time
       localStorage.setItem('kit-json-tester-host', host);
       localStorage.setItem('kit-json-tester-port', port);
+      localStorage.setItem('kit-json-tester-protocol', protocol);
       localStorage.setItem('kit-json-tester-posid', posidInput.value.trim());
       localStorage.setItem('kit-json-tester-printerwidth', printerWidthInput.value);
       
-      addMessage('info', 'info', { Info: `Connected to ${host}:${port}` });
+      const protoLabel = protocol === 'wss' ? 'WSS' : 'TCP';
+      addMessage('info', 'info', { Info: `Connected to ${host}:${port} (${protoLabel})` });
       
       // Auto-send connect request
       await sendConnect();

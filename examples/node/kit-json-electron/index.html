@@ -471,6 +471,10 @@
       <span style="color:#a8b2c1;font-size:12px">PayTec Terminal Interface</span>
       <div class="connection">
         <div class="status-dot" id="statusDot"></div>
+        <select id="protocolSelect" class="header-input" aria-label="Protocol" title="Connection protocol" style="width:80px">
+          <option value="tcp">TCP</option>
+          <option value="wss">WSS</option>
+        </select>
         <span class="floating-field header-field" data-label="Host" style="width:120px">
           <input type="text" id="hostInput" value="127.0.0.1" class="header-input" placeholder=" " aria-label="Host">
         </span>

@@ -2,11 +2,13 @@ const { app, BrowserWindow, ipcMain, Menu, dialog } = require('electron');
 const path = require('path');
 const net = require('net');
 const fs = require('fs');
+const WebSocket = require('ws');
 const Ajv2020 = require('ajv/dist/2020');
 const addFormats = require('ajv-formats');
 
 let mainWindow;
 let socket = null;
+let wsClient = null;
 let rxBuffer = '';
 
 // Load and compile schema
@@ -20,6 +22,24 @@ const schema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
 const ajv = new Ajv2020({ allErrors: true, strict: false });
 addFormats(ajv);
 const validate = ajv.compile(schema);
+
+// Load custom CA certificates for WSS connections
+const caPath = fs.existsSync(path.join(__dirname, 'ca-certificates.pem'))
+  ? path.join(__dirname, 'ca-certificates.pem')
+  : fs.existsSync(path.join(process.resourcesPath || '', 'ca-certificates.pem'))
+    ? path.join(process.resourcesPath, 'ca-certificates.pem')
+    : null;
+
+function loadCaCertificates() {
+  if (!caPath) return undefined;
+  try {
+    const content = fs.readFileSync(caPath, 'utf8').trim();
+    if (!content || !content.includes('-----BEGIN CERTIFICATE-----')) return undefined;
+    return content;
+  } catch {
+    return undefined;
+  }
+}
 
 // Window state persistence
 const stateFile = path.join(app.getPath('userData'), 'window-state.json');
@@ -70,11 +90,7 @@ function createWindow() {
   // Clean up socket before window closes
   mainWindow.on('close', () => {
     saveWindowState();
-    if (socket) {
-      socket.removeAllListeners();
-      socket.destroy();
-      socket = null;
-    }
+    destroyConnection();
   });
   
   mainWindow.on('closed', () => {
@@ -126,60 +142,113 @@ app.on('window-all-closed', () => {
 });
 
 // Terminal connection handling
-ipcMain.handle('terminal:connect', async (event, host, port) => {
-  return new Promise((resolve, reject) => {
-    if (socket) {
-      socket.destroy();
-    }
-    
-    rxBuffer = '';
-    socket = new net.Socket();
-    
-    socket.connect(parseInt(port), host, () => {
-      // Clear the connection timeout once connected
-      socket.setTimeout(0);
-      resolve({ success: true });
-    });
-    
-    socket.on('data', (data) => {
-      rxBuffer += data.toString();
-      let newlineIdx;
-      while ((newlineIdx = rxBuffer.indexOf('\n')) !== -1) {
-        const line = rxBuffer.substring(0, newlineIdx).trim();
-        rxBuffer = rxBuffer.substring(newlineIdx + 1);
-        if (line) {
-          processIncoming(line);
-        }
+function destroyConnection() {
+  if (wsClient) {
+    wsClient.removeAllListeners();
+    wsClient.close();
+    wsClient = null;
+  }
+  if (socket) {
+    socket.removeAllListeners();
+    socket.destroy();
+    socket = null;
+  }
+}
+
+function setupDataStream(writeFn) {
+  // Returns a function to feed incoming data through the line-buffered parser
+  return (data) => {
+    rxBuffer += typeof data === 'string' ? data : data.toString();
+    let newlineIdx;
+    while ((newlineIdx = rxBuffer.indexOf('\n')) !== -1) {
+      const line = rxBuffer.substring(0, newlineIdx).trim();
+      rxBuffer = rxBuffer.substring(newlineIdx + 1);
+      if (line) {
+        processIncoming(line);
       }
-    });
-    
-    socket.on('close', () => {
-      sendToRenderer('terminal:disconnected');
-      socket = null;
-    });
-    
-    socket.on('error', (err) => {
-      sendToRenderer('terminal:error', err.message);
-      reject(err);
-    });
-    
-    socket.setTimeout(10000, () => {
-      if (socket) socket.destroy();
-      reject(new Error('Connection timeout'));
-    });
+    }
+  };
+}
+
+ipcMain.handle('terminal:connect', async (event, host, port, protocol) => {
+  return new Promise((resolve, reject) => {
+    destroyConnection();
+    rxBuffer = '';
+
+    if (protocol === 'wss') {
+      const ca = loadCaCertificates();
+      const wsOptions = {
+        rejectUnauthorized: !!ca,
+      };
+      if (ca) {
+        wsOptions.ca = ca;
+      }
+
+      const url = `wss://${host}:${port}`;
+      wsClient = new WebSocket(url, wsOptions);
+
+      const timeout = setTimeout(() => {
+        if (wsClient) {
+          wsClient.removeAllListeners();
+          wsClient.close();
+          wsClient = null;
+        }
+        reject(new Error('Connection timeout'));
+      }, 10000);
+
+      wsClient.on('open', () => {
+        clearTimeout(timeout);
+        resolve({ success: true });
+      });
+
+      wsClient.on('message', setupDataStream());
+
+      wsClient.on('close', () => {
+        clearTimeout(timeout);
+        sendToRenderer('terminal:disconnected');
+        wsClient = null;
+      });
+
+      wsClient.on('error', (err) => {
+        clearTimeout(timeout);
+        sendToRenderer('terminal:error', err.message);
+        reject(err);
+      });
+    } else {
+      socket = new net.Socket();
+
+      socket.connect(parseInt(port), host, () => {
+        socket.setTimeout(0);
+        resolve({ success: true });
+      });
+
+      socket.on('data', setupDataStream());
+
+      socket.on('close', () => {
+        sendToRenderer('terminal:disconnected');
+        socket = null;
+      });
+
+      socket.on('error', (err) => {
+        sendToRenderer('terminal:error', err.message);
+        reject(err);
+      });
+
+      socket.setTimeout(10000, () => {
+        if (socket) socket.destroy();
+        reject(new Error('Connection timeout'));
+      });
+    }
   });
 });
 
 ipcMain.handle('terminal:disconnect', async () => {
-  if (socket) {
-    socket.destroy();
-    socket = null;
-  }
+  destroyConnection();
   return { success: true };
 });
 
 ipcMain.handle('terminal:send', async (event, message) => {
-  if (!socket) {
+  if (!socket && !wsClient) {
     throw new Error('Not connected');
   }
   
@@ -191,7 +260,11 @@ ipcMain.handle('terminal:send', async (event, message) => {
   }
   
   const line = JSON.stringify(json) + '\n';
-  socket.write(line);
+  if (wsClient) {
+    wsClient.send(Buffer.from(line));
+  } else {
+    socket.write(line);
+  }
   
   sendToRenderer('terminal:sent', {
     message: json,
@@ -224,7 +297,8 @@ function processIncoming(line) {
     // Auto-respond to HeartbeatRequest
     if (json.HeartbeatRequest !== undefined) {
       const response = JSON.stringify({ HeartbeatResponse: {} }) + '\n';
-      if (socket) socket.write(response);
+      if (wsClient) wsClient.send(Buffer.from(response));
+      else if (socket) socket.write(response);
       sendToRenderer('terminal:heartbeat');
       return;
     }
