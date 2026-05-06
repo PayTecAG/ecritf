@@ -40,6 +40,7 @@ const portInput = document.getElementById('portInput');
 const protocolSelect = document.getElementById('protocolSelect');
 const posidInput = document.getElementById('posidInput');
 const printerWidthInput = document.getElementById('printerWidthInput');
+const useExternalDisplayCheck = document.getElementById('useExternalDisplayCheck');
 const messagesContent = document.getElementById('messagesContent');
 const receiptContent = document.getElementById('receiptContent');
 
@@ -49,11 +50,13 @@ const savedPort = localStorage.getItem('kit-json-tester-port');
 const savedPosid = localStorage.getItem('kit-json-tester-posid');
 const savedPrinterWidth = localStorage.getItem('kit-json-tester-printerwidth');
 const savedProtocol = localStorage.getItem('kit-json-tester-protocol');
+const savedUseExternalDisplay = localStorage.getItem('kit-json-tester-useexternaldisplay');
 if (savedHost) hostInput.value = savedHost;
 if (savedPort) portInput.value = savedPort;
 if (savedPosid) posidInput.value = savedPosid;
 if (savedPrinterWidth) printerWidthInput.value = savedPrinterWidth;
 if (savedProtocol) protocolSelect.value = savedProtocol;
+if (savedUseExternalDisplay !== null) useExternalDisplayCheck.checked = savedUseExternalDisplay === '1';
 
 // Update default port when protocol changes
 protocolSelect.addEventListener('change', () => {
@@ -173,6 +176,7 @@ function updateUI() {
   protocolSelect.disabled = connected;
   posidInput.disabled = connected;
   printerWidthInput.disabled = connected;
+  useExternalDisplayCheck.disabled = connected;
   
   // Activate/Deactivate toggle button
   allButtons.activate.disabled = !connected;
@@ -484,6 +488,7 @@ async function toggleConnection() {
       localStorage.setItem('kit-json-tester-protocol', protocol);
       localStorage.setItem('kit-json-tester-posid', posidInput.value.trim());
       localStorage.setItem('kit-json-tester-printerwidth', printerWidthInput.value);
+      localStorage.setItem('kit-json-tester-useexternaldisplay', useExternalDisplayCheck.checked ? '1' : '0');
       
       const protoLabel = protocol === 'wss' ? 'WSS' : 'TCP';
       addMessage('info', 'info', { Info: `Connected to ${host}:${port} (${protoLabel})` });
@@ -513,6 +518,9 @@ async function sendConnect() {
     PrinterWidth: (pw >= 20 && pw <= 80) ? pw : 40,
     UnsolicitedReceipts: 1
   };
+  if (useExternalDisplayCheck.checked) {
+    req.UseExternalDisplay = 1;
+  }
   const posid = posidInput.value.trim();
   if (posid) req.POSID = posid;
   await sendMessage({ ConnectRequest: req });

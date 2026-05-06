@@ -487,6 +487,10 @@
         <span class="floating-field header-field" data-label="PW" style="width:50px">
           <input type="number" id="printerWidthInput" value="40" class="header-input" placeholder=" " aria-label="Printer Width" title="Printer Width (characters per line)" min="20" max="80">
         </span>
+        <label style="display:flex;align-items:center;gap:4px;color:#a8b2c1;font-size:11px;white-space:nowrap" title="Forward cardholder prompts and RFID status to ECR">
+          <input type="checkbox" id="useExternalDisplayCheck" aria-label="Use External Display">
+          Forward cardholder display
+        </label>
         <button id="connectBtn" onclick="toggleConnection()">Connect</button>
       </div>
     </div>
