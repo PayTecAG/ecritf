@@ -1,9 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://paytec.ch/schemas/ecritf-v1.0.0.json",
+  "$id": "https://paytec.ch/schemas/ecritf-v1.1.0.json",
   "title": "PayTec EFT/POS Terminal Interface Schema",
   "description": "JSON Schema for the PayTec ECR Interface messages. This schema defines all request and response messages for communication with PayTec EFT/POS terminals.",
-  "version": "1.0.0",
   "$defs": {
     "TrmID": {
       "type": "string",
@@ -146,6 +145,11 @@
       "type": "integer",
       "description": "UI button flags (bitwise combination): 0x01=OK, 0x02=Cancel, 0x04=Clear, 0x08=Back, 0x10=Left, 0x20=Right",
       "minimum": 0
+    },
+    "RFIDStatus": {
+      "type": "integer",
+      "description": "RFID status: 0=Not working, 1=Idle, 2=Ready, 3=Processing, 4=Complete, 5=Ready with LEDs extinguished, 99=Error, 255=Not applicable",
+      "enum": [0, 1, 2, 3, 4, 5, 99, 255]
     },
     "ErrorCode": {
       "type": "integer",
@@ -316,6 +320,11 @@
         "SuppressScheduledTasks": {
           "type": "integer",
           "description": "If true, no scheduled tasks (initializations, batch captures, etc.) shall be performed; also prevents standby/sleep mode",
+          "enum": [0, 1]
+        },
+        "UseExternalDisplay": {
+          "type": "integer",
+          "description": "If true, the cardholder prompts and RFID status notifications are forwarded to the cash register.",
           "enum": [0, 1]
         },
         "POSID": {
@@ -867,6 +876,23 @@
       },
       "additionalProperties": true
     },
+    "DisplayNotification": {
+      "type": "object",
+      "description": "Informs the ECR about text displayed on the terminal",
+      "properties": {
+        "CardholderText": { "type": "string", "description": "Text displayed to cardholder" },
+        "CardholderResource": { "type": "integer", "description": "Numeric identifier for cardholder text" }
+      },
+      "additionalProperties": true
+    },
+    "RFIDStatusNotification": {
+      "type": "object",
+      "description": "Informs the ECR about RFID status changes",
+      "properties": {
+        "RFIDStatus": { "$ref": "#/$defs/RFIDStatus" }
+      },
+      "additionalProperties": true
+    },
     "HeartbeatRequest": {
       "type": "object",
       "description": "Keep-alive heartbeat request"
@@ -933,6 +959,8 @@
     "PrintReceiptResponse": { "$ref": "#/$defs/PrintReceiptResponse" },
     "DeviceCommandRequest": { "$ref": "#/$defs/DeviceCommandRequest" },
     "DeviceCommandResponse": { "$ref": "#/$defs/DeviceCommandResponse" },
+    "DisplayNotification": { "$ref": "#/$defs/DisplayNotification" },
+    "RFIDStatusNotification": { "$ref": "#/$defs/RFIDStatusNotification" },
     "HeartbeatRequest": { "$ref": "#/$defs/HeartbeatRequest" },
     "HeartbeatResponse": { "$ref": "#/$defs/HeartbeatResponse" },
     "ErrorNotification": { "$ref": "#/$defs/ErrorNotification" }
