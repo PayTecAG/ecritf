@@ -1,6 +1,6 @@
 {
   "name": "kit-json-electron",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "PayTec KIT JSON Tester Application",
   "main": "main.js",
   "scripts": {

@@ -51,6 +51,7 @@ const savedPosid = localStorage.getItem('kit-json-tester-posid');
 const savedPrinterWidth = localStorage.getItem('kit-json-tester-printerwidth');
 const savedProtocol = localStorage.getItem('kit-json-tester-protocol');
 const savedUseExternalDisplay = localStorage.getItem('kit-json-tester-useexternaldisplay');
+const PETROL_SETTINGS_KEY = 'kit-json-tester-petrol-settings';
 if (savedHost) hostInput.value = savedHost;
 if (savedPort) portInput.value = savedPort;
 if (savedPosid) posidInput.value = savedPosid;
@@ -435,6 +436,338 @@ function escapeHtml(str) {
   return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
+function readOptionalText(id) {
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+
+function createProductRecord(values = {}) {
+  const row = document.createElement('div');
+  row.className = 'petrol-line-item product-record-item';
+  row.innerHTML = `
+    <div class="petrol-line-actions">
+      <select data-product-record-field="RecordType" aria-label="Record Type" onchange="onProductRecordTypeChange(this)" style="flex:1">
+        <option value="Fuel">Fuel</option>
+        <option value="Shop">Shop</option>
+        <option value="OrderRef">OrderRef</option>
+      </select>
+      <button type="button" onclick="removeProductRecord(this)" class="secondary" style="width:auto;padding:4px 8px;font-size:11px">Remove</button>
+    </div>
+    <div class="petrol-line-row" data-record-fields="product">
+      <span class="floating-field control-field" data-label="Product Code">
+        <input type="text" data-product-record-field="ProdCode" placeholder=" " aria-label="Product Code">
+      </span>
+      <span class="floating-field control-field" data-label="Description">
+        <input type="text" data-product-record-field="ProdDescript" placeholder=" " aria-label="Product Description">
+      </span>
+      <span class="floating-field control-field" data-label="Quantity">
+        <input type="text" data-product-record-field="ProdQuantity" placeholder=" " aria-label="Product Quantity">
+      </span>
+      <span class="floating-field control-field" data-label="Unit Price">
+        <input type="text" data-product-record-field="UnitPrice" placeholder=" " aria-label="Unit Price">
+      </span>
+      <span class="floating-field control-field" data-label="Price">
+        <input type="text" data-product-record-field="Price" placeholder=" " aria-label="Price">
+      </span>
+      <span class="floating-field control-field" data-record-fields="fuel" data-label="Pump No">
+        <input type="number" data-product-record-field="ItemPumpNo" placeholder=" " aria-label="Pump Number" min="0">
+      </span>
+    </div>
+    <span class="floating-field control-field" data-record-fields="product" data-label="AID Restrictions">
+      <input type="text" data-product-record-field="AIDs" placeholder=" " aria-label="AID Restrictions" title="Enter multiple base64 AIDs separated by comma, space, semicolon, or newline">
+    </span>
+    <span class="floating-field control-field" data-record-fields="order" data-label="Order ID" style="display:none">
+      <input type="text" data-product-record-field="OrderID" placeholder=" " aria-label="Order ID" maxlength="48">
+    </span>
+  `;
+
+  Object.keys(values).forEach(key => {
+    const field = row.querySelector(`[data-product-record-field="${key}"]`);
+    if (!field) return;
+    if (field.type === 'checkbox') field.checked = !!values[key];
+    else field.value = values[key];
+  });
+  updateProductRecordFields(row);
+  updateProductRecordTypeOptions();
+  return row;
+}
+
+function onProductRecordTypeChange(select) {
+  updateProductRecordFields(select.closest('.product-record-item'));
+  updateProductRecordTypeOptions();
+  saveTransactionExtensionSettings();
+  updateProductRecordsAmountInput();
+}
+
+function updateProductRecordTypeOptions() {
+  const usedSingleRecordTypes = new Set();
+  document.querySelectorAll('.product-record-item').forEach(row => {
+    const type = readProductRecordField(row, 'RecordType');
+    if (type && type !== 'Fuel') usedSingleRecordTypes.add(type);
+  });
+
+  document.querySelectorAll('.product-record-item').forEach(row => {
+    const currentType = readProductRecordField(row, 'RecordType');
+    row.querySelectorAll('[data-product-record-field="RecordType"] option').forEach(option => {
+      option.disabled = option.value !== 'Fuel' && option.value !== currentType && usedSingleRecordTypes.has(option.value);
+    });
+  });
+}
+
+function updateProductRecordFields(row) {
+  if (!row) return;
+  const type = readProductRecordField(row, 'RecordType') || 'Fuel';
+  row.querySelectorAll('[data-record-fields="product"]').forEach(el => {
+    el.style.display = type === 'OrderRef' ? 'none' : '';
+  });
+  row.querySelectorAll('[data-record-fields="fuel"]').forEach(el => {
+    el.style.display = type === 'Fuel' ? '' : 'none';
+  });
+  row.querySelectorAll('[data-record-fields="order"]').forEach(el => {
+    el.style.display = type === 'OrderRef' ? '' : 'none';
+  });
+}
+
+function addProductRecord(values) {
+  document.getElementById('productRecords').appendChild(createProductRecord(values));
+  updateProductRecordTypeOptions();
+  saveTransactionExtensionSettings();
+  updateProductRecordsAmountInput();
+}
+
+function removeProductRecord(button) {
+  const rows = document.querySelectorAll('.product-record-item');
+  if (rows.length <= 1) return;
+  button.closest('.product-record-item').remove();
+  updateProductRecordTypeOptions();
+  saveTransactionExtensionSettings();
+  updateProductRecordsAmountInput();
+}
+
+function readProductRecordField(row, fieldName) {
+  const field = row.querySelector(`[data-product-record-field="${fieldName}"]`);
+  if (!field) return '';
+  return field.type === 'checkbox' ? field.checked : field.value.trim();
+}
+
+function splitProductRecordAids(value) {
+  return value.split(/[\s,;]+/).map(aid => aid.trim()).filter(Boolean);
+}
+
+function hasProductRecordData(record, aids) {
+  if (record.RecordType === 'OrderRef') return !!record.OrderID;
+  return !!(record.ProdCode || record.ProdDescript || record.ProdQuantity || record.UnitPrice || record.Price || record.ItemPumpNo || aids.length > 0);
+}
+
+function parseProductRecordPriceToCents(value, label) {
+  if (!value) throw new Error(`${label} needs a price`);
+  const amount = Number(value.replace(',', '.'));
+  if (!Number.isFinite(amount)) throw new Error(`${label} has an invalid price`);
+  return Math.round(amount * 100);
+}
+
+function buildRestrictionItem(record) {
+  const item = {};
+  if (record.ProdCode) item.ItemID = record.ProdCode;
+  if (record.ProdQuantity) item.ItemQuantity = record.ProdQuantity;
+  if (record.UnitPrice) item.ItemUnitPrice = record.UnitPrice;
+  if (record.Price) item.ItemAmt = record.Price;
+  if (record.ItemPumpNo !== '') item.ItemPumpNo = parseInt(record.ItemPumpNo, 10);
+  return item;
+}
+
+function readProductRecords() {
+  const prRecords = [];
+  const restrictionsByAid = new Map();
+  const usedSingleRecordTypes = new Set();
+  let amountCents = 0;
+
+  document.querySelectorAll('.product-record-item').forEach(row => {
+    const record = {
+      RecordType: readProductRecordField(row, 'RecordType') || 'Fuel',
+      ProdCode: readProductRecordField(row, 'ProdCode'),
+      ProdDescript: readProductRecordField(row, 'ProdDescript'),
+      ProdQuantity: readProductRecordField(row, 'ProdQuantity'),
+      UnitPrice: readProductRecordField(row, 'UnitPrice'),
+      Price: readProductRecordField(row, 'Price'),
+      ItemPumpNo: readProductRecordField(row, 'ItemPumpNo'),
+      OrderID: readProductRecordField(row, 'OrderID')
+    };
+    const aids = splitProductRecordAids(readProductRecordField(row, 'AIDs'));
+    if (!hasProductRecordData(record, aids)) return;
+    if (record.RecordType !== 'Fuel') {
+      if (usedSingleRecordTypes.has(record.RecordType)) throw new Error(`Only one ${record.RecordType} record is allowed`);
+      usedSingleRecordTypes.add(record.RecordType);
+    }
+
+    if (record.RecordType === 'OrderRef') {
+      if (!record.OrderID) throw new Error('Each OrderRef record needs an order ID');
+      prRecords.push({ RecordType: 'OrderRef', OrderID: record.OrderID });
+      return;
+    }
+
+    if (!record.ProdCode) throw new Error(`Each ${record.RecordType} record needs a product code`);
+    amountCents += parseProductRecordPriceToCents(record.Price, record.ProdCode);
+
+    const prRecord = {
+      RecordType: record.RecordType,
+      ProdCode: record.ProdCode,
+      ProdDescript: record.ProdDescript,
+      ProdQuantity: record.ProdQuantity,
+      UnitPrice: record.UnitPrice,
+      Price: record.Price
+    };
+    Object.keys(prRecord).forEach(key => {
+      if (prRecord[key] === '') delete prRecord[key];
+    });
+    prRecords.push(prRecord);
+
+    if (aids.length > 0) {
+      const restrictionItem = buildRestrictionItem(record);
+      aids.forEach(aid => {
+        if (!restrictionsByAid.has(aid)) restrictionsByAid.set(aid, []);
+        restrictionsByAid.get(aid).push(restrictionItem);
+      });
+    }
+  });
+
+  return {
+    prRecords,
+    restrictions: Array.from(restrictionsByAid, ([AID, Items]) => ({ AID, Items })),
+    amountCents
+  };
+}
+
+function addTransactionExtensionData(req) {
+  const errorEl = document.getElementById('productRecordsError');
+  if (errorEl) errorEl.textContent = '';
+  const includePetrolPOSData = document.getElementById('includePetrolPOSDataCheck').checked;
+  const includeProductRecords = document.getElementById('includeProductRecordsCheck').checked;
+  if (!includePetrolPOSData && !includeProductRecords) return true;
+
+  try {
+    if (includePetrolPOSData) {
+      const petrolPOSData = {
+        ClerkID: readOptionalText('petrolClerkIdInput'),
+        FuelDispNo: readOptionalText('petrolFuelDispNoInput'),
+        POSDNo: readOptionalText('petrolPosdNoInput'),
+        RctNo: readOptionalText('petrolRctNoInput'),
+        ShiftNo: readOptionalText('petrolShiftNoInput')
+      };
+      Object.keys(petrolPOSData).forEach(key => {
+        if (!petrolPOSData[key]) delete petrolPOSData[key];
+      });
+      if (Object.keys(petrolPOSData).length > 0) req.PetrolPOSData = petrolPOSData;
+    }
+
+    if (includeProductRecords) {
+      const { prRecords, restrictions, amountCents } = readProductRecords();
+      if (prRecords.length > 0) req.PrRecords = prRecords;
+      if (restrictions.length > 0) req.SetOfRestrictionsPerAID = restrictions;
+      if (prRecords.some(record => record.RecordType !== 'OrderRef')) {
+        if (amountCents < 0) throw new Error('Authorization amount from product records must not be negative');
+        req.AmtAuth = amountCents;
+      }
+    }
+    return true;
+  } catch (err) {
+    if (errorEl) errorEl.textContent = err.message;
+    addMessage('error', 'error', { Error: `Invalid transaction extension data: ${err.message}` });
+    return false;
+  }
+}
+
+function getProductRecordValues(row) {
+  return {
+    RecordType: readProductRecordField(row, 'RecordType'),
+    ProdCode: readProductRecordField(row, 'ProdCode'),
+    ProdDescript: readProductRecordField(row, 'ProdDescript'),
+    ProdQuantity: readProductRecordField(row, 'ProdQuantity'),
+    UnitPrice: readProductRecordField(row, 'UnitPrice'),
+    Price: readProductRecordField(row, 'Price'),
+    ItemPumpNo: readProductRecordField(row, 'ItemPumpNo'),
+    AIDs: readProductRecordField(row, 'AIDs'),
+    OrderID: readProductRecordField(row, 'OrderID')
+  };
+}
+
+function updateProductRecordsAmountInput() {
+  if (!document.getElementById('includeProductRecordsCheck').checked) return;
+
+  let amountCents = 0;
+  let hasProductRecords = false;
+  try {
+    document.querySelectorAll('.product-record-item').forEach(row => {
+      const record = getProductRecordValues(row);
+      if (record.RecordType === 'OrderRef') return;
+      const aids = splitProductRecordAids(record.AIDs);
+      if (!hasProductRecordData(record, aids)) return;
+      if (!record.Price) throw new Error('Missing product record price');
+      amountCents += parseProductRecordPriceToCents(record.Price, record.ProdCode || 'Product record');
+      hasProductRecords = true;
+    });
+  } catch {
+    return;
+  }
+
+  if (hasProductRecords && amountCents >= 0) {
+    document.getElementById('amountInput').value = (amountCents / 100).toFixed(2);
+  }
+}
+
+function saveTransactionExtensionSettings() {
+  const settings = {
+    includePetrolPOSData: document.getElementById('includePetrolPOSDataCheck').checked,
+    includeProductRecords: document.getElementById('includeProductRecordsCheck').checked,
+    petrolPOSData: {
+      ClerkID: readOptionalText('petrolClerkIdInput'),
+      FuelDispNo: readOptionalText('petrolFuelDispNoInput'),
+      POSDNo: readOptionalText('petrolPosdNoInput'),
+      RctNo: readOptionalText('petrolRctNoInput'),
+      ShiftNo: readOptionalText('petrolShiftNoInput')
+    },
+    productRecords: Array.from(document.querySelectorAll('.product-record-item'), getProductRecordValues)
+  };
+  localStorage.setItem(PETROL_SETTINGS_KEY, JSON.stringify(settings));
+}
+
+function restoreTransactionExtensionSettings() {
+  let settings = null;
+  try {
+    const raw = localStorage.getItem(PETROL_SETTINGS_KEY);
+    if (raw) settings = JSON.parse(raw);
+  } catch {
+    settings = null;
+  }
+
+  if (settings) {
+    const includeLegacyPetrolData = !!settings.includePetrolData;
+    document.getElementById('includePetrolPOSDataCheck').checked = settings.includePetrolPOSData !== undefined ? !!settings.includePetrolPOSData : includeLegacyPetrolData;
+    document.getElementById('includeProductRecordsCheck').checked = settings.includeProductRecords !== undefined ? !!settings.includeProductRecords : includeLegacyPetrolData;
+    const petrolPOSData = settings.petrolPOSData || {};
+    document.getElementById('petrolClerkIdInput').value = petrolPOSData.ClerkID || '';
+    document.getElementById('petrolFuelDispNoInput').value = petrolPOSData.FuelDispNo || '';
+    document.getElementById('petrolPosdNoInput').value = petrolPOSData.POSDNo || '';
+    document.getElementById('petrolRctNoInput').value = petrolPOSData.RctNo || '';
+    document.getElementById('petrolShiftNoInput').value = petrolPOSData.ShiftNo || '';
+    const productRecords = Array.isArray(settings.productRecords) ? settings.productRecords : (Array.isArray(settings.lineItems) ? settings.lineItems : []);
+    productRecords.forEach(record => addProductRecord(record));
+  }
+
+  if (document.querySelectorAll('.product-record-item').length === 0) {
+    addProductRecord({
+      RecordType: 'Fuel',
+      ProdCode: 'PROD1234',
+      ProdDescript: 'Diesel',
+      ProdQuantity: '10.00',
+      UnitPrice: '1.800',
+      Price: '18.00',
+      ItemPumpNo: '1',
+      AIDs: 'oAAAAAQQEA=='
+    });
+  }
+}
+
 function showReceipt(text) {
   const entry = document.createElement('div');
   entry.style.cssText = 'margin-bottom:10px;padding-bottom:10px;border-bottom:1px dashed #ccc';
@@ -489,6 +822,7 @@ async function toggleConnection() {
       localStorage.setItem('kit-json-tester-posid', posidInput.value.trim());
       localStorage.setItem('kit-json-tester-printerwidth', printerWidthInput.value);
       localStorage.setItem('kit-json-tester-useexternaldisplay', useExternalDisplayCheck.checked ? '1' : '0');
+      saveTransactionExtensionSettings();
       
       const protoLabel = protocol === 'wss' ? 'WSS' : 'TCP';
       addMessage('info', 'info', { Info: `Connected to ${host}:${port} (${protoLabel})` });
@@ -583,6 +917,8 @@ async function sendTransaction() {
   if (fn === 32 && lastTrxSeqCnt) {
     req.TrxSeqCntOri = lastTrxSeqCnt;
   }
+  saveTransactionExtensionSettings();
+  if (!addTransactionExtensionData(req)) return;
 
   pendingTransaction = true;
   // Store noAutoConfirm flag for this transaction
@@ -973,4 +1309,20 @@ function clearMessages() {
 }
 
 // Initial UI state
+restoreTransactionExtensionSettings();
+const transactionExtensionSections = [
+  document.getElementById('petrolPOSDataSection'),
+  document.getElementById('productRecordsSection')
+];
+transactionExtensionSections.forEach(section => {
+  section.addEventListener('input', () => {
+    saveTransactionExtensionSettings();
+    updateProductRecordsAmountInput();
+  });
+  section.addEventListener('change', () => {
+    saveTransactionExtensionSettings();
+    updateProductRecordsAmountInput();
+  });
+});
+updateProductRecordsAmountInput();
 updateUI();

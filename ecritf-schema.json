@@ -297,6 +297,229 @@
         }
       }
     },
+    "PetrolPOSData": {
+      "type": "object",
+      "description": "Sent by the POSD to the terminal and is used only for petrol MOC transactions",
+      "properties": {
+        "ClerkID": {
+          "type": "string",
+          "description": "Clerk Identifier"
+        },
+        "FuelDispNo": {
+          "type": "string",
+          "description": "Fuel Dispenser Number"
+        },
+        "POSDNo": {
+          "type": "string",
+          "description": "POSD Number"
+        },
+        "RctNo": {
+          "type": "string",
+          "description": "Receipt Number"
+        },
+        "ShiftNo": {
+          "type": "string",
+          "description": "Shift Number"
+        }
+      },
+      "additionalProperties": true
+    },
+    "AddInfo": {
+      "type": "object",
+      "description": "Additional transaction information for MOC transactions",
+      "properties": {
+        "Mileage": {
+          "type": "string",
+          "description": "Mileage"
+        },
+        "VehicleNo": {
+          "type": "string",
+          "description": "Vehicle number"
+        },
+        "DriverCode": {
+          "type": "string",
+          "description": "Driver code"
+        },
+        "Status": {
+          "type": "string",
+          "description": "Error- and statuscodes"
+        },
+        "CaptureType": {
+          "type": "string",
+          "description": "The contents are dependent on the network operator"
+        },
+        "Info": {
+          "type": "string",
+          "description": "Additional information"
+        },
+        "FleetID": {
+          "type": "string",
+          "description": "Fleet identification"
+        },
+        "EmployeeNo": {
+          "type": "string",
+          "description": "Employee number"
+        },
+        "CostCenter": {
+          "type": "string",
+          "description": "Cost center"
+        },
+        "ProjectNo": {
+          "type": "string",
+          "description": "Project number"
+        },
+        "LicensePlate": {
+          "type": "string",
+          "description": "License plate"
+        },
+        "ReferenceNo": {
+          "type": "string",
+          "description": "MOC reference number"
+        },
+        "UserID": {
+          "type": "string",
+          "description": "User identifier"
+        },
+        "WorkOrderPONo": {
+          "type": "string",
+          "description": "Work order purchase order number"
+        }
+      },
+      "additionalProperties": true
+    },
+    "RestrictionItem": {
+      "type": "object",
+      "description": "This container contains the purchased goods, services and discounts of the transaction, used e.g. for petrol MOC",
+      "properties": {
+        "ItemAmtGross": { 
+          "type": "string",
+          "description": "Item Amount Gross, signed decimal" 
+        },
+        "ItemAmt": { 
+          "type": "string",
+          "description": "Item Amount, signed decimal" 
+        },
+        "ItemAuthReslt": {
+          "type": "integer",
+          "description": "Item Authorisation Result"
+        },
+        "ItemDisc": {
+          "type": "string",
+          "description": "Item Discount Amount, signed decimal" 
+        },
+        "ItemDiscID": {
+          "type": "string",
+          "description": "Item Discount ID"
+        },
+        "ItemID": {
+          "type": "string",
+          "description": "Item ID"
+        },
+        "ItemLoyalID": {
+          "type": "string",
+          "description": "Item Loyalty ID"
+        },
+        "ItemPumpNo": {
+          "type": "integer",
+          "description": "Item Pump Number"
+        },
+        "ItemQuantity": {
+          "type": "string",
+          "description": "Item Quantity, may include decimals"
+        },
+        "ItemQuantityType": {
+          "type": "string",
+          "description": "Item Quantity Type"
+        },
+        "ItemTax": {
+          "type": "string",
+          "description": "Item Tax, signed decimal"
+        },
+        "ItemUnitPrice": {
+          "type": "string",
+          "description": "Item Unit Price, signed decimal"
+        },
+        "ItemUnitPriceDisc": {
+          "type": "string",
+          "description": "Item Unit Price Discount, signed decimal"
+        },
+        "ItemUnitPriceGross": {
+          "type": "string",
+          "description": "Item Unit Price Gross, signed decimal"
+        }
+      },
+      "additionalProperties": true
+    },
+    "RestrictionsPerAID": {
+      "type": "object",
+      "required": ["AID", "Items"],
+      "description": "Restrictions for one AID, containing up to 20 item entries",
+      "properties": {
+        "AID": {
+          "$ref": "#/$defs/Base64Binary",
+          "description": "Application Identifier (AID) for which the restrictions are applied"
+        },
+        "Items": {
+          "type": "array",
+          "description": "Purchased goods, services and discounts for this AID",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/RestrictionItem"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "SetOfRestrictionsPerAID": {
+      "type": "array",
+      "description": "This container contains the purchased goods, services and discounts of the transaction, for each relevant AID. Used e.g. for petrol MOC",
+      "items": { "$ref": "#/$defs/RestrictionsPerAID" }
+    },
+    "PrRecord": {
+      "type": "object",
+      "description": "Product Record",
+      "properties": {
+        "RecordType": {
+          "type": "string",
+          "enum": ["Fuel", "Shop", "OrderRef"],
+          "description": "ep2 record type without the Rec prefix; maps to RecFuel, RecShop or RecOrderRef"
+        },
+        "ProdCode": {
+          "type": "string",
+          "description": "Product Identification Code"
+        },
+        "ProdDescript": {
+          "type": "string",
+          "description": "Product Description"
+        },
+        "ProdQuantity": {
+          "type": "string",
+          "description": "Product Quantity, may include decimals"
+        },
+        "Price": {
+          "type": "string",
+          "description": "Total Product Price for the whole quantity as signed decimal. Negative values might be used for refunds/reversals etc."
+        },
+        "UnitPrice": {
+          "type": "string",
+          "description": "Product Price for a single unit as signed decimal. Negative values might be used for refunds/reversals etc."
+        },
+        "OrderID": {
+          "type": "string",
+          "description": "Merchant's order identifier (max 18 chars for ep2 7.x, 48 chars for ep2 >= 8.x)"
+        },
+        "Permitted": {
+          "type": "boolean",
+          "description": "Specifies whether the product group was permitted or not"
+        }
+      },
+      "additionalProperties": true
+    },
+    "PrRecords": {
+      "type": "array",
+      "description": "Set of product records",
+      "items": { "$ref": "#/$defs/PrRecord" }
+    },
     "ConnectRequest": {
       "type": "object",
       "description": "Request to connect to the terminal",
@@ -492,6 +715,10 @@
           "enum": [0, 1]
         },
         "RecOrderRef": { "$ref": "#/$defs/RecOrderRef" },
+        "PetrolPOSData": { "$ref": "#/$defs/PetrolPOSData" },
+        "AddInfo": { "$ref": "#/$defs/AddInfo" },
+        "SetOfRestrictionsPerAID": { "$ref": "#/$defs/SetOfRestrictionsPerAID" },
+        "PrRecords": { "$ref": "#/$defs/PrRecords" },
         "DCCOrigDate": {
           "$ref": "#/$defs/DateYYYYMMDD",
           "description": "Original date of DCC rate quotation, used for refunds of DCC transactions"
@@ -567,7 +794,10 @@
         "DCCRate": { "type": "integer", "description": "DCC rate" },
         "DCCRateExp": { "type": "integer", "description": "DCC rate expiration" },
         "AOSA": { "type": "integer", "description": "Available Offline Spending Amount" },
-        "FormFactorInd": { "$ref": "#/$defs/Base64Binary", "description": "Form factor indicator" }
+        "FormFactorInd": { "$ref": "#/$defs/Base64Binary", "description": "Form factor indicator" },
+		"AddInfo": { "$ref": "#/$defs/AddInfo" },
+        "RestrictionsPerAID": { "$ref": "#/$defs/RestrictionsPerAID" },
+        "PrRecords": { "$ref": "#/$defs/PrRecords" }
       },
       "additionalProperties": true
     },
@@ -588,7 +818,9 @@
         "TrxSeqCnt": {
           "type": "integer",
           "description": "Transaction sequence counter of the transaction to confirm; only needed in petrol environment to confirm Authorization Purchase transactions"
-        }
+        },
+        "RestrictionsPerAID": { "$ref": "#/$defs/RestrictionsPerAID" },
+        "PrRecords": { "$ref": "#/$defs/PrRecords" }
       },
       "additionalProperties": true
     },

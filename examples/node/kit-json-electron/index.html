@@ -378,9 +378,48 @@
       border-radius: 4px;
       font-size: 12px;
     }
+
+    .control-group textarea {
+      width: 100%;
+      min-height: 90px;
+      padding: 6px 8px;
+      background: #0d0d1a;
+      border: 1px solid #1a1a2e;
+      color: #ccc;
+      border-radius: 4px;
+      font-family: Consolas, Monaco, monospace;
+      font-size: 11px;
+      line-height: 1.35;
+      resize: vertical;
+    }
+
+    .petrol-line-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 8px;
+      padding: 8px;
+      border: 1px solid rgba(15,52,96,0.8);
+      border-radius: 4px;
+      background: rgba(13,13,26,0.45);
+    }
+
+    .petrol-line-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .petrol-line-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+    }
     
     .control-group select:focus,
-    .control-group input:focus {
+    .control-group input:focus,
+    .control-group textarea:focus {
       outline: none;
       border-color: #e94560;
     }
@@ -587,6 +626,41 @@
               <input type="number" id="acqIdInput" placeholder=" " aria-label="Acquirer ID" style="width:100%;padding:6px;background:#0f3460;border:1px solid #1a1a2e;color:#fff;border-radius:4px;font-size:12px">
             </span>
           </div>
+          <details id="petrolPOSDataSection" style="margin-top:8px;border:1px solid #0f3460;border-radius:4px;padding:8px;background:rgba(15,52,96,0.22)">
+            <summary style="cursor:pointer;font-size:11px;color:#a8b2c1;text-transform:uppercase;letter-spacing:0.5px">Petrol POS Data</summary>
+            <label style="display:flex;align-items:center;gap:6px;margin:8px 0;color:#eee;text-transform:none;letter-spacing:0;font-size:11px">
+              <input type="checkbox" id="includePetrolPOSDataCheck"> Include PetrolPOSData
+            </label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+              <span class="floating-field control-field" data-label="Clerk ID">
+                <input type="text" id="petrolClerkIdInput" placeholder=" " aria-label="Petrol Clerk ID">
+              </span>
+              <span class="floating-field control-field" data-label="Fuel Disp. No">
+                <input type="text" id="petrolFuelDispNoInput" placeholder=" " aria-label="Fuel Dispenser Number">
+              </span>
+              <span class="floating-field control-field" data-label="POSD No">
+                <input type="text" id="petrolPosdNoInput" placeholder=" " aria-label="POSD Number">
+              </span>
+              <span class="floating-field control-field" data-label="Receipt No">
+                <input type="text" id="petrolRctNoInput" placeholder=" " aria-label="Receipt Number">
+              </span>
+              <span class="floating-field control-field" data-label="Shift No" style="grid-column:1 / -1">
+                <input type="text" id="petrolShiftNoInput" placeholder=" " aria-label="Shift Number">
+              </span>
+            </div>
+          </details>
+          <details id="productRecordsSection" style="margin-top:8px;border:1px solid #0f3460;border-radius:4px;padding:8px;background:rgba(15,52,96,0.22)">
+            <summary style="cursor:pointer;font-size:11px;color:#a8b2c1;text-transform:uppercase;letter-spacing:0.5px">Product records</summary>
+            <label style="display:flex;align-items:center;gap:6px;margin:8px 0;color:#eee;text-transform:none;letter-spacing:0;font-size:11px">
+              <input type="checkbox" id="includeProductRecordsCheck"> Include PrRecords
+            </label>
+            <div class="petrol-line-actions" style="margin-top:8px">
+              <label style="margin:0">Records</label>
+              <button type="button" onclick="addProductRecord()" class="secondary" style="width:auto;padding:4px 8px;font-size:11px">Add</button>
+            </div>
+            <div id="productRecords"></div>
+            <div id="productRecordsError" style="color:#e74c3c;font-size:11px;margin-top:6px;min-height:14px"></div>
+          </details>
           <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
             <button onclick="trxButtonClick()" id="trxBtn" class="success" disabled style="flex:1"><span class="icon">&#x1f4b3;</span> Transaction</button>
             <label style="display:flex;align-items:center;gap:4px;cursor:pointer;white-space:nowrap;font-size:11px">
