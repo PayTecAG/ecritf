@@ -567,7 +567,8 @@
         "IFDSerialNum": { "$ref": "#/$defs/IFDSerialNum" },
         "SoftwareVersion": { "type": "integer" },
         "PeSeqCnt": { "type": "integer", "description": "Booking period sequence counter" },
-        "ActSeqCnt": { "type": "integer", "description": "Activation/shift sequence counter" }
+        "ActSeqCnt": { "type": "integer", "description": "Activation/shift sequence counter" },
+        "InstallationID" : { "type": "string", "description": "Installation identifier of the terminal" }
       },
       "additionalProperties": true
     },
