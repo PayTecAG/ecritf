@@ -16,6 +16,8 @@ let lastReceiptRequest = null;
 let pendingReceiptEntry = null;
 let pendingApprovedTrxResponse = null;
 let pendingConfirmationRequest = null;
+let pendingTransactionRequest = null;
+let pendingConfirmationContext = null;
 
 // TrmStatus bit definitions
 const TRM_STATUS_BITS = [
@@ -293,6 +295,7 @@ function showTransactionResult(resp) {
   // Details grid
   const details = [];
   if (resp.Brand) details.push(['Brand', resp.Brand]);
+  if (resp.AID) details.push(['AID', resp.AID]);
   if (resp.AmtAuth !== undefined) details.push(['Amount, authorized', formatAmount(resp.AmtAuth, resp.TrxCurrC)]);
   if (resp.AmtOther) details.push(['Cashback', formatAmount(resp.AmtOther, resp.TrxCurrC)]);
   if (resp.TrxAmt !== undefined) details.push(['Transaction Amount', formatAmount(resp.TrxAmt, resp.TrxCurrC)]);
@@ -433,7 +436,7 @@ function updateTrmStatusBits(status) {
 }
 
 function escapeHtml(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 function readOptionalText(id) {
@@ -473,8 +476,11 @@ function createProductRecord(values = {}) {
         <input type="number" data-product-record-field="ItemPumpNo" placeholder=" " aria-label="Pump Number" min="0">
       </span>
     </div>
-    <span class="floating-field control-field" data-record-fields="product" data-label="AID Restrictions">
-      <input type="text" data-product-record-field="AIDs" placeholder=" " aria-label="AID Restrictions" title="Enter multiple base64 AIDs separated by comma, space, semicolon, or newline">
+    <span class="floating-field control-field" data-record-fields="product" data-label="AID Restrictions (hex)">
+      <input type="text" data-product-record-field="AIDs" placeholder=" " aria-label="AID Restrictions" title="Enter hexadecimal AIDs separated by comma, space, semicolon, or newline">
+    </span>
+    <span class="floating-field control-field" data-record-fields="product" data-label="Item Loyalty ID">
+      <input type="text" data-product-record-field="ItemLoyalID" placeholder=" " aria-label="Item Loyalty ID">
     </span>
     <span class="floating-field control-field" data-record-fields="order" data-label="Order ID" style="display:none">
       <input type="text" data-product-record-field="OrderID" placeholder=" " aria-label="Order ID" maxlength="48">
@@ -554,6 +560,19 @@ function splitProductRecordAids(value) {
   return value.split(/[\s,;]+/).map(aid => aid.trim()).filter(Boolean);
 }
 
+function aidHexToBase64(value) {
+  const hex = value.trim().replace(/^0x/i, '');
+  if (!hex) return '';
+  if (!/^[0-9a-f]+$/i.test(hex) || hex.length % 2 !== 0) {
+    throw new Error(`Invalid hexadecimal AID: ${value}`);
+  }
+  let binary = '';
+  for (let i = 0; i < hex.length; i += 2) {
+    binary += String.fromCharCode(parseInt(hex.slice(i, i + 2), 16));
+  }
+  return btoa(binary);
+}
+
 function hasProductRecordData(record, aids) {
   if (record.RecordType === 'OrderRef') return !!record.OrderID;
   return !!(record.ProdCode || record.ProdDescript || record.ProdQuantity || record.UnitPrice || record.Price || record.ItemPumpNo || aids.length > 0);
@@ -569,6 +588,7 @@ function parseProductRecordPriceToCents(value, label) {
 function buildRestrictionItem(record) {
   const item = {};
   if (record.ProdCode) item.ItemID = record.ProdCode;
+  if (record.ItemLoyalID) item.ItemLoyalID = record.ItemLoyalID;
   if (record.ProdQuantity) item.ItemQuantity = record.ProdQuantity;
   if (record.UnitPrice) item.ItemUnitPrice = record.UnitPrice;
   if (record.Price) item.ItemAmt = record.Price;
@@ -591,9 +611,10 @@ function readProductRecords() {
       UnitPrice: readProductRecordField(row, 'UnitPrice'),
       Price: readProductRecordField(row, 'Price'),
       ItemPumpNo: readProductRecordField(row, 'ItemPumpNo'),
+      ItemLoyalID: readProductRecordField(row, 'ItemLoyalID'),
       OrderID: readProductRecordField(row, 'OrderID')
     };
-    const aids = splitProductRecordAids(readProductRecordField(row, 'AIDs'));
+    const aids = splitProductRecordAids(readProductRecordField(row, 'AIDs')).map(aidHexToBase64);
     if (!hasProductRecordData(record, aids)) return;
     if (record.RecordType !== 'Fuel') {
       if (usedSingleRecordTypes.has(record.RecordType)) throw new Error(`Only one ${record.RecordType} record is allowed`);
@@ -686,6 +707,7 @@ function getProductRecordValues(row) {
     UnitPrice: readProductRecordField(row, 'UnitPrice'),
     Price: readProductRecordField(row, 'Price'),
     ItemPumpNo: readProductRecordField(row, 'ItemPumpNo'),
+    ItemLoyalID: readProductRecordField(row, 'ItemLoyalID'),
     AIDs: readProductRecordField(row, 'AIDs'),
     OrderID: readProductRecordField(row, 'OrderID')
   };
@@ -763,7 +785,7 @@ function restoreTransactionExtensionSettings() {
       UnitPrice: '1.800',
       Price: '18.00',
       ItemPumpNo: '1',
-      AIDs: 'oAAAAAQQEA=='
+      AIDs: 'A0000000041010'
     });
   }
 }
@@ -882,6 +904,118 @@ function trxButtonClick() {
   else sendTransaction();
 }
 
+function getMatchingRestriction(aid) {
+  const restrictions = pendingTransactionRequest && pendingTransactionRequest.SetOfRestrictionsPerAID;
+  if (!aid || !Array.isArray(restrictions)) return null;
+  return restrictions.find(restriction => restriction.AID === aid) || null;
+}
+
+function getConfirmationRecords(response, restriction) {
+  const records = response.PrRecords || (pendingTransactionRequest && pendingTransactionRequest.PrRecords) || [];
+  return records;
+}
+
+function showProductConfirmationDialog(response, restriction) {
+  const records = getConfirmationRecords(response, restriction);
+  pendingConfirmationContext = { aid: response.AID, restriction, records };
+  const recordsEl = document.getElementById('productConfirmationRecords');
+  const errorEl = document.getElementById('productConfirmationError');
+  recordsEl.innerHTML = '';
+  errorEl.textContent = '';
+  document.getElementById('productConfirmationAid').textContent = response.AID
+    ? `Transaction AID: ${response.AID}`
+    : 'Transaction AID: not returned';
+
+  records.forEach((record, index) => {
+    const restrictionItem = restriction && (restriction.Items || []).find(item => item.ItemID === record.ProdCode);
+    const row = document.createElement('div');
+    row.style.cssText = 'border:1px solid #0f3460;border-radius:4px;padding:8px;background:rgba(15,52,96,0.22)';
+    row.dataset.recordIndex = index;
+    row.innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px">
+        <input type="checkbox" data-confirm-record="include" ${record.Permitted === false ? '' : 'checked'}>
+        <strong style="flex:1;color:#eee">${escapeHtml(record.ProdCode || record.OrderID || 'Product record')}</strong>
+        <span style="font-size:11px;color:#a8b2c1">${escapeHtml(record.ProdDescript || record.RecordType || '')}</span>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <span style="font-size:11px;color:#a8b2c1;flex:1">${escapeHtml([record.ProdQuantity, record.UnitPrice, record.Price].filter(Boolean).join(' / '))}</span>
+        ${restrictionItem ? `<span class="floating-field control-field" data-label="Discount" style="width:130px">
+          <input type="text" data-confirm-record="discount" value="${escapeHtml(restrictionItem.ItemDisc || '')}" placeholder=" " aria-label="Discount">
+        </span>` : '<span style="font-size:10px;color:#636e7e">No AID discount</span>'}
+      </div>`;
+    recordsEl.appendChild(row);
+  });
+
+  document.getElementById('productConfirmationOverlay').style.display = 'flex';
+}
+
+function closeProductConfirmationDialog() {
+  document.getElementById('productConfirmationOverlay').style.display = 'none';
+  pendingConfirmationContext = null;
+}
+
+function getConfirmationDetails() {
+  const context = pendingConfirmationContext;
+  if (!context) return {};
+  const rows = Array.from(document.querySelectorAll('#productConfirmationRecords > div'));
+  const selected = [];
+  const selectedIds = new Set();
+
+  rows.forEach(row => {
+    const index = parseInt(row.dataset.recordIndex, 10);
+    const include = row.querySelector('[data-confirm-record="include"]').checked;
+    if (!include) return;
+    const record = JSON.parse(JSON.stringify(context.records[index]));
+    selected.push(record);
+    if (record.ProdCode) selectedIds.add(record.ProdCode);
+  });
+
+  const details = {};
+  if (context.records.length > 0) details.PrRecords = selected;
+  let finalAmountCents = 0;
+  selected.forEach(record => {
+    if (record.Price) {
+      finalAmountCents += parseProductRecordPriceToCents(record.Price, record.ProdCode || 'Product record');
+    }
+  });
+  if (context.restriction) {
+    const items = (context.restriction.Items || []).filter(item => !item.ItemID || selectedIds.has(item.ItemID))
+      .map(item => ({ ...item }));
+    rows.forEach(row => {
+      const index = parseInt(row.dataset.recordIndex, 10);
+      const record = context.records[index];
+      const item = items.find(candidate => candidate.ItemID === record.ProdCode);
+      if (!item) return;
+      const discount = row.querySelector('[data-confirm-record="discount"]').value.trim();
+      if (!discount) {
+        delete item.ItemDisc;
+        return;
+      }
+      const amount = Number(discount.replace(',', '.'));
+      if (!Number.isFinite(amount)) throw new Error(`Invalid discount for ${record.ProdCode || 'product record'}`);
+      item.ItemDisc = amount.toFixed(2);
+      finalAmountCents -= Math.round(amount * 100);
+    });
+    if (items.length > 0) details.RestrictionsPerAID = { AID: context.aid, Items: items };
+  }
+  if (context.records.some(record => record.Price)) {
+    if (finalAmountCents < 0) throw new Error('Discounted final amount must not be negative');
+    details.TrxAmt = finalAmountCents;
+    document.getElementById('confirmAmountInput').value = (finalAmountCents / 100).toFixed(2);
+  }
+  return details;
+}
+
+function submitProductConfirmation(confirm) {
+  try {
+    const details = confirm ? getConfirmationDetails() : {};
+    closeProductConfirmationDialog();
+    confirmTransaction(confirm, true, details);
+  } catch (err) {
+    document.getElementById('productConfirmationError').textContent = err.message;
+  }
+}
+
 async function sendTransaction() {
   const fn = parseInt(document.getElementById('trxFunctionSelect').value);
   const meta = TRX_INPUTS[fn] || {};
@@ -923,11 +1057,12 @@ async function sendTransaction() {
   pendingTransaction = true;
   // Store noAutoConfirm flag for this transaction
   pendingTransaction_noAutoConfirm = !!meta.noAutoConfirm;
+  pendingTransactionRequest = JSON.parse(JSON.stringify(req));
   updateUI();
   await sendMessage({ TransactionRequest: req });
 }
 
-async function confirmTransaction(confirm, manual = false) {
+async function confirmTransaction(confirm, manual = false, details = {}) {
   const req = {
     Confirm: confirm ? 1 : 0
   };
@@ -943,6 +1078,7 @@ async function confirmTransaction(confirm, manual = false) {
       req.TrxAmt = trxAmt;
     }
   }
+  if (confirm) Object.assign(req, details);
 
   pendingConfirmationRequest = {
     confirm: !!confirm,
@@ -961,6 +1097,9 @@ async function abortTransaction() {
     AbortTransactionRequest: {}
   });
   pendingTransaction = false;
+  pendingTransactionRequest = null;
+  pendingConfirmationContext = null;
+  closeProductConfirmationDialog();
   updateUI();
 }
 
@@ -1125,6 +1264,14 @@ async function handleResponse(data) {
       lastTrxSeqCnt = resp.TrxSeqCnt;
       pendingTransaction = true;
       awaitingConfirmation = true;
+      const matchingRestriction = getMatchingRestriction(resp.AID);
+      const confirmationRecords = getConfirmationRecords(resp, matchingRestriction);
+      pendingConfirmationContext = {
+        aid: resp.AID,
+        restriction: matchingRestriction,
+        records: confirmationRecords
+      };
+      pendingTransaction_noAutoConfirm = pendingTransaction_noAutoConfirm || !!matchingRestriction;
       
       // Pre-fill reference fields from response for follow-up transactions
       if (resp.TrxRefNum) document.getElementById('trxRefInput').value = resp.TrxRefNum;
@@ -1134,15 +1281,21 @@ async function handleResponse(data) {
         ? (approvedAmount / 100).toFixed(2)
         : '';
       
-      // Auto-confirm if enabled (but not for Authorization Purchase etc.)
-      if (document.getElementById('autoConfirmCheck').checked && !pendingTransaction_noAutoConfirm) {
+      const needsProductConfirmation = !!matchingRestriction || confirmationRecords.length > 0;
+      // Auto-confirm only when no product decision is required for this transaction.
+      if (document.getElementById('autoConfirmCheck').checked && !pendingTransaction_noAutoConfirm && !needsProductConfirmation) {
         confirmTransaction(true);
+      } else if (needsProductConfirmation) {
+        showProductConfirmationDialog(resp, matchingRestriction);
       }
     } else {
       showTransactionResult(resp);
       // Declined/Aborted
       pendingTransaction = false;
       awaitingConfirmation = false;
+      pendingTransactionRequest = null;
+      pendingConfirmationContext = null;
+      closeProductConfirmationDialog();
       document.getElementById('confirmAmountInput').value = '';
       pendingApprovedTrxResponse = null;
     }
@@ -1153,6 +1306,8 @@ async function handleResponse(data) {
     awaitingConfirmation = false;
     document.getElementById('confirmAmountInput').value = '';
     pendingConfirmationRequest = null;
+    pendingConfirmationContext = null;
+    pendingTransactionRequest = null;
   }
   
   if (message.AbortTransactionResponse) {
@@ -1224,6 +1379,9 @@ function handleDisconnected() {
   pendingTransaction = false;
   pendingApprovedTrxResponse = null;
   pendingConfirmationRequest = null;
+  pendingTransactionRequest = null;
+  pendingConfirmationContext = null;
+  closeProductConfirmationDialog();
   document.getElementById('confirmAmountInput').value = '';
   addMessage('info', 'info', { Info: 'Connection closed by terminal' });
   updateUI();

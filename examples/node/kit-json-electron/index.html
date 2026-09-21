@@ -762,6 +762,26 @@
     </div>
   </div>
 
+  <!-- Product confirmation dialog -->
+  <div id="productConfirmationOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:1100;align-items:center;justify-content:center">
+    <div style="background:#16213e;border:1px solid #0f3460;border-radius:8px;width:720px;max-width:94vw;max-height:86vh;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,0.5)">
+      <div style="padding:12px 16px;border-bottom:1px solid #0f3460">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:14px;font-weight:500;color:#e94560">Confirm product records</span>
+          <button onclick="closeProductConfirmationDialog()" class="secondary" style="padding:4px 10px;font-size:16px;line-height:1">&times;</button>
+        </div>
+        <div id="productConfirmationAid" style="font-size:11px;color:#a8b2c1;margin-top:6px"></div>
+      </div>
+      <div id="productConfirmationRecords" style="padding:12px 16px;overflow:auto;display:flex;flex-direction:column;gap:8px"></div>
+      <div id="productConfirmationError" style="color:#e74c3c;font-size:11px;padding:0 16px;min-height:16px"></div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;padding:12px 16px;border-top:1px solid #0f3460">
+        <button onclick="closeProductConfirmationDialog()" class="secondary">Cancel</button>
+        <button onclick="submitProductConfirmation(false)">Rollback</button>
+        <button onclick="submitProductConfirmation(true)" class="success">Confirm</button>
+      </div>
+    </div>
+  </div>
+
   <script src="renderer.js"></script>
 </body>
 </html>
