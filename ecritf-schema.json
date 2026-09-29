@@ -509,8 +509,9 @@
           "description": "Merchant's order identifier (max 18 chars for ep2 7.x, 48 chars for ep2 >= 8.x)"
         },
         "Permitted": {
-          "type": "boolean",
-          "description": "Specifies whether the product group was permitted or not"
+          "type": "integer",
+          "description": "Specifies whether the product group was permitted or not (not used in ep2)",
+          "enum": [0, 1]
         }
       },
       "additionalProperties": true
