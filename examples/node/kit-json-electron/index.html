@@ -652,7 +652,10 @@
           <details id="productRecordsSection" style="margin-top:8px;border:1px solid #0f3460;border-radius:4px;padding:8px;background:rgba(15,52,96,0.22)">
             <summary style="cursor:pointer;font-size:11px;color:#a8b2c1;text-transform:uppercase;letter-spacing:0.5px">Product records</summary>
             <label style="display:flex;align-items:center;gap:6px;margin:8px 0;color:#eee;text-transform:none;letter-spacing:0;font-size:11px">
-              <input type="checkbox" id="includeProductRecordsCheck"> Include PrRecords
+              <input type="checkbox" id="includePrRecordsCheck"> Send PrRecords
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;margin:8px 0;color:#eee;text-transform:none;letter-spacing:0;font-size:11px">
+              <input type="checkbox" id="includeRestrictionsCheck"> Send RestrictionsPerAID
             </label>
             <div class="petrol-line-actions" style="margin-top:8px">
               <label style="margin:0">Records</label>
@@ -667,6 +670,9 @@
               <input type="checkbox" id="autoConfirmCheck" checked onchange="updateUI()"> Auto-confirm
             </label>
           </div>
+          <label style="display:flex;align-items:center;gap:6px;margin-top:6px;color:#eee;font-size:11px;letter-spacing:0;text-transform:none">
+            <input type="checkbox" id="awaitProceedCheck"> Await card data (ProceedTransaction)
+          </label>
           <div id="manualConfirmAmountRow" class="floating-field control-field" data-label="Final Amount (TrxAmt)" style="display:none;margin-top:6px">
             <input type="number" id="confirmAmountInput" class="amount-input" step="1.00" min="0" placeholder=" " aria-label="Final Amount (TrxAmt, optional)">
           </div>
@@ -758,6 +764,57 @@
       <div style="display:flex;justify-content:flex-end;gap:8px;padding:12px 16px;border-top:1px solid #0f3460">
         <button onclick="closeSendJsonDialog()" class="secondary">Cancel</button>
         <button onclick="submitSendJsonDialog()" id="sendJsonSubmitBtn">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Proceed transaction dialog -->
+  <div id="proceedTransactionOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:1200;align-items:center;justify-content:center">
+    <div style="background:#16213e;border:1px solid #0f3460;border-radius:8px;width:760px;max-width:94vw;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,0.5)">
+      <div style="padding:12px 16px;border-bottom:1px solid #0f3460">
+        <div style="font-size:14px;font-weight:500;color:#e94560">Proceed transaction</div>
+        <div id="proceedTransactionCardData" style="font-size:11px;color:#a8b2c1;margin-top:6px"></div>
+      </div>
+      <div style="padding:12px 16px;overflow:auto;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <span class="floating-field control-field" data-label="Currency Code">
+          <input type="number" id="proceedCurrencyInput" min="0" placeholder=" " aria-label="Proceed Currency Code">
+        </span>
+        <span class="floating-field control-field" data-label="Authorized Amount (minor unit)">
+          <input type="number" id="proceedAmountInput" min="0" placeholder=" " aria-label="Proceed Authorized Amount">
+        </span>
+        <div style="grid-column:1 / -1;border:1px solid #0f3460;border-radius:4px;padding:8px">
+          <div style="font-size:11px;color:#a8b2c1;margin-bottom:8px">Proceed transaction time extension</div>
+          <div style="display:grid;grid-template-columns:160px 1fr auto;gap:8px;align-items:end">
+            <span class="floating-field control-field" data-label="Additional seconds">
+              <input type="number" id="proceedExtensionSecondsInput" min="1" value="30" placeholder=" " aria-label="Proceed transaction extension seconds">
+            </span>
+            <span class="floating-field control-field" data-label="Cardholder text">
+              <input type="text" id="proceedExtensionCardholderTextInput" placeholder=" " aria-label="Proceed transaction time extension cardholder text">
+            </span>
+            <button type="button" onclick="sendProceedTransactionTimeExtension()" class="secondary" style="height:34px">Request time</button>
+          </div>
+        </div>
+        <div style="grid-column:1 / -1">
+          <label style="display:flex;align-items:center;gap:6px;margin:0 0 8px;color:#eee;font-size:11px;letter-spacing:0;text-transform:none">
+            <input type="checkbox" id="sendProceedPrRecordsCheck" checked> Send PrRecords
+          </label>
+          <span class="floating-field control-field" data-label="PrRecords (JSON array)" style="display:block">
+            <textarea id="proceedPrRecordsInput" spellcheck="false" placeholder="[]" style="width:100%;height:150px;resize:vertical;background:#0d0d1a;color:#fff;border:1px solid #0f3460;border-radius:4px;padding:8px;font-family:Consolas,Monaco,monospace;font-size:12px"></textarea>
+          </span>
+        </div>
+        <div style="grid-column:1 / -1">
+          <label style="display:flex;align-items:center;gap:6px;margin:0 0 8px;color:#eee;font-size:11px;letter-spacing:0;text-transform:none">
+            <input type="checkbox" id="sendProceedRestrictionsCheck" checked> Send RestrictionsPerAID
+          </label>
+          <span class="floating-field control-field" data-label="RestrictionsPerAID (JSON object)" style="display:block">
+            <textarea id="proceedRestrictionsInput" spellcheck="false" placeholder="{}" style="width:100%;height:150px;resize:vertical;background:#0d0d1a;color:#fff;border:1px solid #0f3460;border-radius:4px;padding:8px;font-family:Consolas,Monaco,monospace;font-size:12px"></textarea>
+          </span>
+        </div>
+      </div>
+      <div id="proceedTransactionError" style="color:#e74c3c;font-size:11px;padding:0 16px;min-height:16px"></div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;padding:12px 16px;border-top:1px solid #0f3460">
+        <button onclick="abortProceedTransaction()" class="secondary">Abort</button>
+        <button onclick="submitProceedTransaction()" class="success">Proceed</button>
       </div>
     </div>
   </div>

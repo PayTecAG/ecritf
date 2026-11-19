@@ -42,8 +42,8 @@
     },
     "TrxResult": {
       "type": "integer",
-      "description": "Transaction result: 0=Approved, 1=Declined, 2=Referred (phone auth needed), 3=Aborted",
-      "enum": [0, 1, 2, 3],
+      "description": "Transaction result: 0=Approved, 1=Declined, 2=Referred (phone auth needed), 3=Aborted, 4=In progress",
+      "enum": [0, 1, 2, 3, 4],
       "examples": [0]
     },
     "TrxResultExtended": {
@@ -54,7 +54,7 @@
     },
     "TrxReqFlags": {
       "type": "integer",
-      "description": "Transaction request flags: 0x01=Start silently, 0x04=Report unknown NFC UIDs in status, 0x08=Abort silently on unknown NFC",
+      "description": "Transaction request flags: 0x01=Start silently, 0x04=Report unknown NFC UIDs in status, 0x08=Abort silently on unknown NFC, 0x20=Await ProceedTransactionResponse after reading the payment means",
       "minimum": 0,
       "examples": [5]
     },
@@ -866,6 +866,71 @@
     "ConfirmationTimeExtensionResponse": {
       "type": "object"
     },
+    "ProceedTransactionTimeExtensionRequest": {
+      "type": "object",
+      "description": "Request more time for the proceed transaction response",
+      "required": ["Seconds"],
+      "properties": {
+        "Seconds": {
+          "type": "integer", "description": "Additional seconds requested"
+        },
+        "CardholderText": {
+          "type": "string",
+          "description": "Text to be shown to the cardholder while waiting for the proceed transaction response"
+        }
+      },
+      "additionalProperties": true
+    },
+    "ProceedTransactionTimeExtensionResponse": {
+      "type": "object"
+    },
+    "ProceedTransactionRequest": {
+      "type": "object",
+      "description": "Transaction data known to the terminal, sent before it waits for the POS to decide whether to proceed",
+      "required": ["TrxResult", "Brand", "AID"],
+      "properties": {
+        "TrxResult": {
+          "const": 4,
+          "description": "Always 4 (In progress) for a proceed transaction request"
+        },
+        "Brand": { "type": "string", "description": "Card brand" },
+        "AccountType": { "type": "integer" },
+        "AcqID": { "type": "integer" },
+        "AmtAuth": { "$ref": "#/$defs/Amount" },
+        "AmtOther": { "$ref": "#/$defs/Amount", "description": "Cashback amount" },
+        "AID": { "$ref": "#/$defs/Base64Binary" },
+        "AIDICC": { "$ref": "#/$defs/Base64Binary" },
+        "AppPANPrtCardholder": { "type": "string" },
+        "AppPANPrtAttendant": { "type": "string" },
+        "AuthReslt": { "type": "integer" },
+        "DisplayName": { "type": "string" },
+        "POSEntryMode": { "$ref": "#/$defs/POSEntryMode" },
+        "SurrogatePAN": { "$ref": "#/$defs/Base64Binary" },
+        "TipAmt": { "$ref": "#/$defs/Amount" },
+        "TrxAmt": { "$ref": "#/$defs/Amount" },
+        "TrmID": { "$ref": "#/$defs/TrmID" },
+        "TrxCurrC": { "$ref": "#/$defs/CurrencyCode" },
+        "TrxSeqCnt": { "type": "integer" },
+        "TrxRefNum": { "type": "string" },
+        "TrxType": { "type": "integer" },
+        "TrxDate": { "$ref": "#/$defs/DateYYMMDD" },
+        "TrxTime": { "$ref": "#/$defs/TimeHHMMSS" },
+        "VoicePhone": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "ProceedTransactionResponse": {
+      "type": "object",
+      "description": "POS decision to proceed and updated transaction data returned to the terminal",
+      "properties": {
+        "TrxFunction": { "$ref": "#/$defs/TrxFunction" },
+        "TrxCurrC": { "$ref": "#/$defs/CurrencyCode" },
+        "AmtAuth": { "$ref": "#/$defs/Amount" },
+        "PrRecords": { "$ref": "#/$defs/PrRecords" },
+        "RestrictionsPerAID": { "$ref": "#/$defs/RestrictionsPerAID" }
+      },
+      "additionalProperties": true
+    },
     "AbortTransactionRequest": {
       "type": "object",
       "description": "Abort an in-progress transaction",
@@ -1180,6 +1245,10 @@
     "TransactionDataChangeResponse": { "$ref": "#/$defs/TransactionDataChangeResponse" },
     "ConfirmationTimeExtensionRequest": { "$ref": "#/$defs/ConfirmationTimeExtensionRequest" },
     "ConfirmationTimeExtensionResponse": { "$ref": "#/$defs/ConfirmationTimeExtensionResponse" },
+    "ProceedTransactionTimeExtensionRequest": { "$ref": "#/$defs/ProceedTransactionTimeExtensionRequest" },
+    "ProceedTransactionTimeExtensionResponse": { "$ref": "#/$defs/ProceedTransactionTimeExtensionResponse" },
+    "ProceedTransactionRequest": { "$ref": "#/$defs/ProceedTransactionRequest" },
+    "ProceedTransactionResponse": { "$ref": "#/$defs/ProceedTransactionResponse" },
     "LockEFTOperationsRequest": { "$ref": "#/$defs/LockEFTOperationsRequest" },
     "LockEFTOperationsResponse": { "$ref": "#/$defs/LockEFTOperationsResponse" },
     "UnlockEFTOperationsRequest": { "$ref": "#/$defs/UnlockEFTOperationsRequest" },

@@ -18,6 +18,7 @@ let pendingApprovedTrxResponse = null;
 let pendingConfirmationRequest = null;
 let pendingTransactionRequest = null;
 let pendingConfirmationContext = null;
+let pendingProceedTransactionRequest = null;
 
 // TrmStatus bit definitions
 const TRM_STATUS_BITS = [
@@ -53,6 +54,7 @@ const savedPosid = localStorage.getItem('kit-json-tester-posid');
 const savedPrinterWidth = localStorage.getItem('kit-json-tester-printerwidth');
 const savedProtocol = localStorage.getItem('kit-json-tester-protocol');
 const savedUseExternalDisplay = localStorage.getItem('kit-json-tester-useexternaldisplay');
+const savedAwaitProceed = localStorage.getItem('kit-json-tester-await-proceed');
 const PETROL_SETTINGS_KEY = 'kit-json-tester-petrol-settings';
 if (savedHost) hostInput.value = savedHost;
 if (savedPort) portInput.value = savedPort;
@@ -60,6 +62,7 @@ if (savedPosid) posidInput.value = savedPosid;
 if (savedPrinterWidth) printerWidthInput.value = savedPrinterWidth;
 if (savedProtocol) protocolSelect.value = savedProtocol;
 if (savedUseExternalDisplay !== null) useExternalDisplayCheck.checked = savedUseExternalDisplay === '1';
+if (savedAwaitProceed !== null) document.getElementById('awaitProceedCheck').checked = savedAwaitProceed === '1';
 
 // Update default port when protocol changes
 protocolSelect.addEventListener('change', () => {
@@ -601,6 +604,7 @@ function readProductRecords() {
   const restrictionsByAid = new Map();
   const usedSingleRecordTypes = new Set();
   let amountCents = 0;
+  let highestFuelAmountCents = 0;
 
   document.querySelectorAll('.product-record-item').forEach(row => {
     const record = {
@@ -628,7 +632,12 @@ function readProductRecords() {
     }
 
     if (!record.ProdCode) throw new Error(`Each ${record.RecordType} record needs a product code`);
-    amountCents += parseProductRecordPriceToCents(record.Price, record.ProdCode);
+    const recordAmountCents = parseProductRecordPriceToCents(record.Price, record.ProdCode);
+    if (record.RecordType === 'Fuel') {
+      highestFuelAmountCents = Math.max(highestFuelAmountCents, recordAmountCents);
+    } else {
+      amountCents += recordAmountCents;
+    }
 
     const prRecord = {
       RecordType: record.RecordType,
@@ -655,7 +664,7 @@ function readProductRecords() {
   return {
     prRecords,
     restrictions: Array.from(restrictionsByAid, ([AID, Items]) => ({ AID, Items })),
-    amountCents
+    amountCents: amountCents + highestFuelAmountCents
   };
 }
 
@@ -663,8 +672,9 @@ function addTransactionExtensionData(req) {
   const errorEl = document.getElementById('productRecordsError');
   if (errorEl) errorEl.textContent = '';
   const includePetrolPOSData = document.getElementById('includePetrolPOSDataCheck').checked;
-  const includeProductRecords = document.getElementById('includeProductRecordsCheck').checked;
-  if (!includePetrolPOSData && !includeProductRecords) return true;
+  const includePrRecords = document.getElementById('includePrRecordsCheck').checked;
+  const includeRestrictions = document.getElementById('includeRestrictionsCheck').checked;
+  if (!includePetrolPOSData && !includePrRecords && !includeRestrictions) return true;
 
   try {
     if (includePetrolPOSData) {
@@ -681,10 +691,10 @@ function addTransactionExtensionData(req) {
       if (Object.keys(petrolPOSData).length > 0) req.PetrolPOSData = petrolPOSData;
     }
 
-    if (includeProductRecords) {
+    if (includePrRecords || includeRestrictions) {
       const { prRecords, restrictions, amountCents } = readProductRecords();
-      if (prRecords.length > 0) req.PrRecords = prRecords;
-      if (restrictions.length > 0) req.SetOfRestrictionsPerAID = restrictions;
+      if (includePrRecords && prRecords.length > 0) req.PrRecords = prRecords;
+      if (includeRestrictions && restrictions.length > 0) req.SetOfRestrictionsPerAID = restrictions;
       if (prRecords.some(record => record.RecordType !== 'OrderRef')) {
         if (amountCents < 0) throw new Error('Authorization amount from product records must not be negative');
         req.AmtAuth = amountCents;
@@ -714,9 +724,12 @@ function getProductRecordValues(row) {
 }
 
 function updateProductRecordsAmountInput() {
-  if (!document.getElementById('includeProductRecordsCheck').checked) return;
+  const includePrRecords = document.getElementById('includePrRecordsCheck');
+  const includeRestrictions = document.getElementById('includeRestrictionsCheck');
+  if (!includePrRecords.checked && !includeRestrictions.checked) return;
 
   let amountCents = 0;
+  let highestFuelAmountCents = 0;
   let hasProductRecords = false;
   try {
     document.querySelectorAll('.product-record-item').forEach(row => {
@@ -725,13 +738,19 @@ function updateProductRecordsAmountInput() {
       const aids = splitProductRecordAids(record.AIDs);
       if (!hasProductRecordData(record, aids)) return;
       if (!record.Price) throw new Error('Missing product record price');
-      amountCents += parseProductRecordPriceToCents(record.Price, record.ProdCode || 'Product record');
+      const recordAmountCents = parseProductRecordPriceToCents(record.Price, record.ProdCode || 'Product record');
+      if (record.RecordType === 'Fuel') {
+        highestFuelAmountCents = Math.max(highestFuelAmountCents, recordAmountCents);
+      } else {
+        amountCents += recordAmountCents;
+      }
       hasProductRecords = true;
     });
   } catch {
     return;
   }
 
+  amountCents += highestFuelAmountCents;
   if (hasProductRecords && amountCents >= 0) {
     document.getElementById('amountInput').value = (amountCents / 100).toFixed(2);
   }
@@ -740,7 +759,8 @@ function updateProductRecordsAmountInput() {
 function saveTransactionExtensionSettings() {
   const settings = {
     includePetrolPOSData: document.getElementById('includePetrolPOSDataCheck').checked,
-    includeProductRecords: document.getElementById('includeProductRecordsCheck').checked,
+    includePrRecords: document.getElementById('includePrRecordsCheck').checked,
+    includeRestrictions: document.getElementById('includeRestrictionsCheck').checked,
     petrolPOSData: {
       ClerkID: readOptionalText('petrolClerkIdInput'),
       FuelDispNo: readOptionalText('petrolFuelDispNoInput'),
@@ -764,8 +784,12 @@ function restoreTransactionExtensionSettings() {
 
   if (settings) {
     const includeLegacyPetrolData = !!settings.includePetrolData;
+    const legacyIncludeProductRecords = settings.includeProductRecords !== undefined
+      ? !!settings.includeProductRecords
+      : includeLegacyPetrolData;
     document.getElementById('includePetrolPOSDataCheck').checked = settings.includePetrolPOSData !== undefined ? !!settings.includePetrolPOSData : includeLegacyPetrolData;
-    document.getElementById('includeProductRecordsCheck').checked = settings.includeProductRecords !== undefined ? !!settings.includeProductRecords : includeLegacyPetrolData;
+    document.getElementById('includePrRecordsCheck').checked = settings.includePrRecords !== undefined ? !!settings.includePrRecords : legacyIncludeProductRecords;
+    document.getElementById('includeRestrictionsCheck').checked = settings.includeRestrictions !== undefined ? !!settings.includeRestrictions : legacyIncludeProductRecords;
     const petrolPOSData = settings.petrolPOSData || {};
     document.getElementById('petrolClerkIdInput').value = petrolPOSData.ClerkID || '';
     document.getElementById('petrolFuelDispNoInput').value = petrolPOSData.FuelDispNo || '';
@@ -844,6 +868,7 @@ async function toggleConnection() {
       localStorage.setItem('kit-json-tester-posid', posidInput.value.trim());
       localStorage.setItem('kit-json-tester-printerwidth', printerWidthInput.value);
       localStorage.setItem('kit-json-tester-useexternaldisplay', useExternalDisplayCheck.checked ? '1' : '0');
+      localStorage.setItem('kit-json-tester-await-proceed', document.getElementById('awaitProceedCheck').checked ? '1' : '0');
       saveTransactionExtensionSettings();
       
       const protoLabel = protocol === 'wss' ? 'WSS' : 'TCP';
@@ -1021,6 +1046,10 @@ async function sendTransaction() {
   const meta = TRX_INPUTS[fn] || {};
   const req = { TrxFunction: fn };
 
+  if (document.getElementById('awaitProceedCheck').checked) {
+    req.TrxReqFlags = 0x20;
+  }
+
   if (meta.amount || meta.cashback) {
     req.TrxCurrC = parseInt(document.getElementById('currencySelect').value);
   }
@@ -1092,6 +1121,126 @@ async function confirmTransaction(confirm, manual = false, details = {}) {
   updateUI();
 }
 
+function showProceedTransactionDialog(request) {
+  pendingProceedTransactionRequest = request;
+  const original = pendingTransactionRequest || {};
+  const aid = request.AID || '';
+  const brand = request.Brand || 'Unknown';
+  const appPan = request.AppPANPrtCardholder || request.AppPANPrtAttendant || request.SurrogatePAN || '';
+  document.getElementById('proceedTransactionCardData').textContent =
+    `Brand: ${brand} | AID: ${aid || '-'} | PAN: ${appPan || '-'} | Result: ${request.TrxResult}`;
+
+  document.getElementById('proceedCurrencyInput').value =
+    request.TrxCurrC !== undefined ? request.TrxCurrC : (original.TrxCurrC !== undefined ? original.TrxCurrC : '');
+  document.getElementById('proceedAmountInput').value =
+    request.AmtAuth !== undefined ? request.AmtAuth : (original.AmtAuth !== undefined ? original.AmtAuth : '');
+
+  let restrictions = request.RestrictionsPerAID;
+  if (!restrictions && Array.isArray(original.SetOfRestrictionsPerAID)) {
+    restrictions = original.SetOfRestrictionsPerAID.find(item => item.AID === aid) || null;
+  }
+
+  const availableRecords = request.PrRecords || original.PrRecords || [];
+  let matchingRecords = availableRecords;
+  if (aid && restrictions) {
+    const restrictedIds = new Set((restrictions.Items || []).map(item => item.ItemID).filter(Boolean));
+    if (restrictedIds.size > 0) {
+      matchingRecords = availableRecords.filter(record =>
+        record.OrderID || !record.ProdCode || restrictedIds.has(record.ProdCode));
+    } else {
+      matchingRecords = [];
+    }
+  } else if (aid && Array.isArray(original.SetOfRestrictionsPerAID)) {
+    matchingRecords = [];
+  }
+
+  document.getElementById('proceedPrRecordsInput').value =
+    JSON.stringify(matchingRecords, null, 2);
+  document.getElementById('proceedRestrictionsInput').value =
+    JSON.stringify(restrictions || {}, null, 2);
+  document.getElementById('sendProceedPrRecordsCheck').checked =
+    document.getElementById('includePrRecordsCheck').checked;
+  document.getElementById('sendProceedRestrictionsCheck').checked =
+    document.getElementById('includeRestrictionsCheck').checked;
+  const savedExtensionSeconds = localStorage.getItem('kit-json-tester-proceed-extension-seconds');
+  const savedExtensionText = localStorage.getItem('kit-json-tester-proceed-extension-text');
+  if (savedExtensionSeconds) document.getElementById('proceedExtensionSecondsInput').value = savedExtensionSeconds;
+  if (savedExtensionText !== null) document.getElementById('proceedExtensionCardholderTextInput').value = savedExtensionText;
+  document.getElementById('proceedTransactionError').textContent = '';
+  document.getElementById('proceedTransactionOverlay').style.display = 'flex';
+}
+
+function closeProceedTransactionDialog() {
+  document.getElementById('proceedTransactionOverlay').style.display = 'none';
+  pendingProceedTransactionRequest = null;
+}
+
+async function submitProceedTransaction() {
+  const errorEl = document.getElementById('proceedTransactionError');
+  errorEl.textContent = '';
+  try {
+    const req = {};
+    const currency = document.getElementById('proceedCurrencyInput').value.trim();
+    const amount = document.getElementById('proceedAmountInput').value.trim();
+
+    if (currency) req.TrxCurrC = parseInt(currency, 10);
+    if (amount) {
+      const amountValue = parseInt(amount, 10);
+      if (!Number.isInteger(amountValue) || amountValue < 0) throw new Error('Authorized amount must be a non-negative integer');
+      req.AmtAuth = amountValue;
+    }
+
+    const prRecordsText = document.getElementById('proceedPrRecordsInput').value.trim();
+    if (document.getElementById('sendProceedPrRecordsCheck').checked && prRecordsText) {
+      const prRecords = JSON.parse(prRecordsText);
+      if (!Array.isArray(prRecords)) throw new Error('PrRecords must be a JSON array');
+      if (prRecords.length > 0) req.PrRecords = prRecords;
+    }
+
+    const restrictionsText = document.getElementById('proceedRestrictionsInput').value.trim();
+    if (document.getElementById('sendProceedRestrictionsCheck').checked && restrictionsText) {
+      const restrictions = JSON.parse(restrictionsText);
+      if (restrictions && typeof restrictions === 'object' && !Array.isArray(restrictions) &&
+          Object.keys(restrictions).length > 0) {
+        req.RestrictionsPerAID = restrictions;
+      }
+    }
+
+    await sendMessage({ ProceedTransactionResponse: req });
+    closeProceedTransactionDialog();
+  } catch (err) {
+    errorEl.textContent = err instanceof SyntaxError ? `Invalid JSON: ${err.message}` : err.message;
+  }
+}
+
+async function sendProceedTransactionTimeExtension() {
+  const errorEl = document.getElementById('proceedTransactionError');
+  errorEl.textContent = '';
+  const secondsText = document.getElementById('proceedExtensionSecondsInput').value.trim();
+  const seconds = parseInt(secondsText, 10);
+  if (!Number.isInteger(seconds) || seconds <= 0) {
+    errorEl.textContent = 'Additional seconds must be a positive integer';
+    return;
+  }
+
+  const req = { Seconds: seconds };
+  const cardholderText = document.getElementById('proceedExtensionCardholderTextInput').value.trim();
+  if (cardholderText) req.CardholderText = cardholderText;
+
+  localStorage.setItem('kit-json-tester-proceed-extension-seconds', String(seconds));
+  localStorage.setItem('kit-json-tester-proceed-extension-text', cardholderText);
+  await sendMessage({ ProceedTransactionTimeExtensionRequest: req });
+}
+
+async function abortProceedTransaction() {
+  await sendMessage({ AbortTransactionRequest: {} });
+  closeProceedTransactionDialog();
+  pendingTransaction = false;
+  awaitingConfirmation = false;
+  pendingTransactionRequest = null;
+  updateUI();
+}
+
 async function abortTransaction() {
   await sendMessage({
     AbortTransactionRequest: {}
@@ -1099,6 +1248,7 @@ async function abortTransaction() {
   pendingTransaction = false;
   pendingTransactionRequest = null;
   pendingConfirmationContext = null;
+  closeProceedTransactionDialog();
   closeProductConfirmationDialog();
   updateUI();
 }
@@ -1169,6 +1319,15 @@ async function sendInitialization() {
 // Response handling
 async function handleResponse(data) {
   const { message, valid, errors } = data;
+
+  if (message.ProceedTransactionRequest) {
+    showProceedTransactionDialog(message.ProceedTransactionRequest);
+  }
+
+  if (message.ProceedTransactionTimeExtensionRequest) {
+    await sendMessage({ ProceedTransactionTimeExtensionResponse: {} });
+  }
+
   if (message.TransactionConfirmationResponse && pendingApprovedTrxResponse) {
     const confirmationResp = message.TransactionConfirmationResponse;
     const deferredMessage = JSON.parse(JSON.stringify(pendingApprovedTrxResponse.message));
@@ -1381,6 +1540,7 @@ function handleDisconnected() {
   pendingConfirmationRequest = null;
   pendingTransactionRequest = null;
   pendingConfirmationContext = null;
+  closeProceedTransactionDialog();
   closeProductConfirmationDialog();
   document.getElementById('confirmAmountInput').value = '';
   addMessage('info', 'info', { Info: 'Connection closed by terminal' });
