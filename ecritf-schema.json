@@ -797,7 +797,7 @@
         "DCCRateExp": { "type": "integer", "description": "DCC rate expiration" },
         "AOSA": { "type": "integer", "description": "Available Offline Spending Amount" },
         "FormFactorInd": { "$ref": "#/$defs/Base64Binary", "description": "Form factor indicator" },
-		"AddInfo": { "$ref": "#/$defs/AddInfo" },
+        "AddInfo": { "$ref": "#/$defs/AddInfo" },
         "RestrictionsPerAID": { "$ref": "#/$defs/RestrictionsPerAID" },
         "PrRecords": { "$ref": "#/$defs/PrRecords" }
       },
