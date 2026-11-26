@@ -277,16 +277,6 @@
       },
       "additionalProperties": true
     },
-    "TrxDataChangeReason": {
-      "type": "object",
-      "description": "Transaction data change reason",
-      "properties": {
-        "TrxDataChangeReasonCode": { "type": "integer" },
-        "MyOneDiscountCode": { "type": "integer", "description": "MyOne discount code" },
-        "BonusCardBrandNumber": { "type": "integer", "description": "Bonus card brand number" }
-      },
-      "additionalProperties": true
-    },
     "RecOrderRef": {
       "type": "object",
       "description": "Merchant order reference record",
@@ -530,11 +520,6 @@
           "type": "integer",
           "description": "Maximum number of characters to be printed on one line",
           "examples": [34, 40]
-        },
-        "SetTrxDataChangeReason": {
-          "type": "array",
-          "description": "Set of transaction data change reasons to activate",
-          "items": { "$ref": "#/$defs/TrxDataChangeReason" }
         },
         "UnsolicitedReceipts": {
           "type": "integer",
@@ -787,7 +772,6 @@
         "CVMResults": { "$ref": "#/$defs/Base64Binary", "description": "Cardholder Verification Method results" },
         "PreAuthExpDate": { "$ref": "#/$defs/DateYYMMDD", "description": "Pre-authorization expiration date" },
         "ATR": { "$ref": "#/$defs/Base64Binary", "description": "Answer to Reset" },
-        "BonusCardBrandNumber": { "type": "integer", "description": "Bonus card brand number" },
         "DCCCommissionAmt": { "$ref": "#/$defs/Amount", "description": "DCC commission amount" },
         "DCCCommissionCurrC": { "$ref": "#/$defs/CurrencyCode", "description": "Currency code for DCC commission amount" },
         "DCCForeignAmount": { "$ref": "#/$defs/Amount", "description": "Amount in foreign (card) currency for DCC" },
@@ -1031,27 +1015,6 @@
       },
       "additionalProperties": true
     },
-    "TransactionDataChangeRequest": {
-      "type": "object",
-      "description": "Notification of transaction data change",
-      "properties": {
-        "SetTrxDataChangeReason": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/TrxDataChangeReason" }
-        }
-      },
-      "additionalProperties": true
-    },
-    "TransactionDataChangeResponse": {
-      "type": "object",
-      "properties": {
-        "AmtAuth": {
-            "$ref": "#/$defs/Amount",
-            "description": "Updated authorized amount"
-        }
-      },
-      "additionalProperties": true
-    },
     "LockEFTOperationsRequest": {
       "type": "object",
       "description": "Lock EFT operations on terminal"
@@ -1241,8 +1204,6 @@
     "ReceiptResponse": { "$ref": "#/$defs/ReceiptResponse" },
     "ReportRequest": { "$ref": "#/$defs/ReportRequest" },
     "ReportResponse": { "$ref": "#/$defs/ReportResponse" },
-    "TransactionDataChangeRequest": { "$ref": "#/$defs/TransactionDataChangeRequest" },
-    "TransactionDataChangeResponse": { "$ref": "#/$defs/TransactionDataChangeResponse" },
     "ConfirmationTimeExtensionRequest": { "$ref": "#/$defs/ConfirmationTimeExtensionRequest" },
     "ConfirmationTimeExtensionResponse": { "$ref": "#/$defs/ConfirmationTimeExtensionResponse" },
     "ProceedTransactionTimeExtensionRequest": { "$ref": "#/$defs/ProceedTransactionTimeExtensionRequest" },

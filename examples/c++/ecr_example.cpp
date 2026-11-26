@@ -68,8 +68,6 @@ typedef enum ECRMessageType_ {
     ECR_MSG_REPORT_REQUEST                          = 0x25,
     ECR_MSG_REPORT_RESPONSE                         = 0x26,
 
-    ECR_MSG_TRX_DATA_CHANGE_REQUEST                 = 0x27,
-    ECR_MSG_TRX_DATA_CHANGE_RESPONSE                = 0x28,
     ECR_MSG_CONFIRMATION_TIME_EXTENSION_REQUEST     = 0x29,
     ECR_MSG_CONFIRMATION_TIME_EXTENSION_RESPONSE    = 0x30,
 
